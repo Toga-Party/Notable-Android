@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Notable_OPENCV</string>
+    <string name="button_send">Take Photo</string>
+</resources>
