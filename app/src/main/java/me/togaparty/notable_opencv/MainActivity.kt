@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         val camCaptureButton = findViewById<Button>(R.id.cam_capture_button)
         camCaptureButton.setOnClickListener{takePhoto()}
         outDirectory = getOutDirectory()
-
         cameraExecutor = Executors.newSingleThreadExecutor()
         // Example of a call to a native method
         //findViewById<EditText>(R.id.editText).text = stringFromJNI()
@@ -105,8 +104,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode == REQUEST_CODE_PERMISSIONS) {
+        //super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(requestCode == REQUEST_CODE_PERMISSIONS && allPermissionsGranted()) {
             startCamera()
         } else {
             Toast.makeText(this,
