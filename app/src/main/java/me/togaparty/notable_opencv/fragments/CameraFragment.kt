@@ -1,60 +1,166 @@
 package me.togaparty.notable_opencv.fragments
 
+import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Toast
+import androidx.camera.core.*
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.fragment.NavHostFragment
+import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CameraFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CameraFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+
+
+    private lateinit var container: ConstraintLayout
+    private lateinit var viewFinder: PreviewView
+    private lateinit var outputDirectory: File
+    private lateinit var cameraExecutor: ExecutorService
+
+    private var preview: Preview? = null
+    private var imageCapture: ImageCapture? = null
+    private var camera: Camera? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+        if (savedInstanceState == null) {
+            if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
+                NavHostFragment.findNavController(this)
+                        .navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
+            }
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
+            NavHostFragment.findNavController(this)
+                    .navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_camera, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_camera, container, false)
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        container = view as ConstraintLayout
+        viewFinder = container.findViewById(R.id.view_finder)
+        cameraExecutor = Executors.newSingleThreadExecutor()
+        outputDirectory = MainActivity.getOutputDirectory(requireContext())
+        container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
+        viewFinder.post {
+            startCamera()
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CameraFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CameraFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        cameraExecutor.shutdown()
+    }
+
+    private fun startCamera() {
+        //GlobalScope.launch(Dispatchers.IO) {
+            val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+            cameraProviderFuture.addListener( {
+                val cameraProvider = cameraProviderFuture.get()
+                val rotation = viewFinder.display.rotation
+                preview = Preview.Builder()
+                        .setTargetRotation(rotation)
+                        .build()
+                        .also {
+
+                            it.setSurfaceProvider(viewFinder.surfaceProvider)
+                        }
+                val cameraSelector : CameraSelector = CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .build()
+                imageCapture = ImageCapture.Builder()
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .setTargetRotation(rotation)
+                        .build()
+
+                cameraProvider.unbindAll()
+                try {
+                    camera = cameraProvider.bindToLifecycle(
+                            this as LifecycleOwner, cameraSelector, preview, imageCapture)
+                    preview?.setSurfaceProvider(viewFinder.surfaceProvider)
+
+                } catch(exc: Exception) {
+                    Log.e(TAG, "Use case binding failed", exc)
                 }
+
+            }, ContextCompat.getMainExecutor(requireContext()))
+       // }
+    }
+
+    private fun takePhoto() {
+        Log.d(TAG, "TakePhoto method is called")
+        val imageCapture = imageCapture ?: return
+
+        // Create time-stamped output file to hold the image
+        val photoFile = File(
+                outputDirectory,
+                SimpleDateFormat(FILENAME_FORMAT, Locale.US
+                ).format(System.currentTimeMillis()) + PHOTO_EXTENSION)
+
+
+        // Create output options object which contains file + metadata
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+        // Set up image capture listener, which is triggered after photo has
+        // been taken
+        imageCapture.takePicture(
+                outputOptions, cameraExecutor, object : ImageCapture.OnImageSavedCallback {
+
+
+            override fun onError(exc: ImageCaptureException) {
+                Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
             }
+
+            override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                val savedUri = Uri.fromFile(photoFile)
+                val msg = "Photo capture succeeded: $savedUri"
+                viewFinder.post {
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                }
+                Log.d(TAG, msg)
+            }
+        })
+    }
+
+
+    /**
+     * A native method that is implemented by the 'native-lib' native library,
+     * which is packaged with this application.
+     */
+    private external fun stringFromJNI(): String
+
+    companion object {
+        init {
+            System.loadLibrary("native-lib")
+        }
+        private const val TAG = "Notable:CameraX"
+        private const val FILENAME_FORMAT = "EEE dd_MM_yyyy HH:mm:ss"
+        private const val PHOTO_EXTENSION = ".jpg"
     }
 }

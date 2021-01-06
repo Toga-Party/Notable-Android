@@ -2,7 +2,7 @@
 #include <string>
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_me_togaparty_notable_1opencv_MainActivity_stringFromJNI(
+Java_me_togaparty_notable_1opencv_fragments_CameraFragment_stringFromJNI(
         JNIEnv* env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
