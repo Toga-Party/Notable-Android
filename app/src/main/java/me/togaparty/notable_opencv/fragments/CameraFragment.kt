@@ -149,16 +149,7 @@ class CameraFragment : Fragment() {
     }
 
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    private external fun stringFromJNI(): String
-
     companion object {
-        init {
-            System.loadLibrary("native-lib")
-        }
         private const val TAG = "Notable:CameraX"
         private const val FILENAME_FORMAT = "EEE dd_MM_yyyy HH:mm:ss"
         private const val PHOTO_EXTENSION = ".jpg"
