@@ -12,3 +12,5 @@ Target Objectives:
 4.   Attempt feature recognition on MNist data-set.
 5.   Attempt staff line removal in musical score sheet.
 
+# Kanban
+https://github.com/users/Aroueterra/projects/2
