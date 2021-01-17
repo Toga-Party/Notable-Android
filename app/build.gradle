@@ -67,8 +67,7 @@ dependencies {
 
     //CameraX View class
     implementation "androidx.camera:camera-view:1.0.0-alpha20"
-
-    //implementation "androidx.camera:camera-extensions:1.0.0-alpha20"
+    implementation "androidx.camera:camera-extensions:1.0.0-alpha20"
 
     //Unit Test
     testImplementation 'junit:junit:4.13.1'

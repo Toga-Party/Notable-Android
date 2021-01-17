@@ -1,9 +1,12 @@
 package me.togaparty.notable_opencv.utils
 
 import android.graphics.Bitmap
+import androidx.camera.core.ImageProxy
 import org.opencv.android.Utils
+import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
+
 
 fun Mat.otsuThreshold(bitmap: Bitmap, thresh: Double = 50.00, max: Double = 255.00,
                   type:Int = Imgproc.THRESH_OTSU, action: (Bitmap) -> Unit) {
