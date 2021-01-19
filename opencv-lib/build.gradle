@@ -47,11 +47,11 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs = ['native/libs']
-            java.srcDirs = ['java/src']
-            aidl.srcDirs = ['java/src']
-            res.srcDirs = ['java/res']
-            manifest.srcFile 'java/AndroidManifest.xml'
+            jniLibs.srcDirs = ['JNILibs']
+            java.srcDirs = ['java/']
+            aidl.srcDirs = ['java/']
+            res.srcDirs = ['res']
+            manifest.srcFile 'AndroidManifest.xml'
         }
     }
     externalNativeBuild {
