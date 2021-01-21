@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/permissionsFragment">
+    app:startDestination="@id/dashboardFragment">
     <fragment
         android:id="@+id/cameraFragment"
         android:name="me.togaparty.notable_opencv.fragments.CameraFragment"
@@ -21,4 +21,37 @@
             android:id="@+id/action_permissionsFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="me.togaparty.notable_opencv.fragments.DashboardFragment"
+        android:label="fragment_dashboard"
+        tools:layout="@layout/fragment_dashboard" >
+        <action
+            android:id="@+id/action_dashboardFragment_to_permissionsFragment"
+            app:destination="@id/permissionsFragment" />
+        <action
+            android:id="@+id/action_dashboardFragment_to_filesFragment"
+            app:destination="@id/filesFragment" />
+        <action
+            android:id="@+id/action_dashboardFragment_to_glossaryFragment"
+            app:destination="@id/glossaryFragment" />
+        <action
+            android:id="@+id/action_dashboardFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/filesFragment"
+        android:name="me.togaparty.notable_opencv.fragments.FilesFragment"
+        android:label="fragment_files"
+        tools:layout="@layout/fragment_files" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="me.togaparty.notable_opencv.fragments.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/glossaryFragment"
+        android:name="me.togaparty.notable_opencv.fragments.GlossaryFragment"
+        android:label="fragment_glossary"
+        tools:layout="@layout/fragment_glossary" />
 </navigation>

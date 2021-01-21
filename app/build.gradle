@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs'
+    id 'kotlin-android-extensions'
 }
 
 android {
@@ -56,6 +57,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    // For control over item selection of both touch and mouse driven selection
+    implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc03"
 
     // Navigation library
     def nav_version = "2.3.2"
