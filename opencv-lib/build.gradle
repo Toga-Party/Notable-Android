@@ -15,8 +15,6 @@ android {
         versionCode openCVersionCode
         versionName openCVersionName
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_shared"
@@ -28,14 +26,13 @@ android {
     buildTypes {
         debug {
             packagingOptions {
-                doNotStrip '**/*.so'
+                doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
             }
         }
-
         release {
-           packagingOptions {
-               doNotStrip '**/*.so'
-           }
+            packagingOptions {
+                doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
@@ -47,13 +44,14 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs = ['JNILibs']
-            java.srcDirs = ['java/']
-            aidl.srcDirs = ['java/']
+            jniLibs.srcDirs = ['native/libs']
+            java.srcDirs = ['java']
+            aidl.srcDirs = ['java']
             res.srcDirs = ['res']
             manifest.srcFile 'AndroidManifest.xml'
         }
     }
+
     externalNativeBuild {
         cmake {
             path (project.projectDir.toString() + '/libcxx_helper/CMakeLists.txt')
@@ -62,5 +60,4 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
