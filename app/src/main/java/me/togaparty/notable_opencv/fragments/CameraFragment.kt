@@ -25,13 +25,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.utils.*
+import me.togaparty.notable_opencv.utils.convertImageProxyToBitmap
+import me.togaparty.notable_opencv.utils.implement
+import me.togaparty.notable_opencv.utils.toBitmap
+import me.togaparty.notable_opencv.utils.toMat
 import org.opencv.android.InstallCallbackInterface
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.OpenCVLoader.initAsync
-import org.opencv.core.Mat
-import org.opencv.core.MatOfPoint
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -185,32 +186,14 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
             override fun onCaptureSuccess(image: ImageProxy) {
                 //rudimentary off loading the work
                 GlobalScope.launch(Dispatchers.IO) {
-                    var bitmap = withContext(Dispatchers.IO) { image.convertImageProxyToBitmap() }
+                    val bitmap = withContext(Dispatchers.IO) { image.convertImageProxyToBitmap() }
                     withContext(Dispatchers.IO) {
-                         val byteArrayOutputStream = ByteArrayOutputStream()
+                        val byteArrayOutputStream = ByteArrayOutputStream()
 
-                         with(bitmap.toMat()) {
+                        implement(bitmap.toMat(), bitmap)
+                            .toBitmap()
+                            .compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream)
 
-                             var gray =  Mat()
-                             this.toGrayScale(bitmap, gray)
-
-                             gray.blur()
-                             gray.erode()
-                             gray.canny(bitmap)
-
-                             var contours: MutableList<MatOfPoint> = ArrayList()
-                             gray.findContours(contours)
-
-                             gray = zeroes(gray)
-                             gray.prepareRectangles(contours)
-                             gray.erode()
-
-                             gray.findContours(contours)
-                             gray.drawRectangles(contours, this)
-
-                             this.toBitmap()
-
-                         }.compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream)
                         val data = byteArrayOutputStream.toByteArray()
                         val fileOutputStream = FileOutputStream(photoFile)
                         fileOutputStream.write(data)
