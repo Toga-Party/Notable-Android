@@ -10,7 +10,7 @@
         android:layout_width="413dp"
         android:layout_height="150dp"
         android:text="TextView"
-        android:textSize="25dp"
+        android:textSize="23dp"
         android:fontFamily="@font/amiko_bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
