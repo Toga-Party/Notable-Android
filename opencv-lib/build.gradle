@@ -7,6 +7,7 @@ println "OpenCV: " +openCVersionName + " " + project.buildscript.sourceFile
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion

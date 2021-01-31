@@ -1,5 +1,5 @@
 package me.togaparty.notable_opencv.fragments
-import android.graphics.Bitmap
+
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
@@ -22,20 +22,14 @@ import androidx.navigation.fragment.NavHostFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.utils.convertImageProxyToBitmap
 import me.togaparty.notable_opencv.utils.implement
-import me.togaparty.notable_opencv.utils.toBitmap
-import me.togaparty.notable_opencv.utils.toMat
 import org.opencv.android.InstallCallbackInterface
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.OpenCVLoader.initAsync
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -92,7 +86,9 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_camera, container, false)
+    ): View? {
+        return inflater.inflate(R.layout.fragment_camera, container, false)
+    }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -115,6 +111,7 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
     override fun getCameraXConfig(): CameraXConfig {
         return Camera2Config.defaultConfig()
     }
+
     private fun startCamera() {
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -171,40 +168,17 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
         val imageCapture = imageCapture ?: return
 
         // Create time-stamped output file to hold the image
-        val photoFile = File(
-                outputDirectory,
-                SimpleDateFormat(FILENAME_FORMAT, Locale.US
-                ).format(System.currentTimeMillis()) + PHOTO_EXTENSION)
-        photoFile.createNewFile()
+        val photoFile = File(outputDirectory, SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+                .format(System.currentTimeMillis()) + PHOTO_EXTENSION)
+
         // Create output options object which contains file (Used in another takePicture method)
-            //val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
         // Set up image capture listener, which is triggered after photo has been taken
 
-        imageCapture.takePicture(cameraExecutor, object: ImageCapture.OnImageCapturedCallback(){
-
-            override fun onCaptureSuccess(image: ImageProxy) {
-                //rudimentary off loading the work
-                GlobalScope.launch(Dispatchers.IO) {
-                    val bitmap = withContext(Dispatchers.IO) { image.convertImageProxyToBitmap() }
-                    withContext(Dispatchers.IO) {
-                        val byteArrayOutputStream = ByteArrayOutputStream()
-
-                        implement(bitmap.toMat(), bitmap)
-                            .toBitmap()
-                            .compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream)
-
-                        val data = byteArrayOutputStream.toByteArray()
-                        val fileOutputStream = FileOutputStream(photoFile)
-                        fileOutputStream.write(data)
-                        fileOutputStream.flush()
-                        fileOutputStream.close()
-
-                    }
-
-                }
-
-                val msg = "Photo capture succeeded: "
+        imageCapture.takePicture(outputOptions, cameraExecutor, object: ImageCapture.OnImageSavedCallback {
+            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                val msg = "Photo capture succeeded."
                 viewFinder.post{
                     Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                 }
@@ -212,10 +186,18 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
             }
 
             override fun onError(exception: ImageCaptureException) {
-                super.onError(exception)
-                Log.e(TAG, "Photo capture failed: ${exception.message}", exception)
+                val msg = "Photo capture failed."
+                viewFinder.post{
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                }
+                Log.e(TAG, msg, exception)
             }
+
         })
+        GlobalScope.launch(Dispatchers.IO) {
+            implement(photoFile.absolutePath)
+        }
+
     }
 
     companion object {

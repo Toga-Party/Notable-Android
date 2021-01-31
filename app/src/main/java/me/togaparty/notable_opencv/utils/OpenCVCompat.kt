@@ -1,38 +1,15 @@
 package me.togaparty.notable_opencv.utils
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import androidx.camera.core.ImageProxy
 import org.opencv.android.Utils
 import org.opencv.core.*
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc.*
-import java.util.ArrayList
-import kotlin.math.min
+import kotlin.math.PI
 import kotlin.math.max
+import kotlin.math.min
 
-/*
-fun Mat.threshold(
-        bitmap: Bitmap, thresh: Double = 100.0, max: Double = 255.0,
-        type: Int = THRESH_OTSU, action: (Bitmap) -> Unit
-) {
-    this.toGrayScale(bitmap)
-    threshold(this, this, thresh, max, type)
-    return action(this.toBitmap())
-}
-*/
-
-
-fun ImageProxy.convertImageProxyToBitmap(): Bitmap {
-    val buffer = planes[0].buffer
-    buffer.rewind()
-    val bytes = ByteArray(buffer.capacity())
-    buffer.get(bytes)
-    this.close()
-    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-}
-
-fun Mat.toGrayScale(bitmap: Bitmap, mat: Mat? = null) {
-    Utils.bitmapToMat(bitmap, this)
+fun Mat.toGrayScale(mat: Mat? = null) {
     mat?.let{
         cvtColor(this, mat, COLOR_RGB2GRAY)
     }?: run {
@@ -45,14 +22,11 @@ fun Bitmap.toMat() : Mat {
     Utils.bitmapToMat(this, mat)
     return mat
 }
-
-
 fun Mat.toBitmap(config: Bitmap.Config = Bitmap.Config.ARGB_8888): Bitmap {
     val bitmap = Bitmap.createBitmap(this.cols(), this.rows(), config)
     Utils.matToBitmap(this, bitmap)
     return bitmap
 }
-
 fun Mat.findContours(
         contours: MutableList<MatOfPoint>,
         hierarchy: Mat = Mat(),
@@ -70,58 +44,59 @@ fun Mat.erode() {
     erode(this, this, Mat())
 }
 fun Mat.canny(
-        bitmap: Bitmap, thresh: Double = 50.0, max: Double = 255.0, aperture: Int = 3,
+        edges: Mat = Mat(), low: Double = 50.0, high: Double = 255.0, aperture: Int = 3,
         l2Gradient: Boolean = true
 ){
-    this.toGrayScale(bitmap)
-    Canny(this, this, thresh, max, aperture, l2Gradient)
+    Canny(this, edges, low, high, aperture, l2Gradient)
 }
-fun Mat.prepareContours(contours: MutableList<MatOfPoint>) {
-    for (i in 0 until contours.size) {
-        val rect: Rect = boundingRect(contours[i])
-        if (rect.width > 10 || rect.height > 10) {
-            rectangle(this, rect, Scalar(255.00), -1)
-        }
-    }
-}
-fun Mat.drawContours(contours: MutableList<MatOfPoint>, gray: Mat) {
-    var big = Rect()
-    for (i in 0 until contours.size) {
-        if (contourArea(contours[i]) > gray.cols() * gray.rows() / 8) {
-            val rect = boundingRect(contours[i])
-            rectangle(gray, rect, Scalar(255.0, 0.0, 0.0), 2)
-        } else {
-            if (big.height < 1) {
-                big = boundingRect(contours[i])
-            }
-            big = union(big, boundingRect(contours[i]))
-        }
-    }
-    rectangle(this, big, Scalar (0.0, 255.0, 0.0), 2)
+
+fun cornerHarris(
+        src: Mat,
+        dst: Mat,
+        blockSize: Int = 7,
+        kSize: Int = 3,
+        sigma: Double = 0.04
+) {
+    cornerHarris(src, dst, blockSize,kSize, sigma)
 }
 
 fun zeroes(src: Mat): Mat {
     return Mat.zeros(src.rows(), src.cols(), src.type())
 }
+fun linspace(start: Double, stop: Double, num: Int)
+    = Array(num) { start + it * ((stop - start) / (num - 1)) }
 
-fun implement(src: Mat, bitmap: Bitmap) : Mat {
-    var gray =  Mat()
-    src.toGrayScale(bitmap, gray)
+fun implement(filename: String){
+    var src: Mat = Imgcodecs.imread(filename)
+    var gray = Mat()
 
-    gray.blur()
-    gray.erode()
-    gray.canny(bitmap)
-    val contours =
-            gray.findContours(ArrayList<MatOfPoint>())
+    src.toGrayScale(gray)
+    var edges = Mat()
+    src.canny(edges, high = 150.0, aperture = 2)
 
-    gray = zeroes(gray)
-    gray.prepareContours(contours)
-    gray.erode()
+    var lines = MatOfInt4()
+    var slopes = MatOfFloat()
 
-    gray.findContours(contours)
-    src.drawContours(contours, gray)
-    return src
+
+    HoughLinesP(edges, lines, PI/180, 100.0, 50, 10.0)
+
+    if (lines.empty()) {
+        return
+    }
+
+    for (i in 0..lines.cols()) {
+        var vec = lines.get(0, i)
+
+        slopes.push_back(
+            when (vec[0] - vec[2] < 0.0000001) {
+                true -> Mat(0, 1000000)
+                false -> Mat(0, (vec[1] - vec[3]) / (vec[0] - vec[2]).toFloat())
+            }
+        )
+    }
+
 }
+
 fun union(a: Rect, b: Rect) : Rect {
     if (a.empty()) {
         a.x = b.x
