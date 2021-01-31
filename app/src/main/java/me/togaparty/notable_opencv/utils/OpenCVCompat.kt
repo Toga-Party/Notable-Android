@@ -6,6 +6,7 @@ import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc.*
 import kotlin.math.PI
+import kotlin.math.atan
 import kotlin.math.max
 import kotlin.math.min
 
@@ -86,17 +87,21 @@ fun implement(filename: String){
 
     for (i in 0..lines.cols()) {
         var vec = lines.get(0, i)
+        var value = FloatArray(1)
 
-        slopes.push_back(
-            when (vec[0] - vec[2] < 0.0000001) {
-                true -> Mat(0, 1000000)
-                false -> Mat(0, (vec[1] - vec[3]) / (vec[0] - vec[2]).toFloat())
-            }
-        )
+        value [0] = when (vec[0] - vec[2] < 0.0000001) {
+            true -> 1000000.toFloat()
+            false -> (vec[1] - vec[3]).toFloat() / (vec[0] - vec[2]).toFloat()
+        }
+        slopes.put(0, i, value)
     }
+    var rotation = atan(median(slopes)) * 180.0 / PI
 
 }
+fun median(slopes: MatOfFloat): Float {
 
+    return 0.toFloat()
+}
 fun union(a: Rect, b: Rect) : Rect {
     if (a.empty()) {
         a.x = b.x
