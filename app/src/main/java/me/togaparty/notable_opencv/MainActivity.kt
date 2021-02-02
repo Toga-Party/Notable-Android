@@ -1,11 +1,12 @@
 package me.togaparty.notable_opencv
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
+import android.os.Environment.MEDIA_MOUNTED
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
-import me.togaparty.notable_opencv.utils.ExampleItem
-import org.opencv.android.OpenCVLoader
 import java.io.File
 
 
@@ -25,10 +26,13 @@ class MainActivity : AppCompatActivity() {
 
         fun getOutputDirectory(context: Context): File {
             val appContext = context.applicationContext
-            val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
-                File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
-            return if (mediaDir != null && mediaDir.exists())
-                mediaDir else appContext.filesDir
+
+            return if (MEDIA_MOUNTED == Environment.getExternalStorageState()) {
+                val externalDir = context.externalCacheDirs.firstOrNull()?.let {
+                    File(it, "Notable_OPENCV").apply { mkdir() }}
+                return if (externalDir != null && externalDir.exists())
+                    externalDir else appContext.filesDir
+            } else context.getCacheDir()
         }
     }
 }

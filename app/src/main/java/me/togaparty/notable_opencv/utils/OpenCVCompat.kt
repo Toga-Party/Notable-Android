@@ -1,10 +1,19 @@
 package me.togaparty.notable_opencv.utils
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.Environment
+import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
+import me.togaparty.notable_opencv.MainActivity
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
+import org.opencv.imgcodecs.Imgcodecs.imread
 import org.opencv.imgproc.Imgproc.*
+import java.io.File
+import java.lang.Exception
+import java.util.*
 import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.max
@@ -67,14 +76,31 @@ fun zeroes(src: Mat): Mat {
 fun linspace(start: Double, stop: Double, num: Int)
     = Array(num) { start + it * ((stop - start) / (num - 1)) }
 
-fun implement(filename: String){
-    var src: Mat = Imgcodecs.imread(filename)
-    var gray = Mat()
+fun implement(file: File) {
+
+
+
+    if (file.exists()) {
+        Log.d("COMPATDEBUG" , file.absolutePath)
+
+    } else {
+        Log.d("COMPATDEBUG", "NULL ${file.absolutePath}")
+    }
+
+
+
+    /*var gray = Mat()
 
     src.toGrayScale(gray)
     var edges = Mat()
     src.canny(edges, high = 150.0, aperture = 2)
 
+    var theta = getAngle(edges)
+    if (theta  == null) NullPointerException("Something went wrong here")
+    */
+    
+}
+fun getAngle(edges: Mat) : Double? {
     var lines = MatOfInt4()
     var slopes = MatOfFloat()
 
@@ -82,7 +108,7 @@ fun implement(filename: String){
     HoughLinesP(edges, lines, PI/180, 100.0, 50, 10.0)
 
     if (lines.empty()) {
-        return
+        return null
     }
 
     for (i in 0..lines.cols()) {
@@ -95,12 +121,18 @@ fun implement(filename: String){
         }
         slopes.put(0, i, value)
     }
-    var rotation = atan(median(slopes)) * 180.0 / PI
-
+    return atan(median(slopes)) * 180.0 / PI
 }
 fun median(slopes: MatOfFloat): Float {
 
-    return 0.toFloat()
+    var array = slopes.toArray()
+
+    Arrays.sort(array)
+    var n = array.size
+    return when (n % 2 == 0) {
+        true -> array[(n + 1) / 2 - 1]
+        false-> (array[n / 2 - 1] + array[n / 2]) / 2
+    }
 }
 fun union(a: Rect, b: Rect) : Rect {
     if (a.empty()) {

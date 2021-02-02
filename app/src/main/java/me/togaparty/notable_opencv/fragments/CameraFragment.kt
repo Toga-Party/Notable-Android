@@ -168,8 +168,9 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
         val imageCapture = imageCapture ?: return
 
         // Create time-stamped output file to hold the image
-        val photoFile = File(outputDirectory, SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-                .format(System.currentTimeMillis()) + PHOTO_EXTENSION)
+        var filename = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+                .format(System.currentTimeMillis()) + PHOTO_EXTENSION
+        val photoFile = File(outputDirectory, filename)
 
         // Create output options object which contains file (Used in another takePicture method)
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
@@ -195,7 +196,7 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
 
         })
         GlobalScope.launch(Dispatchers.IO) {
-            implement(photoFile.absolutePath)
+            implement(photoFile)
         }
 
     }
@@ -220,7 +221,7 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
             }
         }
         private const val TAG = "Notable:CameraX"
-        private const val FILENAME_FORMAT = "EEE dd_MM_yyyy HH:mm:ss"
+        private const val FILENAME_FORMAT = "EEE_dd_MM_yyyy_HHmmss"
         private const val PHOTO_EXTENSION = ".jpg"
     }
 

@@ -42,7 +42,8 @@ class PermissionsFragment : Fragment() {
 
         const val REQUEST_CODE_PERMISSIONS = 10
         val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE)
         fun allPermissionsGranted(context: Context) = REQUIRED_PERMISSIONS.all {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
