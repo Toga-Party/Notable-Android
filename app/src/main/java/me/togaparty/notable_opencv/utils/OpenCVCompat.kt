@@ -1,18 +1,17 @@
 package me.togaparty.notable_opencv.utils
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
 import android.util.Log
-import androidx.core.content.ContentProviderCompat.requireContext
 import me.togaparty.notable_opencv.MainActivity
+import me.togaparty.notable_opencv.utils.ImageStorageManager.Companion.getImageFromInternalStorage
 import org.opencv.android.Utils
 import org.opencv.core.*
-import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgcodecs.Imgcodecs.imread
 import org.opencv.imgproc.Imgproc.*
-import java.io.File
-import java.lang.Exception
+import java.io.*
 import java.util.*
 import kotlin.math.PI
 import kotlin.math.atan
@@ -67,45 +66,44 @@ fun cornerHarris(
         kSize: Int = 3,
         sigma: Double = 0.04
 ) {
-    cornerHarris(src, dst, blockSize,kSize, sigma)
+    cornerHarris(src, dst, blockSize, kSize, sigma)
 }
 
 fun zeroes(src: Mat): Mat {
     return Mat.zeros(src.rows(), src.cols(), src.type())
 }
-fun linspace(start: Double, stop: Double, num: Int)
-    = Array(num) { start + it * ((stop - start) / (num - 1)) }
 
-fun implement(file: File) {
+fun implement(context: Context, filename: String) {
 
+    Log.d("COMPATDEBUG" ,filename)
 
+    var bitmap = getImageFromInternalStorage(context, filename)
 
-    if (file.exists()) {
-        Log.d("COMPATDEBUG" , file.absolutePath)
+    if(bitmap == null) Log.e("COMPATDEBUG", "nil")
+    else Log.d("COMPATDEBUG", "good")
+    /*
+    if (src == null || src.empty())
+        Log.d("COMPATDEBUG", "Mat is empty.")
+    else {
+        Log.d("COMPATDEBUG", "Image retrieved succesfully")
+        var gray = Mat()
 
-    } else {
-        Log.d("COMPATDEBUG", "NULL ${file.absolutePath}")
-    }
+        src.toGrayScale(gray)
+        var edges = Mat()
+        src.canny(edges, high = 150.0, aperture = 2)
 
+        var theta = getAngle(edges)
+        if (theta  == null) throw NullPointerException("Something went wrong here")
+    }*/
 
-
-    /*var gray = Mat()
-
-    src.toGrayScale(gray)
-    var edges = Mat()
-    src.canny(edges, high = 150.0, aperture = 2)
-
-    var theta = getAngle(edges)
-    if (theta  == null) NullPointerException("Something went wrong here")
-    */
-    
 }
+
 fun getAngle(edges: Mat) : Double? {
     var lines = MatOfInt4()
     var slopes = MatOfFloat()
 
 
-    HoughLinesP(edges, lines, PI/180, 100.0, 50, 10.0)
+    HoughLinesP(edges, lines, PI / 180, 100.0, 50, 10.0)
 
     if (lines.empty()) {
         return null
@@ -115,7 +113,7 @@ fun getAngle(edges: Mat) : Double? {
         var vec = lines.get(0, i)
         var value = FloatArray(1)
 
-        value [0] = when (vec[0] - vec[2] < 0.0000001) {
+        value[0] = when (vec[0] - vec[2] < 0.0000001) {
             true -> 1000000.toFloat()
             false -> (vec[1] - vec[3]).toFloat() / (vec[0] - vec[2]).toFloat()
         }
@@ -131,7 +129,7 @@ fun median(slopes: MatOfFloat): Float {
     var n = array.size
     return when (n % 2 == 0) {
         true -> array[(n + 1) / 2 - 1]
-        false-> (array[n / 2 - 1] + array[n / 2]) / 2
+        false -> (array[n / 2 - 1] + array[n / 2]) / 2
     }
 }
 fun union(a: Rect, b: Rect) : Rect {

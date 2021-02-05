@@ -16,15 +16,14 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.NavHostFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.utils.implement
+import me.togaparty.notable_opencv.utils.mayNavigate
 import org.opencv.android.InstallCallbackInterface
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
@@ -48,14 +47,22 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("CAMERADEBUG", "Camera Fragment created")
         super.onCreate(savedInstanceState)
+        val result = "CameraFragment"
+        setFragmentResult("requestKey", bundleOf("cameraFragment" to result))
+        cameraExecutor = Executors.newSingleThreadExecutor()
         if (savedInstanceState == null) {
+
             if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-                NavHostFragment.findNavController(this)
+                Log.d("CAMERADEBUG", "Called to navigate to PermissionsFragment")
+                if (this.mayNavigate(R.id.action_cameraFragment_to_permissionsFragment)) {
+                    NavHostFragment.findNavController(this)
                         .navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
+                }
             }
         }
-        initOpenCV()
+
     }
     private fun initOpenCV() {
 
@@ -70,16 +77,14 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
     }
     override fun onResume() {
         super.onResume()
-        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-            NavHostFragment.findNavController(this)
-                    .navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
-        }
-        if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization")
-            initAsync(OpenCVLoader.OPENCV_VERSION, requireContext(), loader)
-        } else {
-            Log.d(TAG, "OpenCV library found inside package. Using it!")
-            loader.onManagerConnected(LoaderCallbackInterface.SUCCESS)
+        if (PermissionsFragment.allPermissionsGranted(requireContext())) {
+            if (!OpenCVLoader.initDebug()) {
+                Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization")
+                initOpenCV()
+            } else {
+                Log.d(TAG, "OpenCV library found inside package. Using it!")
+                loader.onManagerConnected(LoaderCallbackInterface.SUCCESS)
+            }
         }
     }
 
@@ -93,15 +98,19 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        container = view as ConstraintLayout
-        viewFinder = container.findViewById(R.id.view_finder)
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        outputDirectory = MainActivity.getOutputDirectory(requireContext())
-        container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
-        viewFinder.post {
-            startCamera()
+        if (PermissionsFragment.allPermissionsGranted(requireContext())){
+            container = view as ConstraintLayout
+            viewFinder = container.findViewById(R.id.view_finder)
+            outputDirectory = MainActivity.getOutputDirectory(requireContext())
+            container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
+            viewFinder.let{
+                it.post{
+                    startCamera()
+                }
+            }
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -151,6 +160,9 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
 
             cameraProvider.unbindAll()
             try {
+                if (camera != null) {
+                    camera  = null
+                }
                 camera = cameraProvider.bindToLifecycle(
                         this as LifecycleOwner, cameraSelector, preview, imageCapture)
                 preview?.setSurfaceProvider(viewFinder.surfaceProvider)
@@ -168,7 +180,7 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
         val imageCapture = imageCapture ?: return
 
         // Create time-stamped output file to hold the image
-        var filename = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+        val filename = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
                 .format(System.currentTimeMillis()) + PHOTO_EXTENSION
         val photoFile = File(outputDirectory, filename)
 
@@ -193,12 +205,7 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
                 }
                 Log.e(TAG, msg, exception)
             }
-
         })
-        GlobalScope.launch(Dispatchers.IO) {
-            implement(photoFile)
-        }
-
     }
 
     companion object {

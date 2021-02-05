@@ -23,16 +23,24 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object {
-
+        fun isExternalStorageWritable(): Boolean {
+            return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+        }
+        fun isExternalStorageReadable(): Boolean {
+            return Environment.getExternalStorageState() in
+                    setOf(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY)
+        }
         fun getOutputDirectory(context: Context): File {
             val appContext = context.applicationContext
 
-            return if (MEDIA_MOUNTED == Environment.getExternalStorageState()) {
-                val externalDir = context.externalCacheDirs.firstOrNull()?.let {
+            if (isExternalStorageReadable() and isExternalStorageWritable()) {
+                val externalCacheDir = context.externalCacheDirs.firstOrNull()?.let {
                     File(it, "Notable_OPENCV").apply { mkdir() }}
-                return if (externalDir != null && externalDir.exists())
-                    externalDir else appContext.filesDir
-            } else context.getCacheDir()
+                return if (externalCacheDir != null && externalCacheDir.exists())
+                    externalCacheDir else appContext.cacheDir
+            } else {
+                return appContext.cacheDir
+            }
         }
     }
 }
