@@ -3,20 +3,24 @@ package me.togaparty.notable_opencv.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Environment
 import android.util.Log
-import me.togaparty.notable_opencv.MainActivity
-import me.togaparty.notable_opencv.utils.ImageStorageManager.Companion.getImageFromInternalStorage
+import androidx.camera.core.ImageProxy
 import org.opencv.android.Utils
 import org.opencv.core.*
-import org.opencv.imgcodecs.Imgcodecs.imread
 import org.opencv.imgproc.Imgproc.*
-import java.io.*
+import java.nio.ByteBuffer
 import java.util.*
 import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.max
 import kotlin.math.min
+private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
+    val planeProxy = image.planes[0]
+    val buffer: ByteBuffer = planeProxy.buffer
+    val bytes = ByteArray(buffer.remaining())
+    buffer.get(bytes)
+    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+}
 
 fun Mat.toGrayScale(mat: Mat? = null) {
     mat?.let{
@@ -76,11 +80,6 @@ fun zeroes(src: Mat): Mat {
 fun implement(context: Context, filename: String) {
 
     Log.d("COMPATDEBUG" ,filename)
-
-    var bitmap = getImageFromInternalStorage(context, filename)
-
-    if(bitmap == null) Log.e("COMPATDEBUG", "nil")
-    else Log.d("COMPATDEBUG", "good")
     /*
     if (src == null || src.empty())
         Log.d("COMPATDEBUG", "Mat is empty.")
@@ -99,8 +98,8 @@ fun implement(context: Context, filename: String) {
 }
 
 fun getAngle(edges: Mat) : Double? {
-    var lines = MatOfInt4()
-    var slopes = MatOfFloat()
+    val lines = MatOfInt4()
+    val slopes = MatOfFloat()
 
 
     HoughLinesP(edges, lines, PI / 180, 100.0, 50, 10.0)
@@ -110,8 +109,8 @@ fun getAngle(edges: Mat) : Double? {
     }
 
     for (i in 0..lines.cols()) {
-        var vec = lines.get(0, i)
-        var value = FloatArray(1)
+        val vec = lines.get(0, i)
+        val value = FloatArray(1)
 
         value[0] = when (vec[0] - vec[2] < 0.0000001) {
             true -> 1000000.toFloat()
@@ -123,10 +122,10 @@ fun getAngle(edges: Mat) : Double? {
 }
 fun median(slopes: MatOfFloat): Float {
 
-    var array = slopes.toArray()
+    val array = slopes.toArray()
 
     Arrays.sort(array)
-    var n = array.size
+    val n = array.size
     return when (n % 2 == 0) {
         true -> array[(n + 1) / 2 - 1]
         false -> (array[n / 2 - 1] + array[n / 2]) / 2

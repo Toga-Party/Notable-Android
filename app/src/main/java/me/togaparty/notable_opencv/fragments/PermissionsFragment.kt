@@ -28,20 +28,16 @@ class PermissionsFragment : Fragment() {
     private var actionHandler = ArrayList<String>()
     private val rootView by lazy { FrameLayout(requireContext()) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d("PERMISSIONSDEBUG", "Permissions Fragment created")
-        setFragmentResultListener("requestKey") { _ , bundle ->
-            Log.d("PERMISSIONSDEBUG", "Bundle retrieved.")
-            bundle.getString("cameraFragment")?.let { actionHandler.add(it) }
-            bundle.getString("filesFragment")?.let { actionHandler.add(it) }
-        }
-    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setFragmentResultListener("requestKey") { _ , bundle ->
+            Log.d("PERMISSIONSDEBUG", "Bundle retrieved.")
+            bundle.getString("cameraFragment")?.let { actionHandler.add(it) }
+            bundle.getString("filesFragment")?.let { actionHandler.add(it) }
+        }
         return rootView
     }
 

@@ -14,6 +14,9 @@
             app:destination="@id/permissionsFragment"
             app:popUpTo="@id/dashboardFragment"
             />
+        <action
+            android:id="@+id/action_cameraFragment_to_previewImage"
+            app:destination="@id/previewImage" />
     </fragment>
     <fragment
         android:id="@+id/permissionsFragment"
@@ -71,4 +74,9 @@
         android:name="me.togaparty.notable_opencv.fragments.GlossaryFragment"
         android:label="fragment_glossary"
         tools:layout="@layout/fragment_glossary" />
+    <fragment
+        android:id="@+id/previewImage"
+        android:name="me.togaparty.notable_opencv.fragments.PreviewImage"
+        android:label="fragment_preview_image"
+        tools:layout="@layout/fragment_preview_image" />
 </navigation>

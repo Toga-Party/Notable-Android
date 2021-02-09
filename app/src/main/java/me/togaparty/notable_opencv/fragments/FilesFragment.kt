@@ -19,16 +19,14 @@ class FilesFragment : Fragment(), ExampleAdapter.OnItemClickListener{
 
     private val exampleList = generateDummyList(20)
     private val adapter = ExampleAdapter(exampleList, this)
-
+    private val result = "FilesFragment"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val result = "FilesFragment"
         setFragmentResult("requestKey", bundleOf("filesFragment" to result))
-        if (savedInstanceState == null) {
-            if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-                NavHostFragment.findNavController(this)
-                    .navigate(FilesFragmentDirections.actionFilesFragmentToPermissionsFragment())
-            }
+
+        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
+            NavHostFragment.findNavController(this)
+                .navigate(FilesFragmentDirections.actionFilesFragmentToPermissionsFragment())
         }
     }
 

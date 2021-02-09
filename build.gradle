@@ -2,7 +2,7 @@
 apply from: 'buildenvironment/dependencies.gradle'
 buildscript {
 
-    ext.kotlin_version = "1.4.21"
+    ext.kotlin_version = "1.4.30"
     repositories {
         google()
         jcenter()
@@ -21,6 +21,8 @@ allprojects {
         mavenLocal()
         google()
         jcenter()
+        maven { url 'https://maven.google.com' }
+        //maven { url "https://jitpack.io" }
     }
 }
 
