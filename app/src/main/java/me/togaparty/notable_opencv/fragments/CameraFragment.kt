@@ -17,6 +17,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import com.google.common.util.concurrent.ListenableFuture
 import me.togaparty.notable_opencv.MainActivity
@@ -189,12 +190,12 @@ class CameraFragment : Fragment() {
     }
     private fun takePhoto() {
         Log.d(TAG, "TakePhoto method is called")
-        val photoFile = File(
-            outputDirectory,
-            SimpleDateFormat(FILENAME_FORMAT, Locale.US
-            ).format(System.currentTimeMillis()) + PHOTO_EXTENSION)
-        val outputFileOptions = ImageCapture.OutputFileOptions.Builder(
-                photoFile).build()
+        val photoName = SimpleDateFormat(FILENAME_FORMAT, Locale.US
+        ).format(System.currentTimeMillis()) + PHOTO_EXTENSION
+        val photoFile = File(outputDirectory, photoName)
+        val outputFileOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+
         imageCapture.takePicture(outputFileOptions, cameraExecutor,
                 object : ImageCapture.OnImageSavedCallback {
 
@@ -204,21 +205,22 @@ class CameraFragment : Fragment() {
                         previewView.post {
                             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                         }
-
                     }
+
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                         val message = "Image captured successfully"
+                        setFragmentResult("requestKey",
+                                bundleOf("photoPath" to photoName))
                         Log.d(TAG, message)
                         previewView.post {
                             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                         }
+                        view?.let { Navigation.findNavController(it).navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage()) }
+                        //NavHostFragment.findNavController(this).navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
                     }
                 })
-
-        setFragmentResult("requestKey",
-            bundleOf("photoPath" to photoFile.absolutePath))
-        NavHostFragment.findNavController(this).navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
     }
+
 
     companion object {
         private val loader = object: LoaderCallbackInterface {
@@ -239,6 +241,7 @@ class CameraFragment : Fragment() {
                 Log.d(TAG,"OpenCV Manager successfully installed")
             }
         }
+
         private const val TAG = "Notable:CameraX"
         private const val FILENAME_FORMAT = "EEE_dd_MM_yyyy_HHmmss"
         private const val PHOTO_EXTENSION = ".jpg"
