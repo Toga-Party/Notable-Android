@@ -12,7 +12,7 @@
         <action
             android:id="@+id/action_cameraFragment_to_permissionsFragment"
             app:destination="@id/permissionsFragment"
-            app:popUpTo="@id/dashboardFragment"
+            app:popUpTo="@id/cameraFragment"
             />
         <action
             android:id="@+id/action_cameraFragment_to_previewImage"
@@ -23,19 +23,14 @@
         android:name="me.togaparty.notable_opencv.fragments.PermissionsFragment"
         android:label="PermissionsFragment" >
         <action
-            android:id="@+id/action_permissionsFragment_to_cameraFragment"
-            app:destination="@id/cameraFragment"
-            app:popUpTo="@id/dashboardFragment"
-            />
-        <action
             android:id="@+id/action_permissionsFragment_pop"
-            app:popUpTo="@id/dashboardFragment"
-            />
+            app:popUpTo="@id/permissionsFragment"
+            app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_permissionsFragment_to_filesFragment"
-            app:destination="@id/filesFragment"
-            app:popUpTo="@id/dashboardFragment"
-            />
+            android:id="@+id/action_permissionsFragment_to_dashboardFragment"
+            app:destination="@id/dashboardFragment"
+            app:popUpTo="@id/permissionsFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/dashboardFragment"
@@ -54,6 +49,10 @@
         <action
             android:id="@+id/action_dashboardFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_dashboardFragment_to_permissionsFragment"
+            app:destination="@id/permissionsFragment"
+            app:popUpTo="@id/dashboardFragment" />
     </fragment>
     <fragment
         android:id="@+id/filesFragment"
@@ -62,7 +61,8 @@
         tools:layout="@layout/fragment_files" >
         <action
             android:id="@+id/action_filesFragment_to_permissionsFragment"
-            app:destination="@id/permissionsFragment" />
+            app:destination="@id/permissionsFragment"
+            app:popUpTo="@id/filesFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
