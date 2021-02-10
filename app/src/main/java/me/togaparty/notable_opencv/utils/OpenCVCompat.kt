@@ -1,38 +1,28 @@
 package me.togaparty.notable_opencv.utils
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.camera.core.ImageProxy
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc.*
-import java.util.ArrayList
-import kotlin.math.min
+import java.nio.ByteBuffer
+import java.util.*
+import kotlin.math.PI
+import kotlin.math.atan
 import kotlin.math.max
-
-/*
-fun Mat.threshold(
-        bitmap: Bitmap, thresh: Double = 100.0, max: Double = 255.0,
-        type: Int = THRESH_OTSU, action: (Bitmap) -> Unit
-) {
-    this.toGrayScale(bitmap)
-    threshold(this, this, thresh, max, type)
-    return action(this.toBitmap())
-}
-*/
-
-
-fun ImageProxy.convertImageProxyToBitmap(): Bitmap {
-    val buffer = planes[0].buffer
-    buffer.rewind()
-    val bytes = ByteArray(buffer.capacity())
+import kotlin.math.min
+private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
+    val planeProxy = image.planes[0]
+    val buffer: ByteBuffer = planeProxy.buffer
+    val bytes = ByteArray(buffer.remaining())
     buffer.get(bytes)
-    this.close()
     return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 }
 
-fun Mat.toGrayScale(bitmap: Bitmap, mat: Mat? = null) {
-    Utils.bitmapToMat(bitmap, this)
+fun Mat.toGrayScale(mat: Mat? = null) {
     mat?.let{
         cvtColor(this, mat, COLOR_RGB2GRAY)
     }?: run {
@@ -45,14 +35,11 @@ fun Bitmap.toMat() : Mat {
     Utils.bitmapToMat(this, mat)
     return mat
 }
-
-
 fun Mat.toBitmap(config: Bitmap.Config = Bitmap.Config.ARGB_8888): Bitmap {
     val bitmap = Bitmap.createBitmap(this.cols(), this.rows(), config)
     Utils.matToBitmap(this, bitmap)
     return bitmap
 }
-
 fun Mat.findContours(
         contours: MutableList<MatOfPoint>,
         hierarchy: Mat = Mat(),
@@ -70,57 +57,79 @@ fun Mat.erode() {
     erode(this, this, Mat())
 }
 fun Mat.canny(
-        bitmap: Bitmap, thresh: Double = 50.0, max: Double = 255.0, aperture: Int = 3,
+        edges: Mat = Mat(), low: Double = 50.0, high: Double = 255.0, aperture: Int = 3,
         l2Gradient: Boolean = true
 ){
-    this.toGrayScale(bitmap)
-    Canny(this, this, thresh, max, aperture, l2Gradient)
+    Canny(this, edges, low, high, aperture, l2Gradient)
 }
-fun Mat.prepareContours(contours: MutableList<MatOfPoint>) {
-    for (i in 0 until contours.size) {
-        val rect: Rect = boundingRect(contours[i])
-        if (rect.width > 10 || rect.height > 10) {
-            rectangle(this, rect, Scalar(255.00), -1)
-        }
-    }
-}
-fun Mat.drawContours(contours: MutableList<MatOfPoint>, gray: Mat) {
-    var big = Rect()
-    for (i in 0 until contours.size) {
-        if (contourArea(contours[i]) > gray.cols() * gray.rows() / 8) {
-            val rect = boundingRect(contours[i])
-            rectangle(gray, rect, Scalar(255.0, 0.0, 0.0), 2)
-        } else {
-            if (big.height < 1) {
-                big = boundingRect(contours[i])
-            }
-            big = union(big, boundingRect(contours[i]))
-        }
-    }
-    rectangle(this, big, Scalar (0.0, 255.0, 0.0), 2)
+
+fun cornerHarris(
+        src: Mat,
+        dst: Mat,
+        blockSize: Int = 7,
+        kSize: Int = 3,
+        sigma: Double = 0.04
+) {
+    cornerHarris(src, dst, blockSize, kSize, sigma)
 }
 
 fun zeroes(src: Mat): Mat {
     return Mat.zeros(src.rows(), src.cols(), src.type())
 }
 
-fun implement(src: Mat, bitmap: Bitmap) : Mat {
-    var gray =  Mat()
-    src.toGrayScale(bitmap, gray)
+fun implement(context: Context, filename: String) {
 
-    gray.blur()
-    gray.erode()
-    gray.canny(bitmap)
-    val contours =
-            gray.findContours(ArrayList<MatOfPoint>())
+    Log.d("COMPATDEBUG" ,filename)
+    /*
+    if (src == null || src.empty())
+        Log.d("COMPATDEBUG", "Mat is empty.")
+    else {
+        Log.d("COMPATDEBUG", "Image retrieved succesfully")
+        var gray = Mat()
 
-    gray = zeroes(gray)
-    gray.prepareContours(contours)
-    gray.erode()
+        src.toGrayScale(gray)
+        var edges = Mat()
+        src.canny(edges, high = 150.0, aperture = 2)
 
-    gray.findContours(contours)
-    src.drawContours(contours, gray)
-    return src
+        var theta = getAngle(edges)
+        if (theta  == null) throw NullPointerException("Something went wrong here")
+    }*/
+
+}
+
+fun getAngle(edges: Mat) : Double? {
+    val lines = MatOfInt4()
+    val slopes = MatOfFloat()
+
+
+    HoughLinesP(edges, lines, PI / 180, 100.0, 50, 10.0)
+
+    if (lines.empty()) {
+        return null
+    }
+
+    for (i in 0..lines.cols()) {
+        val vec = lines.get(0, i)
+        val value = FloatArray(1)
+
+        value[0] = when (vec[0] - vec[2] < 0.0000001) {
+            true -> 1000000.toFloat()
+            false -> (vec[1] - vec[3]).toFloat() / (vec[0] - vec[2]).toFloat()
+        }
+        slopes.put(0, i, value)
+    }
+    return atan(median(slopes)) * 180.0 / PI
+}
+fun median(slopes: MatOfFloat): Float {
+
+    val array = slopes.toArray()
+
+    Arrays.sort(array)
+    val n = array.size
+    return when (n % 2 == 0) {
+        true -> array[(n + 1) / 2 - 1]
+        false -> (array[n / 2 - 1] + array[n / 2]) / 2
+    }
 }
 fun union(a: Rect, b: Rect) : Rect {
     if (a.empty()) {

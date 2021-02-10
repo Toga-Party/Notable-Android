@@ -6,6 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.utils.ExampleAdapter
@@ -16,6 +19,16 @@ class FilesFragment : Fragment(), ExampleAdapter.OnItemClickListener{
 
     private val exampleList = generateDummyList(20)
     private val adapter = ExampleAdapter(exampleList, this)
+    private val result = "FilesFragment"
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setFragmentResult("requestKey", bundleOf("filesFragment" to result))
+
+        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
+            NavHostFragment.findNavController(this)
+                .navigate(FilesFragmentDirections.actionFilesFragmentToPermissionsFragment())
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

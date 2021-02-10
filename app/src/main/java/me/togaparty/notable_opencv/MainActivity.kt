@@ -2,10 +2,11 @@ package me.togaparty.notable_opencv
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Environment
+import android.os.Environment.MEDIA_MOUNTED
+import android.os.Environment.MEDIA_MOUNTED_READ_ONLY
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
-import me.togaparty.notable_opencv.utils.ExampleItem
-import org.opencv.android.OpenCVLoader
 import java.io.File
 
 
@@ -22,13 +23,24 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object {
-
+        fun isExternalStorageWritable(): Boolean {
+            return Environment.getExternalStorageState() == MEDIA_MOUNTED
+        }
+        fun isExternalStorageReadable(): Boolean {
+            return Environment.getExternalStorageState() in
+                    setOf(MEDIA_MOUNTED, MEDIA_MOUNTED_READ_ONLY)
+        }
         fun getOutputDirectory(context: Context): File {
             val appContext = context.applicationContext
-            val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
-                File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
-            return if (mediaDir != null && mediaDir.exists())
-                mediaDir else appContext.filesDir
+
+            return if (isExternalStorageReadable() and isExternalStorageWritable()) {
+                val externalCacheDir = context.externalCacheDirs.firstOrNull()?.let {
+                    File(it, "Notable_OPENCV").apply { mkdir() }}
+                if (externalCacheDir != null && externalCacheDir.exists())
+                    externalCacheDir else appContext.cacheDir
+            } else {
+                appContext.cacheDir
+            }
         }
     }
 }
