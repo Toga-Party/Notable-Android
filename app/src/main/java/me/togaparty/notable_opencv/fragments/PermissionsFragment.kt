@@ -12,53 +12,41 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
-import me.togaparty.notable_opencv.R
 
 class PermissionsFragment : Fragment() {
 
-
+    private var actionDirection : String? = null
     private var actionHandler = ArrayList<String>()
     private val rootView by lazy { FrameLayout(requireContext()) }
-
+    private lateinit var navController: NavController
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setFragmentResultListener("requestKey") { _ , bundle ->
-            Log.d("PERMISSIONSDEBUG", "Bundle retrieved.")
-            bundle.getString("cameraFragment")?.let { actionHandler.add(it) }
-            bundle.getString("filesFragment")?.let { actionHandler.add(it) }
+        setFragmentResultListener("requestKey") { _, bundle ->
+            Log.d("Permissions Debug", "Bundle retrieved.")
+            actionDirection = bundle.getString("actionDirection")
         }
+        navController = this.findNavController()
         return rootView
     }
 
     override fun onResume() {
         super.onResume()
         if (!allPermissionsGranted(requireContext())) {
-            requestPermissions(
-                    REQUIRED_PERMISSIONS.toTypedArray(), REQUEST_CODE_PERMISSIONS)
+            callRequestPermissions()
         } else {
-            if (actionHandler.toString().equals("[CameraFragment]")) {
-                NavHostFragment.findNavController(this)
-                        .navigate(PermissionsFragmentDirections.actionPermissionsFragmentToCameraFragment())
-            } else {
-                NavHostFragment.findNavController(this)
-                        .navigate(PermissionsFragmentDirections.actionPermissionsFragmentToFilesFragment())
-            }
-
+            navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentPop())
         }
-
-
     }
+    private fun callRequestPermissions() = requestPermissions(
+            REQUIRED_PERMISSIONS.toTypedArray(), REQUEST_CODE_PERMISSIONS)
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -69,51 +57,44 @@ class PermissionsFragment : Fragment() {
 
         if(requestCode == REQUEST_CODE_PERMISSIONS) {
             if(grantResults.isNotEmpty()) {
-                val index = grantResults.indexOfFirst { it != PackageManager.PERMISSION_GRANTED }
-                if (index < 0) {
-                    Toast.makeText(requireContext(), "Permission request granted", Toast.LENGTH_SHORT).show()
-                    if (actionHandler.toString().equals("[CameraFragment]")) {
-                        NavHostFragment.findNavController(this)
-                                .navigate(PermissionsFragmentDirections.actionPermissionsFragmentToCameraFragment())
-                    } else {
-                        NavHostFragment.findNavController(this)
-                                .navigate(PermissionsFragmentDirections.actionPermissionsFragmentToFilesFragment())
-                    }
-                }else {
-                    Log.i("PermissionFragment", "Permission to record denied")
+                if (grantResults.indexOfFirst { it != PackageManager.PERMISSION_GRANTED } > 0) {
                     if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         val builder = AlertDialog.Builder(requireContext())
-                        builder.setMessage("Permission to access the camera and file are required for this " +
-                            "app to capture and process music sheets.")
+                        builder.setMessage("You need to accept required permissions to use this feature.")
                             .setTitle("Permission required")
                             .setPositiveButton("Re-try") { _, _ ->
                                 Log.i("PermissionFragment", "Clicked")
-                                requestPermissions(
-                                        REQUIRED_PERMISSIONS.toTypedArray(), REQUEST_CODE_PERMISSIONS)
+                                callRequestPermissions()
+                            }
+                            .setNegativeButton("Cancel") {_, _ ->
+                                navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentToDashboardFragment())
                             }
                         val dialog = builder.create()
                         dialog.show()
                     } else {
                         val builder = AlertDialog.Builder(requireContext())
-                        builder.setMessage("Permission to access the camera  is required for this " +
-                                "app to capture and process music sheets.")
+                        builder.setMessage("You need to accept required permissions to use this feature.")
                                 .setTitle("Permission denied")
                                 .setPositiveButton("Re-try") { _, _ ->
                                     Log.i("PermissionFragment", "Clicked")
-                                    requestPermissions(
-                                            REQUIRED_PERMISSIONS.toTypedArray(), REQUEST_CODE_PERMISSIONS)
+                                    callRequestPermissions()
                                 }
+                                .setNegativeButton("Cancel") {_, _ ->
+                                    navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentToDashboardFragment())
+                                }
+
                         val dialog = builder.create()
                         dialog.show()
-                        NavHostFragment.findNavController(this)
-                                .navigate(PermissionsFragmentDirections.actionPermissionsFragmentPop())
+                        navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentPop())
                     }
                 }
+                Toast.makeText(requireContext(), "Permission request granted", Toast.LENGTH_SHORT).show()
+                navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentPop())
             }
         } else {
-        Toast.makeText(requireContext(),
-            "Permissions not granted by the user.",
-            Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),
+                "Permissions not granted by the user.",
+                Toast.LENGTH_SHORT).show()
         }
     }
 

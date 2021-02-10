@@ -17,12 +17,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.Navigation
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.google.common.util.concurrent.ListenableFuture
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.utils.mayNavigate
 import org.opencv.android.InstallCallbackInterface
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
@@ -50,54 +49,23 @@ class CameraFragment : Fragment() {
     private lateinit var useCases: MutableList<UseCase>
 
     private lateinit var container: ConstraintLayout
+    private lateinit var navController: NavController
+
     private val result = "CameraFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("CAMERADEBUG", "Camera Fragment created")
         super.onCreate(savedInstanceState)
-        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-            Log.d("CAMERADEBUG", "Called to navigate to PermissionsFragment")
-            if (this.mayNavigate(R.id.action_cameraFragment_to_permissionsFragment)) {
-                setFragmentResult("requestKey", bundleOf("cameraFragment" to result))
-                NavHostFragment.findNavController(this)
-                    .navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
-            }
-        }
-
-    }
-    private fun initViews() {
-        container = view as ConstraintLayout
-        previewView = container.findViewById(R.id.view_finder)
-        outputDirectory = MainActivity.getOutputDirectory(requireContext())
-        container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
-    }
-    private fun initOpenCV() {
-
-        val isInitialized = OpenCVLoader.initDebug()
-
-        if (isInitialized){
-            Log.d(TAG, "The OpenCV was successfully initialized in debug mode using .so libs.")
-        } else {
-            initAsync(OpenCVLoader.OPENCV_VERSION, requireContext(), loader)
-        }
-
     }
 
-    private fun setupCameraSelector() {
-        cameraSelector = CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                .build()
-    }
     override fun onResume() {
         super.onResume()
-        if (PermissionsFragment.allPermissionsGranted(requireContext())) {
-            if (!OpenCVLoader.initDebug()) {
-                Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization")
-                initOpenCV()
-            } else {
-                Log.d(TAG, "OpenCV library found inside package. Using it!")
-                loader.onManagerConnected(LoaderCallbackInterface.SUCCESS)
-            }
+        if (!OpenCVLoader.initDebug()) {
+            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization")
+            initializeOpenCV()
+        } else {
+            Log.d(TAG, "OpenCV library found inside package. Using it!")
+            loader.onManagerConnected(LoaderCallbackInterface.SUCCESS)
         }
     }
 
@@ -107,29 +75,46 @@ class CameraFragment : Fragment() {
     ): View? {
         return inflater.inflate(R.layout.fragment_camera, container, false)
     }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
+            Log.d("Camera Debug", "Called to navigate to PermissionsFragment")
+            setFragmentResult("requestKey", bundleOf("cameraFragment" to result))
+            navController.navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
+        }
+        container = view as ConstraintLayout
+        navController = this.findNavController()
+        previewView = container.findViewById(R.id.view_finder)
+        outputDirectory = MainActivity.getOutputDirectory(requireContext())
+        container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
+    }
 
     override fun onStart() {
         super.onStart()
-        if (PermissionsFragment.allPermissionsGranted(requireContext())) {
-            initViews()
-            setupCameraSelector()
-            previewView.let {
-                it.post {
-                    startCamera()
-                }
+        previewView.let {
+            it.post {
+                startCamera()
             }
-            orientationEventListener.enable()
+        }
+        orientationEventListener.enable()
+    }
+    
+    @SuppressLint("RestrictedApi")
+    override fun onStop() {
+        orientationEventListener.disable()
+        cameraProvider.shutdown()
+        super.onStop()
+    }
+    private fun initializeOpenCV() {
+        val isInitialized = OpenCVLoader.initDebug()
+        if (isInitialized){
+            Log.d(TAG, "The OpenCV was successfully initialized in debug mode using .so libs.")
+        } else {
+            initAsync(OpenCVLoader.OPENCV_VERSION, requireContext(), loader)
         }
     }
 
-    @SuppressLint("RestrictedApi")
-    override fun onStop() {
-        if (PermissionsFragment.allPermissionsGranted(requireContext())) {
-            orientationEventListener.disable()
-            cameraProvider.shutdown()
-        }
-        super.onStop()
-    }
+
     private val orientationEventListener by lazy {
         object : OrientationEventListener(requireContext()) {
             override fun onOrientationChanged(orientation: Int) {
@@ -146,6 +131,12 @@ class CameraFragment : Fragment() {
         }
     }
     private fun startCamera() {
+
+        fun setupCameraSelector() {
+            cameraSelector = CameraSelector.Builder()
+                    .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                    .build()
+        }
         fun initCamera() {
             cameraExecutor = ContextCompat.getMainExecutor(requireContext())
             cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -180,7 +171,7 @@ class CameraFragment : Fragment() {
             )
             preview.setSurfaceProvider(previewView.surfaceProvider)
         }
-
+        setupCameraSelector()
         initCamera()
         cameraProviderFuture.addListener ({
             setupImageCapture()
@@ -215,8 +206,7 @@ class CameraFragment : Fragment() {
                         previewView.post {
                             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                         }
-                        view?.let { Navigation.findNavController(it).navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage()) }
-                        //NavHostFragment.findNavController(this).navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
+                        navController.navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
                     }
                 })
     }
