@@ -60,6 +60,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.1.0"
     // For control over item selection of both touch and mouse driven selection
     implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc03"
+    implementation 'androidx.palette:palette:1.0.0'
 
     // Navigation library
     def nav_version = "2.3.2"
@@ -91,4 +92,12 @@ dependencies {
     //OpenCV
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(":opencv-lib")
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    kapt 'com.github.bumptech.glide:compiler:4.8.0'
+
+    //loadingspinner
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
 }

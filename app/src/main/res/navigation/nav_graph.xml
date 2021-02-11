@@ -30,14 +30,14 @@
             android:id="@+id/action_dashboardFragment_to_permissionsFragment"
             app:destination="@id/permissionsFragment" />
         <action
-            android:id="@+id/action_dashboardFragment_to_filesFragment"
-            app:destination="@id/filesFragment" />
+            android:id="@+id/action_dashboardFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
         <action
             android:id="@+id/action_dashboardFragment_to_glossaryFragment"
             app:destination="@id/glossaryFragment" />
         <action
-            android:id="@+id/action_dashboardFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
+            android:id="@+id/action_dashboardFragment_to_notableGlideActivity"
+            app:destination="@id/notableGlideActivity" />
     </fragment>
     <fragment
         android:id="@+id/filesFragment"
@@ -53,5 +53,11 @@
         android:id="@+id/glossaryFragment"
         android:name="me.togaparty.notable_opencv.fragments.GlossaryFragment"
         android:label="fragment_glossary"
-        tools:layout="@layout/fragment_glossary" />
+        tools:layout="@layout/fragment_glossary" >
+
+    </fragment>
+    <activity
+        android:id="@+id/notableGlideActivity"
+        android:name="me.togaparty.notable_opencv.NotableGlideActivity"
+        android:label="NotableGlideActivity" />
 </navigation>

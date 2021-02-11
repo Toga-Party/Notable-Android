@@ -76,7 +76,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when(v!!.id){
             R.id.camera_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_permissionsFragment)
-            R.id.files_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_filesFragment)
+            R.id.files_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_notableGlideActivity)
             R.id.settings_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_settingsFragment)
             R.id.glossary_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_glossaryFragment)
         }
