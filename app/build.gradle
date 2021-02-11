@@ -85,12 +85,6 @@ dependencies {
     implementation "androidx.camera:camera-view:1.0.0-alpha21"
     implementation "androidx.camera:camera-extensions:1.0.0-alpha21"
 
-    //Image Picker
-    //implementation 'com.github.dhaval2404:imagepicker:1.8'
-
-    //Inline Activity Result
-    //implementation 'com.github.florent37:inline-activity-result-kotlin:1.0.4'
-
     //Ucrop - THIS IS THE NEWEST VERSION! GRADLE WHAT THE HELL
     //noinspection GradleDependency
     implementation 'com.github.yalantis:ucrop:2.2.6-native'

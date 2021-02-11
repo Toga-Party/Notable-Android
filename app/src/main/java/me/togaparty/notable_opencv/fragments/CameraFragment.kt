@@ -1,6 +1,5 @@
 package me.togaparty.notable_opencv.fragments
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
@@ -30,7 +29,7 @@ import org.opencv.android.OpenCVLoader.initAsync
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import kotlin.reflect.KClass
 
 class CameraFragment : Fragment() {
@@ -39,11 +38,10 @@ class CameraFragment : Fragment() {
     private lateinit var outputDirectory: File
 
     private lateinit var camera: Camera
-
-    private lateinit var cameraExecutor: Executor
-    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraSelector: CameraSelector
-    private lateinit var cameraProvider: ProcessCameraProvider
+
+    private lateinit var processCameraProvider: ProcessCameraProvider
+    private lateinit var processCameraProviderFuture: ListenableFuture<ProcessCameraProvider>
 
     private lateinit var previewView: PreviewView
     private lateinit var preview: Preview
@@ -54,15 +52,11 @@ class CameraFragment : Fragment() {
     private lateinit var container: ConstraintLayout
     private lateinit var navController: NavController
 
-    private val result = "CameraFragment"
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("CAMERADEBUG", "Camera Fragment created")
         super.onCreate(savedInstanceState)
+        outputDirectory = MainActivity.getOutputDirectory(requireContext())
+        processCameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
     }
-
     override fun onResume() {
         super.onResume()
         if (!OpenCVLoader.initDebug()) {
@@ -83,33 +77,35 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-            Log.d("Camera Debug", "Called to navigate to PermissionsFragment")
-            setFragmentResult("requestKey", bundleOf("cameraFragment" to result))
+            Log.d("CameraDebug", "Called to navigate to PermissionsFragment")
+            setFragmentResult("requestKey", bundleOf("cameraFragment" to "CameraFragment"))
             navController.navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
         }
+
         container = view as ConstraintLayout
         navController = this.findNavController()
+
         previewView = container.findViewById(R.id.view_finder)
-        outputDirectory = MainActivity.getOutputDirectory(requireContext())
         container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
+
+        processCameraProviderFuture.addListener({
+            processCameraProvider = processCameraProviderFuture.get()
+            previewView.post{
+                startCamera()
+                orientationEventListener.enable()
+            }
+        }, ContextCompat.getMainExecutor(requireContext()))
+
     }
 
-    override fun onStart() {
-        super.onStart()
-        previewView.let {
-            it.post {
-                startCamera()
-            }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (::processCameraProvider.isInitialized) {
+            processCameraProvider.unbindAll()
+            orientationEventListener.disable()
         }
-        orientationEventListener.enable()
     }
-    
-    @SuppressLint("RestrictedApi")
-    override fun onStop() {
-        orientationEventListener.disable()
-        cameraProvider.shutdown()
-        super.onStop()
-    }
+
     private fun initializeOpenCV() {
         val isInitialized = OpenCVLoader.initDebug()
         if (isInitialized){
@@ -118,8 +114,6 @@ class CameraFragment : Fragment() {
             initAsync(OpenCVLoader.OPENCV_VERSION, requireContext(), loader)
         }
     }
-
-
     private val orientationEventListener by lazy {
         object : OrientationEventListener(requireContext()) {
             override fun onOrientationChanged(orientation: Int) {
@@ -135,6 +129,7 @@ class CameraFragment : Fragment() {
             }
         }
     }
+
     private fun startCamera() {
         val imageCaptureExtenders = listOf(
                 HdrImageCaptureExtender::class,
@@ -161,6 +156,7 @@ class CameraFragment : Fragment() {
                 val imageCaptureExtender = getImageCaptureExtender(it)
                 if (imageCaptureExtender != null) {
                     if (imageCaptureExtender.isExtensionAvailable(cameraSelector)) {
+                        Log.d("CameraDebug", "Image Capture Extension applied ${imageCaptureExtender.toString()}")
                         imageCaptureExtender.enableExtension(cameraSelector)
                         return@imageCaptureExtenders
                     }
@@ -180,26 +176,22 @@ class CameraFragment : Fragment() {
             }
         }
         fun enablePreviewExtension() {
+
             previewExtenders.forEach previewExtenders@{
                 val previewExtender = getPreviewExtender(it)
                 if (previewExtender != null) {
                     if (previewExtender.isExtensionAvailable(cameraSelector)) {
+                        Log.d("CameraDebug", "Preview Extension applied ${previewExtender.toString()}")
                         previewExtender.enableExtension(cameraSelector)
                     }
                     return@previewExtenders
                 }
             }
         }
-
         fun setupCameraSelector() {
             cameraSelector = CameraSelector.Builder()
                     .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                     .build()
-        }
-
-        fun initCamera() {
-            cameraExecutor = ContextCompat.getMainExecutor(requireContext())
-            cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         }
         fun setupPreview() {
             val metrics = DisplayMetrics().also { previewView.display.getRealMetrics(it) }
@@ -234,13 +226,9 @@ class CameraFragment : Fragment() {
             preview.setSurfaceProvider(previewView.surfaceProvider)
         }
         setupCameraSelector()
-        initCamera()
         setupPreview()
-        cameraProviderFuture.addListener ({
-            setupImageCapture()
-            cameraProvider = cameraProviderFuture.get()
-            bindPreview(cameraProvider)
-        }, cameraExecutor)
+        setupImageCapture()
+        bindPreview(processCameraProvider)
     }
     private fun takePhoto() {
         Log.d(TAG, "TakePhoto method is called")
@@ -250,7 +238,7 @@ class CameraFragment : Fragment() {
         val outputFileOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
 
-        imageCapture.takePicture(outputFileOptions, cameraExecutor,
+        imageCapture.takePicture(outputFileOptions, Executors.newSingleThreadExecutor(),
                 object : ImageCapture.OnImageSavedCallback {
 
                     override fun onError(error: ImageCaptureException) {
@@ -268,8 +256,8 @@ class CameraFragment : Fragment() {
                         Log.d(TAG, message)
                         previewView.post {
                             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                            navController.navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
                         }
-                        navController.navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
                     }
                 })
     }
