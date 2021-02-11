@@ -43,29 +43,32 @@ class DashboardFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when(v!!.id){
-            R.id.camera_cardview -> return if(ContextCompat.checkSelfPermission(requireContext(),
-                                    Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                                        navController.navigate(
-                                                DashboardFragmentDirections.actionDashboardFragmentToCameraFragment())
-                                    } else {
-                                        //TODO replace Fragment result api with navigation safe args which is available already.
-                                        setFragmentResult("requestKey",
-                                                bundleOf("actionDirection"
-                                                        to R.id.action_dashboardFragment_to_cameraFragment.toString()))
-                                        navController.navigate(
-                                                DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
-                                    }
-            R.id.files_cardview -> return if(ContextCompat.checkSelfPermission(requireContext(),
-                                    Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                                        navController.navigate(
-                                                DashboardFragmentDirections.actionDashboardFragmentToFilesFragment())
-                                    } else {
-                                        setFragmentResult("requestKey",
-                                                bundleOf("actionDirection"
-                                                        to R.id.action_dashboardFragment_to_filesFragment.toString()))
-                                        navController.navigate(
-                                                DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
-                                    }
+            R.id.camera_cardview ->
+                return if(ContextCompat.checkSelfPermission(requireContext(),
+                        Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                        PackageManager.PERMISSION_GRANTED){
+                        navController.navigate(
+                                DashboardFragmentDirections.actionDashboardFragmentToCameraFragment())
+                    } else {
+                        setFragmentResult("requestKey",
+                                bundleOf("actionDirection"
+                                        to R.id.action_dashboardFragment_to_cameraFragment.toString()))
+                        navController.navigate(
+                                DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
+                    }
+            R.id.files_cardview ->
+                return if(ContextCompat.checkSelfPermission(requireContext(),
+                            Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                            PackageManager.PERMISSION_GRANTED){
+                            navController.navigate(
+                                    DashboardFragmentDirections.actionDashboardFragmentToFilesFragment())
+                        } else {
+                            setFragmentResult("requestKey",
+                                    bundleOf("actionDirection"
+                                            to R.id.action_dashboardFragment_to_filesFragment.toString()))
+                            navController.navigate(
+                                    DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
+                        }
 
             R.id.settings_cardview -> navController.navigate(
                     DashboardFragmentDirections.actionDashboardFragmentToSettingsFragment())

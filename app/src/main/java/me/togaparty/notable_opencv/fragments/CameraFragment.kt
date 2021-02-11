@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.Button
 import android.widget.Toast
 import androidx.camera.core.*
+import androidx.camera.extensions.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -30,6 +31,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executor
+import kotlin.reflect.KClass
 
 class CameraFragment : Fragment() {
 
@@ -45,13 +47,16 @@ class CameraFragment : Fragment() {
 
     private lateinit var previewView: PreviewView
     private lateinit var preview: Preview
-    private lateinit var imageCapture: ImageCapture
+
     private lateinit var useCases: MutableList<UseCase>
+    private lateinit var imageCapture: ImageCapture
 
     private lateinit var container: ConstraintLayout
     private lateinit var navController: NavController
 
     private val result = "CameraFragment"
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("CAMERADEBUG", "Camera Fragment created")
@@ -131,19 +136,76 @@ class CameraFragment : Fragment() {
         }
     }
     private fun startCamera() {
+        val imageCaptureExtenders = listOf(
+                HdrImageCaptureExtender::class,
+                AutoImageCaptureExtender::class
+        )
+
+        val previewExtenders = listOf(
+                HdrPreviewExtender::class,
+                AutoPreviewExtender::class
+        )
+        fun getImageCaptureExtender(type: KClass<*>):
+                ImageCaptureExtender? {
+            val imageCaptureBuilder = ImageCapture.Builder()
+            return when (type) {
+                AutoImageCaptureExtender::class ->
+                    AutoImageCaptureExtender.create(imageCaptureBuilder)
+                HdrImageCaptureExtender::class ->
+                    HdrImageCaptureExtender.create(imageCaptureBuilder)
+                else -> null
+            }
+        }
+        fun enableImageCaptureExtension() {
+            imageCaptureExtenders.forEach imageCaptureExtenders@{
+                val imageCaptureExtender = getImageCaptureExtender(it)
+                if (imageCaptureExtender != null) {
+                    if (imageCaptureExtender.isExtensionAvailable(cameraSelector)) {
+                        imageCaptureExtender.enableExtension(cameraSelector)
+                        return@imageCaptureExtenders
+                    }
+                }
+            }
+        }
+
+        fun getPreviewExtender(type: KClass<*>):
+                PreviewExtender? {
+            val previewBuilder = Preview.Builder()
+            return when (type) {
+                AutoPreviewExtender::class ->
+                    AutoPreviewExtender.create(previewBuilder)
+                HdrPreviewExtender::class ->
+                    HdrPreviewExtender.create(previewBuilder)
+                else -> null
+            }
+        }
+        fun enablePreviewExtension() {
+            previewExtenders.forEach previewExtenders@{
+                val previewExtender = getPreviewExtender(it)
+                if (previewExtender != null) {
+                    if (previewExtender.isExtensionAvailable(cameraSelector)) {
+                        previewExtender.enableExtension(cameraSelector)
+                    }
+                    return@previewExtenders
+                }
+            }
+        }
 
         fun setupCameraSelector() {
             cameraSelector = CameraSelector.Builder()
                     .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                     .build()
         }
+
         fun initCamera() {
             cameraExecutor = ContextCompat.getMainExecutor(requireContext())
             cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-
+        }
+        fun setupPreview() {
             val metrics = DisplayMetrics().also { previewView.display.getRealMetrics(it) }
             val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
             val rotation = previewView.display.rotation
+            enablePreviewExtension()
             preview = Preview.Builder()
                     .setTargetRotation(rotation)
                     .setTargetResolution(screenSize)
@@ -151,10 +213,10 @@ class CameraFragment : Fragment() {
                     .also {
                         it.setSurfaceProvider(previewView.surfaceProvider)
                     }
-
         }
         fun setupImageCapture() {
             useCases = mutableListOf()
+            enableImageCaptureExtension()
             imageCapture = ImageCapture.Builder()
                     .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                     .build()
@@ -173,6 +235,7 @@ class CameraFragment : Fragment() {
         }
         setupCameraSelector()
         initCamera()
+        setupPreview()
         cameraProviderFuture.addListener ({
             setupImageCapture()
             cameraProvider = cameraProviderFuture.get()

@@ -16,6 +16,7 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
@@ -63,6 +64,7 @@ class PreviewImageFragment : Fragment() {
         container.findViewById<Button>(R.id.retake).setOnClickListener(
             Navigation.createNavigateOnClickListener(R.id.action_previewImage_pop, null))
         container.findViewById<Button>(R.id.crop).setOnClickListener {cropImage()}
+        container.findViewById<Button>(R.id.process).setOnClickListener {processImage()}
         container.post{
             setImageView()
         }
@@ -82,13 +84,17 @@ class PreviewImageFragment : Fragment() {
     private fun cropImage() {
         val photoName = SimpleDateFormat(FILENAME_FORMAT, Locale.US
         ).format(System.currentTimeMillis()) + PHOTO_EXTENSION
-        val destinationUri = Uri.fromFile(File(outputDirectory, "test.jpg"))
+        val destinationUri = Uri.fromFile(File(outputDirectory, photoName))
         UCrop.of(Uri.fromFile(File(outputDirectory, fileName!!)), destinationUri)
                 //.withAspectRatio(16F, 9F)
                 .withMaxResultSize(imageView.width, imageView.height)
                 .start(requireContext(), this)
     }
+    private fun processImage() {
+        Log.d("Preview", "Processing Image")
 
+
+    }
     private fun setImageView() {
         Log.d("PreviewDebug", "FileURI is : $fileUri")
         val options = RequestOptions()

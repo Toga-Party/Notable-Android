@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:contentDescription="@string/preview_image"
+        android:scaleType="fitXY"
         android:visibility="visible" />
 
     <Button
