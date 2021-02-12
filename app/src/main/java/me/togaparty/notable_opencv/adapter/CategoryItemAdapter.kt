@@ -13,7 +13,7 @@ import me.togaparty.notable_opencv.model.CategoryItem
 class CategoryItemAdapter(private val context:Context, private val categoryItem:List<CategoryItem>): RecyclerView.Adapter<CategoryItemAdapter.CategoryItemViewHolder>() {
 
     class CategoryItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        lateinit var itemText:TextView
+        var itemText:TextView
         init {
             itemText = itemView.findViewById(R.id.item_text)
         }

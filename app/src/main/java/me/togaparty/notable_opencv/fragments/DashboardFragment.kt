@@ -1,41 +1,24 @@
 package me.togaparty.notable_opencv.fragments
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import me.togaparty.notable_opencv.R
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DashboardFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class DashboardFragment : Fragment(), View.OnClickListener {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    var navController: NavController? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
+    private lateinit var navController: NavController
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -44,29 +27,14 @@ class DashboardFragment : Fragment(), View.OnClickListener {
         return inflater.inflate(R.layout.fragment_dashboard, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DashboardFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DashboardFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        navController = Navigation.findNavController(view)
+        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
+            Log.d("Dashboard debug", "Called to navigate to PermissionsFragment")
+            NavHostFragment.findNavController(this)
+                    .navigate(DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
+        }
+        navController = this.findNavController()
         view.findViewById<CardView>(R.id.camera_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.files_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.settings_cardview).setOnClickListener(this)
@@ -75,10 +43,36 @@ class DashboardFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when(v!!.id){
-            R.id.camera_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_permissionsFragment)
-            R.id.files_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_notableGlideActivity)
-            R.id.settings_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_settingsFragment)
-            R.id.glossary_cardview -> navController!!.navigate(R.id.action_dashboardFragment_to_glossaryFragment)
+            R.id.camera_cardview -> return if(ContextCompat.checkSelfPermission(requireContext(),
+                                    Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                                        navController.navigate(
+                                                DashboardFragmentDirections.actionDashboardFragmentToCameraFragment())
+                                    } else {
+                                       
+                                        setFragmentResult("requestKey",
+                                                bundleOf("actionDirection"
+                                                        to R.id.action_dashboardFragment_to_cameraFragment.toString()))
+                                        navController.navigate(
+                                                DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
+                                    }
+            R.id.files_cardview -> return if(ContextCompat.checkSelfPermission(requireContext(),
+                                    Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                                        navController.navigate(
+                                                DashboardFragmentDirections.actionDashboardFragmentToFilesFragment())
+                                    } else {
+                                        setFragmentResult("requestKey",
+                                                bundleOf("actionDirection"
+                                                        to R.id.action_dashboardFragment_to_notableGlideActivity.toString()))
+                                        navController.navigate(
+                                                DashboardFragmentDirections.actionDashboardFragmentToNotableGlideActivity())
+                                    }
+
+            R.id.settings_cardview -> navController.navigate(
+                    DashboardFragmentDirections.actionDashboardFragmentToSettingsFragment())
+            R.id.glossary_cardview -> navController.navigate(
+                    DashboardFragmentDirections.actionDashboardFragmentToGlossaryFragment())
         }
     }
+
+    companion object
 }
