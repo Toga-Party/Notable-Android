@@ -45,9 +45,9 @@ class DashboardFragment : Fragment(), View.OnClickListener {
         when(v!!.id){
             R.id.camera_cardview ->
                 return if(ContextCompat.checkSelfPermission(requireContext(),
-                        Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED){
-                        navController.navigate(
+                          Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                          PackageManager.PERMISSION_GRANTED){
+                          navController.navigate(
                                 DashboardFragmentDirections.actionDashboardFragmentToCameraFragment())
                     } else {
                         setFragmentResult("requestKey",
@@ -58,17 +58,18 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                     }
             R.id.files_cardview ->
                 return if(ContextCompat.checkSelfPermission(requireContext(),
-                            Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                            PackageManager.PERMISSION_GRANTED){
-                            navController.navigate(
-                                    DashboardFragmentDirections.actionDashboardFragmentToFilesFragment())
+                          Manifest.permission.READ_EXTERNAL_STORAGE) == 
+                          PackageManager.PERMISSION_GRANTED){
+                          navController.navigate(
+                                  DashboardFragmentDirections.actionDashboardFragmentToNotableGlideActivity())
                         } else {
                             setFragmentResult("requestKey",
                                     bundleOf("actionDirection"
-                                            to R.id.action_dashboardFragment_to_filesFragment.toString()))
+                                            to R.id.action_dashboardFragment_to_notableGlideActivity.toString()))
                             navController.navigate(
-                                    DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
+                                    DashboardFragmentDirections.actionDashboardFragmentToNotableGlideActivity())
                         }
+
 
             R.id.settings_cardview -> navController.navigate(
                     DashboardFragmentDirections.actionDashboardFragmentToSettingsFragment())
