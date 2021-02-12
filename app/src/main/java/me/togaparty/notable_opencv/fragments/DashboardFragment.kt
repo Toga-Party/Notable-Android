@@ -48,7 +48,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                                         navController.navigate(
                                                 DashboardFragmentDirections.actionDashboardFragmentToCameraFragment())
                                     } else {
-                                        //TODO replace Fragment result api with navigation safe args which is available already.
+                                       
                                         setFragmentResult("requestKey",
                                                 bundleOf("actionDirection"
                                                         to R.id.action_dashboardFragment_to_cameraFragment.toString()))
@@ -62,9 +62,9 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                                     } else {
                                         setFragmentResult("requestKey",
                                                 bundleOf("actionDirection"
-                                                        to R.id.action_dashboardFragment_to_filesFragment.toString()))
+                                                        to R.id.action_dashboardFragment_to_notableGlideActivity.toString()))
                                         navController.navigate(
-                                                DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
+                                                DashboardFragmentDirections.actionDashboardFragmentToNotableGlideActivity())
                                     }
 
             R.id.settings_cardview -> navController.navigate(

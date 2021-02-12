@@ -12,8 +12,7 @@
         <action
             android:id="@+id/action_cameraFragment_to_permissionsFragment"
             app:destination="@id/permissionsFragment"
-            app:popUpTo="@id/cameraFragment"
-            />
+            app:popUpTo="@id/cameraFragment"/>
         <action
             android:id="@+id/action_cameraFragment_to_previewImage"
             app:destination="@id/previewImage" />
@@ -37,7 +36,12 @@
         android:name="me.togaparty.notable_opencv.fragments.DashboardFragment"
         android:label="fragment_dashboard"
         tools:layout="@layout/fragment_dashboard" >
-        <action
+       
+      <action
+          android:id="@+id/action_dashboardFragment_to_notableGlideActivity"
+          app:destination="@id/notableGlideActivity" />
+
+      <action
             android:id="@+id/action_dashboardFragment_to_glossaryFragment"
             app:destination="@id/glossaryFragment" />
         <action
@@ -53,6 +57,7 @@
             android:id="@+id/action_dashboardFragment_to_permissionsFragment"
             app:destination="@id/permissionsFragment"
             app:popUpTo="@id/dashboardFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/filesFragment"
@@ -73,7 +78,12 @@
         android:id="@+id/glossaryFragment"
         android:name="me.togaparty.notable_opencv.fragments.GlossaryFragment"
         android:label="fragment_glossary"
-        tools:layout="@layout/fragment_glossary" />
+        tools:layout="@layout/fragment_glossary" >
+    </fragment>
+    <activity
+        android:id="@+id/notableGlideActivity"
+        android:name="me.togaparty.notable_opencv.NotableGlideActivity"
+        android:label="NotableGlideActivity" />
     <fragment
         android:id="@+id/previewImage"
         android:name="me.togaparty.notable_opencv.fragments.PreviewImage"

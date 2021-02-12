@@ -4,6 +4,7 @@
 
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
@@ -15,7 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Notable_OPENCV"
         android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true"
         android:fullBackupContent="@xml/backup_descriptor">
+        <activity android:name=".NotableGlideActivity"></activity>
         <activity android:name=".MainActivity" android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
