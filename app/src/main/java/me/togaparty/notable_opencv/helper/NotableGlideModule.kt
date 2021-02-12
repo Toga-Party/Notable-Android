@@ -5,4 +5,4 @@ import com.bumptech.glide.module.AppGlideModule
 
 
 @GlideModule
-class NotableGlideModule : AppGlideModule()
+final class NotableGlideModule : AppGlideModule()

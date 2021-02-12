@@ -14,7 +14,7 @@ import org.opencv.utils.Converters;
 /**
  * Video writer class.
  *
- * The class provides C++ API for writing video files or image sequences.
+ * The class provides C++ API for writing video gallery or image sequences.
  */
 public class VideoWriter {
 

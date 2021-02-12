@@ -2,7 +2,7 @@
     <string name="app_name">Notable_OPENCV</string>
     <string name="button_send">Take Photo</string>
     <string name="preview_image">Preview Image</string>
-    <string name="files">Files</string>
+    <string name="gallery">Gallery</string>
     <string name="scan">Scan</string>
     <string name="notable">Notable!</string>
     <string name="music_note">Music Note</string>

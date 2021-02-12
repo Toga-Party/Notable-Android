@@ -16,11 +16,9 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -29,6 +27,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.yalantis.ucrop.UCrop
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
+import me.togaparty.notable_opencv.helper.GlideApp
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -102,7 +101,7 @@ class PreviewImageFragment : Fragment() {
             .placeholder(ColorDrawable(Color.WHITE))
             .error(ColorDrawable(Color.CYAN))
 
-        Glide.with(this)
+        GlideApp.with(this)
             .setDefaultRequestOptions(options)
             .load(fileUri)
             .skipMemoryCache(true)

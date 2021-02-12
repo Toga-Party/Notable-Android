@@ -1,8 +1,6 @@
 package me.togaparty.notable_opencv.adapter
 
 import android.content.Context
-import android.net.Uri
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +10,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.item_gallery_image.view.*
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
-import java.io.File
+
 
 class GlideGalleryImageAdapter(private val itemList: List<GlideImage>) : RecyclerView.Adapter<GlideGalleryImageAdapter.ViewHolder>() {
     private var context: Context? = null

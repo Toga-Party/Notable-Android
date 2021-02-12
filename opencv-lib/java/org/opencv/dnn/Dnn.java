@@ -57,7 +57,7 @@ public class Dnn {
     //
 
     /**
-     * Reads a network model stored in &lt;a href="https://pjreddie.com/darknet/"&gt;Darknet&lt;/a&gt; model files.
+     * Reads a network model stored in &lt;a href="https://pjreddie.com/darknet/"&gt;Darknet&lt;/a&gt; model gallery.
      * @param cfgFile      path to the .cfg file with text description of the network architecture.
      * @param darknetModel path to the .weights file with learned network.
      * @return Network object that ready to do forward, throw an exception in failure cases.
@@ -68,7 +68,7 @@ public class Dnn {
     }
 
     /**
-     * Reads a network model stored in &lt;a href="https://pjreddie.com/darknet/"&gt;Darknet&lt;/a&gt; model files.
+     * Reads a network model stored in &lt;a href="https://pjreddie.com/darknet/"&gt;Darknet&lt;/a&gt; model gallery.
      * @param cfgFile      path to the .cfg file with text description of the network architecture.
      * @return Network object that ready to do forward, throw an exception in failure cases.
      * @return Net object.
@@ -83,7 +83,7 @@ public class Dnn {
     //
 
     /**
-     * Reads a network model stored in &lt;a href="https://pjreddie.com/darknet/"&gt;Darknet&lt;/a&gt; model files.
+     * Reads a network model stored in &lt;a href="https://pjreddie.com/darknet/"&gt;Darknet&lt;/a&gt; model gallery.
      * @param bufferCfg   A buffer contains a content of .cfg file with text description of the network architecture.
      * @param bufferModel A buffer contains a content of .weights file with learned network.
      * @return Net object.
@@ -95,7 +95,7 @@ public class Dnn {
     }
 
     /**
-     * Reads a network model stored in &lt;a href="https://pjreddie.com/darknet/"&gt;Darknet&lt;/a&gt; model files.
+     * Reads a network model stored in &lt;a href="https://pjreddie.com/darknet/"&gt;Darknet&lt;/a&gt; model gallery.
      * @param bufferCfg   A buffer contains a content of .cfg file with text description of the network architecture.
      * @return Net object.
      */

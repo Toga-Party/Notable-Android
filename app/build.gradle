@@ -63,8 +63,10 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.1.0"
 
     // For control over item selection of both touch and mouse driven selection
+
+    //noinspection GradleDependency recycylerview is in release candidate version.
     implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc03"
-    implementation 'androidx.palette:palette:1.0.0'
+    implementation 'androidx.palette:palette-ktx:1.0.0'
 
 
     // Navigation library
@@ -87,13 +89,17 @@ dependencies {
     implementation "androidx.camera:camera-view:1.0.0-alpha21"
     implementation "androidx.camera:camera-extensions:1.0.0-alpha21"
 
-    //Ucrop - THIS IS THE NEWEST VERSION! GRADLE WHAT THE HELL
-    //noinspection GradleDependency
+    //noinspection GradleDependency ucrop is in latest native version
     implementation 'com.github.yalantis:ucrop:2.2.6-native'
 
+    //implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0'
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+
+
+    //Loading Spinner
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     //Unit Test
     testImplementation 'junit:junit:4.13.1'
@@ -106,11 +112,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(":opencv-lib")
 
-    //glide
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
-    kapt 'com.github.bumptech.glide:compiler:4.8.0'
 
-    //loadingspinner
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
 }
