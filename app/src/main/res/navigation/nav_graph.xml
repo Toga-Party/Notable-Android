@@ -86,7 +86,12 @@
         android:label="NotableGlideActivity" />
     <fragment
         android:id="@+id/previewImage"
-        android:name="me.togaparty.notable_opencv.fragments.PreviewImage"
+        android:name="me.togaparty.notable_opencv.fragments.PreviewImageFragment"
         android:label="fragment_preview_image"
-        tools:layout="@layout/fragment_preview_image" />
+        tools:layout="@layout/fragment_preview_image" >
+        <action
+            android:id="@+id/action_previewImage_pop"
+            app:popUpTo="@id/previewImage"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

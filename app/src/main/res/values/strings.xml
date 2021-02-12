@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Notable_OPENCV</string>
     <string name="button_send">Take Photo</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="preview_image">Preview Image</string>
     <string name="files">Files</string>
     <string name="scan">Scan</string>
@@ -13,5 +12,8 @@
     <string name="settings_icon">Settings Icon</string>
     <string name="glossary">Glossary</string>
     <string name="book_icon">Book Icon</string>
+    <string name="retake">Retake</string>
+    <string name="crop">Crop</string>
+    <string name="process">Process</string>
 
 </resources>
