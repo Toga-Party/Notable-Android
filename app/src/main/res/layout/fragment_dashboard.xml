@@ -26,7 +26,8 @@
             app:layout_constraintHeight_percent="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.562" />
+            app:layout_constraintVertical_bias="0.562"
+            android:contentDescription="@string/music_note" />
 
         <TextView
             android:id="@+id/title_notable"
@@ -34,7 +35,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/amiko_bold"
             android:lineSpacingExtra="10sp"
-            android:text="Notable!"
+            android:text="@string/notable"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="35dp"
             app:layout_constraintBottom_toTopOf="@+id/imageView"
@@ -78,13 +79,14 @@
                     android:layout_width="106dp"
                     android:layout_height="120dp"
                     android:layout_weight="0.9"
-                    android:src="@drawable/camera_icon" />
+                    android:src="@drawable/camera_icon"
+                    android:contentDescription="@string/camera_icon" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
-                    android:text="Scan"
+                    android:text="@string/scan"
                     android:textColor="@color/yellow"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -118,13 +120,14 @@
                     android:layout_width="106dp"
                     android:layout_height="120dp"
                     android:layout_weight="0.9"
-                    android:src="@drawable/files_icon" />
+                    android:src="@drawable/files_icon"
+                    android:contentDescription="@string/files_icon" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
-                    android:text="Files"
+                    android:text="@string/gallery"
                     android:textColor="@color/yellow"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -158,13 +161,14 @@
                     android:layout_width="106dp"
                     android:layout_height="120dp"
                     android:layout_weight="0.9"
-                    android:src="@drawable/settings_icon" />
+                    android:src="@drawable/settings_icon"
+                    android:contentDescription="@string/settings_icon" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
-                    android:text="Settings"
+                    android:text="@string/settings"
                     android:textColor="@color/yellow"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -199,13 +203,14 @@
                     android:layout_width="106dp"
                     android:layout_height="120dp"
                     android:layout_weight="0.9"
-                    android:src="@drawable/book_icon" />
+                    android:src="@drawable/book_icon"
+                    android:contentDescription="@string/book_icon" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
-                    android:text="Glossary"
+                    android:text="@string/glossary"
                     android:textColor="@color/yellow"
                     android:textSize="20sp"
                     android:textStyle="bold" />

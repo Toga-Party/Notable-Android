@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.fragments.FilesFragment
 
 class ExampleAdapter(
     private val exampleList:List<ExampleItem>,

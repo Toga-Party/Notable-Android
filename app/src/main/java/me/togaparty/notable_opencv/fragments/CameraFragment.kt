@@ -1,87 +1,67 @@
 package me.togaparty.notable_opencv.fragments
-import android.graphics.Bitmap
+
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.Toast
-import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.*
-import androidx.camera.extensions.HdrImageCaptureExtender
+import androidx.camera.extensions.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.fragment.NavHostFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import com.google.common.util.concurrent.ListenableFuture
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.utils.convertImageProxyToBitmap
-import me.togaparty.notable_opencv.utils.otsuThreshold
-import me.togaparty.notable_opencv.utils.toMat
 import org.opencv.android.InstallCallbackInterface
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.OpenCVLoader.initAsync
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.reflect.KClass
 
-class CameraFragment : Fragment(), CameraXConfig.Provider {
+class CameraFragment : Fragment() {
+
+
+    private lateinit var outputDirectory: File
+
+    private lateinit var camera: Camera
+    private lateinit var cameraSelector: CameraSelector
+
+    private lateinit var processCameraProvider: ProcessCameraProvider
+    private lateinit var processCameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+
+    private lateinit var previewView: PreviewView
+    private lateinit var preview: Preview
+
+    private lateinit var useCases: MutableList<UseCase>
+    private lateinit var imageCapture: ImageCapture
 
     private lateinit var container: ConstraintLayout
-    private lateinit var viewFinder: PreviewView
-    private lateinit var outputDirectory: File
-    private lateinit var cameraExecutor: ExecutorService
-
-    private var preview: Preview? = null
-    private var imageCapture: ImageCapture? = null
-    private var camera: Camera? = null
-
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
-            if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-                NavHostFragment.findNavController(this)
-                        .navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
-            }
-        }
-        initOpenCV()
-    }
-    private fun initOpenCV() {
-
-        val isInitialized = OpenCVLoader.initDebug()
-
-        if (isInitialized){
-            Log.d(TAG, "The OpenCV was successfully initialized in debug mode using .so libs.")
-        } else {
-            initAsync(OpenCVLoader.OPENCV_VERSION, requireContext(), loader)
-        }
-
+        outputDirectory = MainActivity.getOutputDirectory(requireContext())
+        processCameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
     }
     override fun onResume() {
         super.onResume()
-        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-            NavHostFragment.findNavController(this)
-                    .navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
-        }
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization")
-            initAsync(OpenCVLoader.OPENCV_VERSION, requireContext(), loader)
+            initializeOpenCV()
         } else {
             Log.d(TAG, "OpenCV library found inside package. Using it!")
             loader.onManagerConnected(LoaderCallbackInterface.SUCCESS)
@@ -91,130 +71,197 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_camera, container, false)
-
-
+    ): View? {
+        return inflater.inflate(R.layout.fragment_camera, container, false)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        container = view as ConstraintLayout
-        viewFinder = container.findViewById(R.id.view_finder)
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        outputDirectory = MainActivity.getOutputDirectory(requireContext())
-        container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
-        viewFinder.post {
-            startCamera()
+        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
+            Log.d("CameraDebug", "Called to navigate to PermissionsFragment")
+            setFragmentResult("requestKey", bundleOf("cameraFragment" to "CameraFragment"))
+            navController.navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
         }
+
+        container = view as ConstraintLayout
+        navController = this.findNavController()
+
+        previewView = container.findViewById(R.id.view_finder)
+        container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
+
+        processCameraProviderFuture.addListener({
+            processCameraProvider = processCameraProviderFuture.get()
+            previewView.post{
+                startCamera()
+                orientationEventListener.enable()
+            }
+        }, ContextCompat.getMainExecutor(requireContext()))
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        cameraExecutor.shutdown()
+        if (::processCameraProvider.isInitialized) {
+            processCameraProvider.unbindAll()
+            orientationEventListener.disable()
+        }
     }
 
-    override fun getCameraXConfig(): CameraXConfig {
-        return Camera2Config.defaultConfig()
+    private fun initializeOpenCV() {
+        val isInitialized = OpenCVLoader.initDebug()
+        if (isInitialized){
+            Log.d(TAG, "The OpenCV was successfully initialized in debug mode using .so libs.")
+        } else {
+            initAsync(OpenCVLoader.OPENCV_VERSION, requireContext(), loader)
+        }
     }
+    private val orientationEventListener by lazy {
+        object : OrientationEventListener(requireContext()) {
+            override fun onOrientationChanged(orientation: Int) {
+                val rotation = when (orientation) {
+                    in 45 until 135 -> Surface.ROTATION_270
+                    in 135 until 225 -> Surface.ROTATION_180
+                    in 225 until 315 -> Surface.ROTATION_90
+                    else -> Surface.ROTATION_0
+                }
+                if (::imageCapture.isInitialized) {
+                    imageCapture.targetRotation = rotation
+                }
+            }
+        }
+    }
+
     private fun startCamera() {
+        val imageCaptureExtenders = listOf(
+                HdrImageCaptureExtender::class,
+                AutoImageCaptureExtender::class
+        )
 
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-        cameraProviderFuture.addListener( {
-            val cameraProvider = cameraProviderFuture.get()
-            val metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
+        val previewExtenders = listOf(
+                HdrPreviewExtender::class,
+                AutoPreviewExtender::class
+        )
+        fun getImageCaptureExtender(type: KClass<*>):
+                ImageCaptureExtender? {
+            val imageCaptureBuilder = ImageCapture.Builder()
+            return when (type) {
+                AutoImageCaptureExtender::class ->
+                    AutoImageCaptureExtender.create(imageCaptureBuilder)
+                HdrImageCaptureExtender::class ->
+                    HdrImageCaptureExtender.create(imageCaptureBuilder)
+                else -> null
+            }
+        }
+        fun enableImageCaptureExtension() {
+            imageCaptureExtenders.forEach imageCaptureExtenders@{
+                val imageCaptureExtender = getImageCaptureExtender(it)
+                if (imageCaptureExtender != null) {
+                    if (imageCaptureExtender.isExtensionAvailable(cameraSelector)) {
+                        Log.d("CameraDebug", "Image Capture Extension applied ${imageCaptureExtender.toString()}")
+                        imageCaptureExtender.enableExtension(cameraSelector)
+                        return@imageCaptureExtenders
+                    }
+                }
+            }
+        }
+
+        fun getPreviewExtender(type: KClass<*>):
+                PreviewExtender? {
+            val previewBuilder = Preview.Builder()
+            return when (type) {
+                AutoPreviewExtender::class ->
+                    AutoPreviewExtender.create(previewBuilder)
+                HdrPreviewExtender::class ->
+                    HdrPreviewExtender.create(previewBuilder)
+                else -> null
+            }
+        }
+        fun enablePreviewExtension() {
+
+            previewExtenders.forEach previewExtenders@{
+                val previewExtender = getPreviewExtender(it)
+                if (previewExtender != null) {
+                    if (previewExtender.isExtensionAvailable(cameraSelector)) {
+                        Log.d("CameraDebug", "Preview Extension applied ${previewExtender.toString()}")
+                        previewExtender.enableExtension(cameraSelector)
+                    }
+                    return@previewExtenders
+                }
+            }
+        }
+        fun setupCameraSelector() {
+            cameraSelector = CameraSelector.Builder()
+                    .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                    .build()
+        }
+        fun setupPreview() {
+            val metrics = DisplayMetrics().also { previewView.display.getRealMetrics(it) }
             val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
-            val rotation = viewFinder.display.rotation
-
+            val rotation = previewView.display.rotation
+            enablePreviewExtension()
             preview = Preview.Builder()
                     .setTargetRotation(rotation)
                     .setTargetResolution(screenSize)
                     .build()
                     .also {
-                        it.setSurfaceProvider(viewFinder.surfaceProvider)
-
+                        it.setSurfaceProvider(previewView.surfaceProvider)
                     }
-
-
-            val cameraSelector : CameraSelector = CameraSelector.Builder()
-                    .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+        }
+        fun setupImageCapture() {
+            useCases = mutableListOf()
+            enableImageCaptureExtension()
+            imageCapture = ImageCapture.Builder()
+                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                     .build()
-
-            val builder = ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .setTargetRotation(rotation)
-
-
-            val hdrImageCaptureExtender = HdrImageCaptureExtender.create(builder)
-
-            if(hdrImageCaptureExtender.isExtensionAvailable(cameraSelector)) {
-                hdrImageCaptureExtender.enableExtension(cameraSelector)
-            }
-
-            imageCapture = builder.build()
-
-
+            useCases.add(imageCapture)
+        }
+        fun bindPreview(cameraProvider: ProcessCameraProvider) {
             cameraProvider.unbindAll()
-            try {
-                camera = cameraProvider.bindToLifecycle(
-                        this as LifecycleOwner, cameraSelector, preview, imageCapture)
-                preview?.setSurfaceProvider(viewFinder.surfaceProvider)
 
-            } catch(exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
-            }
-
-        }, ContextCompat.getMainExecutor(requireContext()))
-
+            camera = cameraProvider.bindToLifecycle(
+                    this as LifecycleOwner,
+                    cameraSelector,
+                    *useCases.toTypedArray(),
+                    preview
+            )
+            preview.setSurfaceProvider(previewView.surfaceProvider)
+        }
+        setupCameraSelector()
+        setupPreview()
+        setupImageCapture()
+        bindPreview(processCameraProvider)
     }
-
     private fun takePhoto() {
         Log.d(TAG, "TakePhoto method is called")
-        val imageCapture = imageCapture ?: return
+        val photoName = SimpleDateFormat(FILENAME_FORMAT, Locale.US
+        ).format(System.currentTimeMillis()) + PHOTO_EXTENSION
+        val photoFile = File(outputDirectory, photoName)
+        val outputFileOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        // Create time-stamped output file to hold the image
-        val photoFile = File(
-                outputDirectory,
-                SimpleDateFormat(FILENAME_FORMAT, Locale.US
-                ).format(System.currentTimeMillis()) + PHOTO_EXTENSION)
-        photoFile.createNewFile()
-        // Create output options object which contains file (Used in another takePicture method)
-            //val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        // Set up image capture listener, which is triggered after photo has been taken
+        imageCapture.takePicture(outputFileOptions, Executors.newSingleThreadExecutor(),
+                object : ImageCapture.OnImageSavedCallback {
 
-        imageCapture.takePicture(cameraExecutor, object: ImageCapture.OnImageCapturedCallback(){
-
-            override fun onCaptureSuccess(image: ImageProxy) {
-                //rudimentary off loading the work
-                GlobalScope.launch(Dispatchers.IO) {
-                    val bitmap = withContext(Dispatchers.IO) { image.convertImageProxyToBitmap() }
-                    withContext(Dispatchers.IO) {
-                        bitmap.toMat().otsuThreshold(bitmap) {
-                            val byteArrayOutputStream = ByteArrayOutputStream()
-                            it.compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream)
-                            val data = byteArrayOutputStream.toByteArray()
-
-                            val fileOutputStream = FileOutputStream(photoFile)
-                            fileOutputStream.write(data)
-                            fileOutputStream.flush()
-                            fileOutputStream.close()
+                    override fun onError(error: ImageCaptureException) {
+                        val message = "Image captured successfully"
+                        Log.d(TAG, message)
+                        previewView.post {
+                            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                         }
-
                     }
 
-                }
-
-                val msg = "Photo capture succeeded: "
-                viewFinder.post{
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                }
-                Log.d(TAG, msg)
-            }
-
-            override fun onError(exception: ImageCaptureException) {
-                super.onError(exception)
-                Log.e(TAG, "Photo capture failed: ${exception.message}", exception)
-            }
-        })
+                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                        val message = "Image captured successfully"
+                        setFragmentResult("requestKey",
+                                bundleOf("photoPath" to photoName))
+                        Log.d(TAG, message)
+                        previewView.post {
+                            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                            navController.navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
+                        }
+                    }
+                })
     }
+
 
     companion object {
         private val loader = object: LoaderCallbackInterface {
@@ -235,8 +282,9 @@ class CameraFragment : Fragment(), CameraXConfig.Provider {
                 Log.d(TAG,"OpenCV Manager successfully installed")
             }
         }
+
         private const val TAG = "Notable:CameraX"
-        private const val FILENAME_FORMAT = "EEE dd_MM_yyyy HH:mm:ss"
+        private const val FILENAME_FORMAT = "EEE_dd_MM_yyyy_HHmmss"
         private const val PHOTO_EXTENSION = ".jpg"
     }
 

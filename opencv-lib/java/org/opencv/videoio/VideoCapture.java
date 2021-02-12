@@ -7,9 +7,9 @@ import org.opencv.core.Mat;
 
 // C++: class VideoCapture
 /**
- * Class for video capturing from video files, image sequences or cameras.
+ * Class for video capturing from video gallery, image sequences or cameras.
  *
- * The class provides C++ API for capturing video from cameras or for reading video files and image sequences.
+ * The class provides C++ API for capturing video from cameras or for reading video gallery and image sequences.
  *
  * Here is how the class can be used:
  * INCLUDE: samples/cpp/videocapture_basic.cpp
@@ -348,7 +348,7 @@ public class VideoCapture {
      *     @return {@code false} if no frames has been grabbed
      *
      *     The method/function combines VideoCapture::grab() and VideoCapture::retrieve() in one call. This is the
-     *     most convenient method for reading video files or capturing data from decode and returns the just
+     *     most convenient method for reading video gallery or capturing data from decode and returns the just
      *     grabbed frame. If no frames has been grabbed (camera has been disconnected, or there are no more
      *     frames in video file), the method returns false and the function returns empty image (with %cv::Mat, test it with Mat::empty()).
      *

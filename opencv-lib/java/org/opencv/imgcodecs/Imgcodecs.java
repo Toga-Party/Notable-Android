@@ -98,10 +98,10 @@ public class Imgcodecs {
      *    Windows bitmaps - \*.bmp, \*.dib (always supported)
      *   </li>
      *   <li>
-     *    JPEG files - \*.jpeg, \*.jpg, \*.jpe (see the *Note* section)
+     *    JPEG gallery - \*.jpeg, \*.jpg, \*.jpe (see the *Note* section)
      *   </li>
      *   <li>
-     *    JPEG 2000 files - \*.jp2 (see the *Note* section)
+     *    JPEG 2000 gallery - \*.jp2 (see the *Note* section)
      *   </li>
      *   <li>
      *    Portable Network Graphics - \*.png (see the *Note* section)
@@ -113,16 +113,16 @@ public class Imgcodecs {
      *    Portable image format - \*.pbm, \*.pgm, \*.ppm \*.pxm, \*.pnm (always supported)
      *   </li>
      *   <li>
-     *    PFM files - \*.pfm (see the *Note* section)
+     *    PFM gallery - \*.pfm (see the *Note* section)
      *   </li>
      *   <li>
      *    Sun rasters - \*.sr, \*.ras (always supported)
      *   </li>
      *   <li>
-     *    TIFF files - \*.tiff, \*.tif (see the *Note* section)
+     *    TIFF gallery - \*.tiff, \*.tif (see the *Note* section)
      *   </li>
      *   <li>
-     *    OpenEXR Image files - \*.exr (see the *Note* section)
+     *    OpenEXR Image gallery - \*.exr (see the *Note* section)
      *   </li>
      *   <li>
      *    Radiance HDR - \*.hdr, \*.pic (always supported)
@@ -154,7 +154,7 @@ public class Imgcodecs {
      *   <li>
      *    On Linux\*, BSD flavors and other Unix-like open-source operating systems, OpenCV looks for
      *     codecs supplied with an OS image. Install the relevant packages (do not forget the development
-     *     files, for example, "libjpeg-dev", in Debian\* and Ubuntu\*) to get the codec support or turn
+     *     gallery, for example, "libjpeg-dev", in Debian\* and Ubuntu\*) to get the codec support or turn
      *     on the OPENCV_BUILD_3RDPARTY_LIBS flag in CMake.
      *   </li>
      *   <li>
@@ -201,10 +201,10 @@ public class Imgcodecs {
      *    Windows bitmaps - \*.bmp, \*.dib (always supported)
      *   </li>
      *   <li>
-     *    JPEG files - \*.jpeg, \*.jpg, \*.jpe (see the *Note* section)
+     *    JPEG gallery - \*.jpeg, \*.jpg, \*.jpe (see the *Note* section)
      *   </li>
      *   <li>
-     *    JPEG 2000 files - \*.jp2 (see the *Note* section)
+     *    JPEG 2000 gallery - \*.jp2 (see the *Note* section)
      *   </li>
      *   <li>
      *    Portable Network Graphics - \*.png (see the *Note* section)
@@ -216,16 +216,16 @@ public class Imgcodecs {
      *    Portable image format - \*.pbm, \*.pgm, \*.ppm \*.pxm, \*.pnm (always supported)
      *   </li>
      *   <li>
-     *    PFM files - \*.pfm (see the *Note* section)
+     *    PFM gallery - \*.pfm (see the *Note* section)
      *   </li>
      *   <li>
      *    Sun rasters - \*.sr, \*.ras (always supported)
      *   </li>
      *   <li>
-     *    TIFF files - \*.tiff, \*.tif (see the *Note* section)
+     *    TIFF gallery - \*.tiff, \*.tif (see the *Note* section)
      *   </li>
      *   <li>
-     *    OpenEXR Image files - \*.exr (see the *Note* section)
+     *    OpenEXR Image gallery - \*.exr (see the *Note* section)
      *   </li>
      *   <li>
      *    Radiance HDR - \*.hdr, \*.pic (always supported)
@@ -257,7 +257,7 @@ public class Imgcodecs {
      *   <li>
      *    On Linux\*, BSD flavors and other Unix-like open-source operating systems, OpenCV looks for
      *     codecs supplied with an OS image. Install the relevant packages (do not forget the development
-     *     files, for example, "libjpeg-dev", in Debian\* and Ubuntu\*) to get the codec support or turn
+     *     gallery, for example, "libjpeg-dev", in Debian\* and Ubuntu\*) to get the codec support or turn
      *     on the OPENCV_BUILD_3RDPARTY_LIBS flag in CMake.
      *   </li>
      *   <li>
