@@ -1,6 +1,6 @@
 package me.togaparty.notable_opencv.adapter
 
-data class GlideImage (
+data class GalleryImage (
     val imageUrl: String,
     val title: String
 )

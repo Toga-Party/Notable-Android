@@ -14,7 +14,7 @@ import me.togaparty.notable_opencv.model.AllCategory
 import me.togaparty.notable_opencv.model.CategoryItem
 
 class GlossaryFragment : Fragment() {
-    private lateinit var mainCategoryRecycler: RecyclerView
+    //private lateinit var mainCategoryRecycler: RecyclerView
     private var mainRecyclerAdapter: MainRecyclerAdapter? = null
 
 
@@ -76,6 +76,5 @@ class GlossaryFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_glossary, container, false)
     }
 
-    companion object {
-    }
+    companion object
 }

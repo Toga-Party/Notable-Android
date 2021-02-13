@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.camera.extensions.ExtensionsManager.init
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import me.togaparty.notable_opencv.R
@@ -16,13 +15,8 @@ class MainRecyclerAdapter(private val context: Context, private val allCategory:
     RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
 
     class MainViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-        var categoryTitle: TextView
-        var itemRecycler:RecyclerView
-
-        init{
-            categoryTitle = itemView.findViewById(R.id.cat_title)
-            itemRecycler = itemView.findViewById(R.id.cat_item_recycler)
-        }
+        var categoryTitle: TextView = itemView.findViewById(R.id.cat_title)
+        var itemRecycler:RecyclerView = itemView.findViewById(R.id.cat_item_recycler)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {

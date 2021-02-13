@@ -12,10 +12,10 @@ import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
 
 
-class GlideGalleryImageAdapter(private val itemList: List<GlideImage>) : RecyclerView.Adapter<GlideGalleryImageAdapter.ViewHolder>() {
+class GalleryImageAdapter(private val itemList: List<GalleryImage>) : RecyclerView.Adapter<GalleryImageAdapter.ViewHolder>() {
     private var context: Context? = null
-    var listener: GlideGalleryImageClickListener? = null
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GlideGalleryImageAdapter.ViewHolder {
+    var listener: GalleryImageClickListener? = null
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryImageAdapter.ViewHolder {
         context = parent.context
         val view = LayoutInflater.from(parent.context).inflate(
             R.layout.item_gallery_image, parent,
@@ -25,12 +25,12 @@ class GlideGalleryImageAdapter(private val itemList: List<GlideImage>) : Recycle
     override fun getItemCount(): Int {
         return itemList.size
     }
-    override fun onBindViewHolder(holder: GlideGalleryImageAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: GalleryImageAdapter.ViewHolder, position: Int) {
         holder.bind()
     }
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind() {
-            val image = itemList.get(adapterPosition)
+            val image = itemList[adapterPosition]
 
             val circularProgressDrawable = context?.let { CircularProgressDrawable(it) }
             if (circularProgressDrawable != null) {
@@ -39,9 +39,7 @@ class GlideGalleryImageAdapter(private val itemList: List<GlideImage>) : Recycle
             if (circularProgressDrawable != null) {
                 circularProgressDrawable.centerRadius = 30f
             }
-            if (circularProgressDrawable != null) {
-                circularProgressDrawable.start()
-            }
+            circularProgressDrawable?.start()
 
 
             // load image
