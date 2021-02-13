@@ -156,7 +156,7 @@ class CameraFragment : Fragment() {
                 val imageCaptureExtender = getImageCaptureExtender(it)
                 if (imageCaptureExtender != null) {
                     if (imageCaptureExtender.isExtensionAvailable(cameraSelector)) {
-                        Log.d("CameraDebug", "Image Capture Extension applied ${imageCaptureExtender.toString()}")
+                        Log.d("CameraDebug", "Image Capture Extension applied $imageCaptureExtender")
                         imageCaptureExtender.enableExtension(cameraSelector)
                         return@imageCaptureExtenders
                     }
@@ -181,7 +181,7 @@ class CameraFragment : Fragment() {
                 val previewExtender = getPreviewExtender(it)
                 if (previewExtender != null) {
                     if (previewExtender.isExtensionAvailable(cameraSelector)) {
-                        Log.d("CameraDebug", "Preview Extension applied ${previewExtender.toString()}")
+                        Log.d("CameraDebug", "Preview Extension applied $previewExtender")
                         previewExtender.enableExtension(cameraSelector)
                     }
                     return@previewExtenders

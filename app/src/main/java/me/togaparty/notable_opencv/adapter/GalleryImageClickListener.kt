@@ -1,5 +1,5 @@
 package me.togaparty.notable_opencv.adapter
 
-interface GlideGalleryImageClickListener {
+interface GalleryImageClickListener {
     fun onClick(position: Int)
 }

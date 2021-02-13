@@ -61,13 +61,13 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                           Manifest.permission.READ_EXTERNAL_STORAGE) == 
                           PackageManager.PERMISSION_GRANTED){
                           navController.navigate(
-                                  DashboardFragmentDirections.actionDashboardFragmentToNotableGlideActivity())
+                                  DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment())
                         } else {
                             setFragmentResult("requestKey",
                                     bundleOf("actionDirection"
-                                            to R.id.action_dashboardFragment_to_notableGlideActivity.toString()))
+                                            to R.id.action_dashboardFragment_to_galleryFragment.toString()))
                             navController.navigate(
-                                    DashboardFragmentDirections.actionDashboardFragmentToNotableGlideActivity())
+                                    DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
                         }
 
 
