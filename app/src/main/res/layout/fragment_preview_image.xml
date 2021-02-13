@@ -18,19 +18,29 @@
     <Button
         android:id="@+id/retake"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
         android:layout_marginBottom="40dp"
+        android:background="@drawable/button_bg_preview"
+        android:fontFamily="@font/amiko_bold"
         android:text="@string/retake"
+        android:textSize="11dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHeight_percent="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.28" />
 
     <Button
         android:id="@+id/crop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.07"
+        app:layout_constraintWidth_percent="0.28"
+        android:background="@drawable/button_bg_preview"
+        android:fontFamily="@font/amiko_bold"
+        android:textSize="11dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="40dp"
         android:text="@string/crop"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -40,11 +50,16 @@
     <Button
         android:id="@+id/process"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="40dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="40dp"
+        android:background="@drawable/button_bg_preview"
+        android:fontFamily="@font/amiko_bold"
         android:text="@string/process"
+        android:textSize="11dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.07"
+        app:layout_constraintWidth_percent="0.30" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
