@@ -3,7 +3,6 @@ package me.togaparty.notable_opencv.fragments
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import me.togaparty.notable_opencv.R
 
@@ -29,11 +27,6 @@ class DashboardFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-            Log.d("Dashboard debug", "Called to navigate to PermissionsFragment")
-            NavHostFragment.findNavController(this)
-                    .navigate(DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
-        }
         navController = this.findNavController()
         view.findViewById<CardView>(R.id.camera_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.files_cardview).setOnClickListener(this)
@@ -52,7 +45,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                     } else {
                         setFragmentResult("requestKey",
                                 bundleOf("actionDirection"
-                                        to R.id.action_dashboardFragment_to_cameraFragment.toString()))
+                                        to "toCamera"))
                         navController.navigate(
                                 DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
                     }
@@ -65,7 +58,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                         } else {
                             setFragmentResult("requestKey",
                                     bundleOf("actionDirection"
-                                            to R.id.action_dashboardFragment_to_galleryFragment.toString()))
+                                            to "toGallery"))
                             navController.navigate(
                                     DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
                         }
