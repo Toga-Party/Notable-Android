@@ -21,24 +21,36 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object {
-        fun isExternalStorageWritable(): Boolean {
+        private fun isExternalStorageWritable(): Boolean {
             return Environment.getExternalStorageState() == MEDIA_MOUNTED
         }
-        fun isExternalStorageReadable(): Boolean {
+        private fun isExternalStorageReadable(): Boolean {
             return Environment.getExternalStorageState() in
                     setOf(MEDIA_MOUNTED, MEDIA_MOUNTED_READ_ONLY)
         }
-        fun getOutputDirectory(context: Context): File {
+        fun getOutputCacheDirectory(context: Context): File {
             val appContext = context.applicationContext
-
+            val externalCacheDir = context.externalCacheDirs.firstOrNull()?.let {
+                File(it, "Notable_OPENCV").apply { mkdir() }}
+            return if (externalCacheDir != null && externalCacheDir.exists())
+                externalCacheDir else appContext.cacheDir
+        }
+        fun getAppSpecificAlbumStorageDir(context: Context): File {
+            val appContext = context.applicationContext
             return if (isExternalStorageReadable() and isExternalStorageWritable()) {
-                val externalCacheDir = context.externalCacheDirs.firstOrNull()?.let {
+                val externalFilesDir = context.getExternalFilesDirs(Environment.DIRECTORY_PICTURES)
+                        .firstOrNull()?.let {
                     File(it, "Notable_OPENCV").apply { mkdir() }}
-                if (externalCacheDir != null && externalCacheDir.exists())
-                    externalCacheDir else appContext.cacheDir
+                if (externalFilesDir != null && externalFilesDir.exists())
+                    externalFilesDir else appContext.filesDir
             } else {
-                appContext.cacheDir
+                appContext.filesDir
             }
         }
+
+        fun deleteCache(context: Context) {
+            getOutputCacheDirectory(context).deleteRecursively()
+        }
+
     }
 }
