@@ -52,7 +52,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                     } else {
                         setFragmentResult("requestKey",
                                 bundleOf("actionDirection"
-                                        to R.id.action_dashboardFragment_to_cameraFragment.toString()))
+                                        to "toCamera"))
                         navController.navigate(
                                 DashboardFragmentDirections.actionDashboardFragmentToPermissionsFragment())
                     }
