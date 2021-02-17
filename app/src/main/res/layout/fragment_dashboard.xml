@@ -37,7 +37,7 @@
             android:lineSpacingExtra="10sp"
             android:text="@string/notable"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="35dp"
+            android:textSize="35sp"
             app:layout_constraintBottom_toTopOf="@+id/imageView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.5"

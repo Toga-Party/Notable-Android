@@ -48,9 +48,9 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="76dp"
         android:fontFamily="@font/amiko_bold"
-        android:text="Settings"
+        android:text="@string/settings"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="28dp"
+        android:textSize="28sp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toStartOf="@+id/imageView3"
         app:layout_constraintHorizontal_bias="0.187"
@@ -66,6 +66,7 @@
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.2"
-        app:layout_constraintWidth_percent="0.4" />
+        app:layout_constraintWidth_percent="0.4"
+        android:contentDescription="@string/imageview3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

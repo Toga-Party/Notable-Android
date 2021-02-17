@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -34,6 +33,7 @@ import kotlinx.coroutines.launch
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
+import me.togaparty.notable_opencv.utils.FileUtils
 import java.io.File
 import java.io.FileOutputStream
 
@@ -45,6 +45,7 @@ class PreviewImageFragment : Fragment() {
     private lateinit var container: ConstraintLayout
     private lateinit var imageView: ImageView
     private lateinit var outputCacheDirectory: File
+    private lateinit var galleryDirectory: File
     private lateinit var navController: NavController
 
 
@@ -54,7 +55,8 @@ class PreviewImageFragment : Fragment() {
         setFragmentResultListener("requestKey") { _, bundle ->
             Log.d("PreviewDebug", "Bundle retrieved.")
             fileName = bundle.getString("photoPath").toString()
-            outputCacheDirectory = (MainActivity.getOutputCacheDirectory(requireContext()))
+            outputCacheDirectory = MainActivity.getOutputCacheDirectory(requireContext())
+            galleryDirectory = MainActivity.getAppSpecificAlbumStorageDir(requireContext())
             fileUri = Uri.fromFile(File(outputCacheDirectory, fileName))
         }
 
@@ -89,37 +91,37 @@ class PreviewImageFragment : Fragment() {
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             Log.d("PreviewDebug", "Image cropped successfully")
             fileUri = data?.let { UCrop.getOutput(data) }!!
-            Log.d("PreviewDebug", "Receieved uri: $fileUri")
+            Log.d("PreviewDebug", "Received uri: $fileUri")
         }
     }
 
     private fun cropImage() {
-        val destinationUri = Uri.fromFile(File(outputCacheDirectory, fileName))
-        UCrop.of(Uri.fromFile(File(outputCacheDirectory, fileName)), destinationUri)
+        fileUri?.let {
+            UCrop.of(it, it)
                 //.withAspectRatio(16F, 9F)
                 .withMaxResultSize(imageView.width, imageView.height)
                 .start(requireContext(), this)
+        }
     }
     private fun processImage() {
         Log.d("Preview", "Processing Image")
-        //Log.i("Preview", MainActivity.getAppSpecificAlbumStorageDir(requireContext()).toString())
+        val file = fileUri?.let { File(it.path!!) }!!
         val builder = AlertDialog.Builder(requireContext())
         builder.setMessage("Do you want to save this image in the gallery?")
                 .setTitle("Save Image")
                 .setPositiveButton("Yes") { _, _ ->
-                    val file = File(MainActivity.getAppSpecificAlbumStorageDir(requireContext()),fileName)
-                    val bitmap = BitmapFactory.decodeFile(File(outputCacheDirectory, fileName).absolutePath)
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
+                    val bitmap = FileUtils.getBitmap(file)
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(galleryDirectory))
                     Toast.makeText(requireContext(), "Image saved", Toast.LENGTH_SHORT).show()
-                    MainActivity.deleteCache(requireContext())
                 }
                 .setNegativeButton("No") {_, _ ->
-                    MainActivity.deleteCache(requireContext())
                 }
                 .create()
                 .show()
-
-
+        fileUri?.let {
+            Log.d("PreviewDebug", it.toString())
+            FileUtils.uploadFile(file, it)
+        }
     }
     private fun setImageView() {
         Log.d("PreviewDebug", "FileURI is : $fileUri")

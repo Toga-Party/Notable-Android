@@ -13,9 +13,9 @@
         android:layout_marginBottom="16dp"
         android:fontFamily="@font/amiko_bold"
         android:lineSpacingExtra="10sp"
-        android:text="Glossary"
+        android:text="@string/glossary"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="30dp"
+        android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/edit_text_glossary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -29,14 +29,14 @@
         android:layout_marginBottom="44dp"
         android:background="@drawable/rounded_edittext"
         android:drawableEnd="@drawable/search_icon"
-        android:hint="Search Words..."
+        android:hint="@string/search_words"
         android:inputType="text"
-        android:textSize="14dp"
+        android:textSize="14sp"
         android:padding="10dip"
         app:layout_constraintBottom_toTopOf="@+id/main_recycler"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        android:autofillHints="" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/main_recycler"

@@ -108,6 +108,7 @@ class PermissionsFragment : Fragment() {
         const val REQUEST_CODE_PERMISSIONS = 110
         val REQUIRED_PERMISSIONS = mutableListOf(
                 Manifest.permission.CAMERA,
+                Manifest.permission.INTERNET,
                 Manifest.permission.READ_EXTERNAL_STORAGE).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 add(Manifest.permission.ACCESS_MEDIA_LOCATION)

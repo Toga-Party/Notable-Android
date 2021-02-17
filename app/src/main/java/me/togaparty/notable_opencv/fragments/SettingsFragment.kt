@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_files.*
-import kotlinx.android.synthetic.main.fragment_files.recycler_view
 import kotlinx.android.synthetic.main.fragment_settings.*
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.utils.ExampleAdapter
@@ -30,7 +28,7 @@ class SettingsFragment : Fragment(), ExampleAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val exampleList = generateDummyList(5)
+        generateDummyList(5)
         settings_recycler_view.adapter = adapter
         settings_recycler_view.layoutManager = LinearLayoutManager(this.context)
         settings_recycler_view.setHasFixedSize(true)
@@ -47,8 +45,7 @@ class SettingsFragment : Fragment(), ExampleAdapter.OnItemClickListener {
     override fun onItemClick(position: Int) {
         Toast.makeText(this.context, "Setting $position clicked", Toast.LENGTH_SHORT).show()
     }
-    companion object {
-    }
+    companion object
 
 
 }
