@@ -111,7 +111,8 @@ class PreviewImageFragment : Fragment() {
                 .setTitle("Save Image")
                 .setPositiveButton("Yes") { _, _ ->
                     val bitmap = FileUtils.getBitmap(file)
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(galleryDirectory))
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(
+                        File(galleryDirectory,fileName)))
                     Toast.makeText(requireContext(), "Image saved", Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton("No") {_, _ ->

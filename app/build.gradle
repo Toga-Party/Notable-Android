@@ -96,16 +96,12 @@ dependencies {
     implementation 'com.github.yalantis:ucrop:2.2.6-native'
 
     //OkHttp
-    //implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
     //Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    //implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava:2.9.0'
-
-
-
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
@@ -123,7 +119,5 @@ dependencies {
     //OpenCV
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(":opencv-lib")
-
-
 
 }

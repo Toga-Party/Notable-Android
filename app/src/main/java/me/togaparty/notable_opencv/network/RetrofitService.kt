@@ -1,19 +1,17 @@
 package me.togaparty.notable_opencv.network
 
 import okhttp3.MultipartBody
-import okhttp3.ResponseBody
+import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.http.Headers
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
+import retrofit2.http.*
 
 
 interface RetrofitService {
-    @Headers("Content-Type: multipart/form-data")
+    //@Headers("Content-Type: application/json")
     @Multipart
     @POST("/predict")
     fun upload(
-        @Part image: MultipartBody.Part
-    ) : Call<ResponseBody>
+        @Part image: MultipartBody.Part,
+        @Part("file_name") name: RequestBody
+    ) : Call<ServerResponse>
 }
