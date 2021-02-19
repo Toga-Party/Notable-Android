@@ -2,7 +2,7 @@
 
 class WebURL {
     companion object {
-        private const val baseURL = "https://be020351999c.ngrok.io/"
+        private const val baseURL = "https://0daf214f1aba.ngrok.io/"
         const val url = baseURL + "predict/"
     }
 }

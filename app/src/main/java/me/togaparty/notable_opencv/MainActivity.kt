@@ -18,8 +18,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         container = findViewById(R.id.fragment_container)
     }
-
-
     companion object {
         private fun isExternalStorageWritable(): Boolean {
             return Environment.getExternalStorageState() == MEDIA_MOUNTED
