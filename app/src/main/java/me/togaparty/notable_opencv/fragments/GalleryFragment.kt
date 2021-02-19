@@ -6,9 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,17 +18,14 @@ import me.togaparty.notable_opencv.adapter.GalleryImageAdapter
 import me.togaparty.notable_opencv.adapter.GalleryImageClickListener
 import java.io.File
 
-class GalleryFragment : Fragment(), GalleryImageClickListener {
+class GalleryFragment : Fragment(),
+        GalleryImageClickListener {
     // Gallery Column Count
     private val spanCount = 2
     private val imageList = ArrayList<GalleryImage>()
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
     private lateinit var galleryDirectory: File
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        galleryDirectory = MainActivity.getAppSpecificAlbumStorageDir(requireContext())
-    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -43,11 +38,12 @@ class GalleryFragment : Fragment(), GalleryImageClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-            Log.d("GalleryDebug", "Called to navigate to PermissionsFragment")
-            setFragmentResult("requestKey", bundleOf("actionDirection" to "toGallery"))
-            navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToPermissionsFragment())
+
+        navController = this.findNavController()
+        if(!DashboardFragment.permissionsGranted(requireContext(), DashboardFragment.CAMERA_REQUIRED_PERMISSIONS)) {
+            navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToDashboardFragment())
         }
+        galleryDirectory = MainActivity.getAppSpecificAlbumStorageDir(requireContext())
         // init adapter
         galleryAdapter = GalleryImageAdapter(imageList)
         galleryAdapter.listener = this
@@ -55,7 +51,7 @@ class GalleryFragment : Fragment(), GalleryImageClickListener {
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
         recyclerView.adapter = galleryAdapter
         // load images
-        navController = this.findNavController()
+
         loadImages()
     }
 
@@ -104,4 +100,6 @@ class GalleryFragment : Fragment(), GalleryImageClickListener {
         galleryFragment.show(fragmentTransaction, "gallery")
     }
     companion object
+
+
 }

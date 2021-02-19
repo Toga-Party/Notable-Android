@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             return if (isExternalStorageReadable() and isExternalStorageWritable()) {
                 val externalFilesDir = context.getExternalFilesDirs(Environment.DIRECTORY_PICTURES)
                         .firstOrNull()?.let {
-                    File(it, "Notable_OPENCV").apply { mkdir() }}
+                            File(it, "Notable_OPENCV").apply { mkdir() }}
                 if (externalFilesDir != null && externalFilesDir.exists())
                     externalFilesDir else appContext.filesDir
             } else {

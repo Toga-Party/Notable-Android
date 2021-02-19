@@ -8,6 +8,7 @@ import android.webkit.MimeTypeMap
 import me.togaparty.notable_opencv.network.RetrofitService
 import me.togaparty.notable_opencv.network.RetrofitWorker
 import me.togaparty.notable_opencv.network.ServerResponse
+import me.togaparty.notable_opencv.network.WebURL.Companion.url
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -25,7 +26,7 @@ class FileUtils{
                 = BitmapFactory.decodeFile(file.absolutePath)
         @JvmStatic
         fun uploadFile(file: File, fileUri: Uri) {
-
+            Log.d("Files", "Upload File to $url")
             val serviceWorker = RetrofitWorker.getRetrofit()
             val requestFile = file
                 .asRequestBody((MimeTypeMap.getFileExtensionFromUrl(fileUri.toString())

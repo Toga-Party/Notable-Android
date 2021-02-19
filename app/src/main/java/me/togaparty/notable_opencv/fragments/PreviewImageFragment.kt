@@ -2,13 +2,17 @@ package me.togaparty.notable_opencv.fragments
 
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -34,8 +38,10 @@ import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.utils.FileUtils
+import me.togaparty.notable_opencv.utils.toast
 import java.io.File
 import java.io.FileOutputStream
+import java.io.OutputStream
 
 
 class PreviewImageFragment : Fragment() {
@@ -110,10 +116,33 @@ class PreviewImageFragment : Fragment() {
         builder.setMessage("Do you want to save this image in the gallery?")
                 .setTitle("Save Image")
                 .setPositiveButton("Yes") { _, _ ->
+                    val fos = FileOutputStream(
+                            File(galleryDirectory,fileName))
                     val bitmap = FileUtils.getBitmap(file)
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(
-                        File(galleryDirectory,fileName)))
-                    Toast.makeText(requireContext(), "Image saved", Toast.LENGTH_SHORT).show()
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                        activity?.contentResolver?.also { resolver ->
+//                            val contentValues = ContentValues().apply {
+//                                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+//                                put(MediaStore.MediaColumns.MIME_TYPE, "image/*")
+//                                put(MediaStore.MediaColumns.RELATIVE_PATH,
+//                                        Environment.DIRECTORY_PICTURES + File.pathSeparator + "Notable")
+//                            }
+//                            val imageUri: Uri? =
+//                                    resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+//                            fos = imageUri?.let { resolver.openOutputStream(it) }
+//                        }
+//                    } else {
+//                        val imagesDir =
+//                                Environment.getExternalStoragePublicDirectory(
+//                                        Environment.DIRECTORY_PICTURES + File.pathSeparator + "Notable")
+//                        val image = File(imagesDir, fileName)
+//                        fos = FileOutputStream(image)
+//                    }
+                    fos.use {
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+                        toast("Saved to Photos")
+                    }
+                    fos.close()
                 }
                 .setNegativeButton("No") {_, _ ->
                 }

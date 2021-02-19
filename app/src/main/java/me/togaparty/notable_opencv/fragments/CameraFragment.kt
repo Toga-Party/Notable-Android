@@ -76,15 +76,13 @@ class CameraFragment : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
-            Log.d("CameraDebug", "Called to navigate to PermissionsFragment")
-            setFragmentResult("requestKey", bundleOf("actionDirection" to "CameraFragment"))
-            navController.navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
-        }
 
-        container = view as ConstraintLayout
+
         navController = this.findNavController()
-
+        if(!DashboardFragment.permissionsGranted(requireContext(), DashboardFragment.CAMERA_REQUIRED_PERMISSIONS)) {
+            navController.navigate(CameraFragmentDirections.actionCameraFragmentToDashboardFragment())
+        }
+        container = view as ConstraintLayout
         previewView = container.findViewById(R.id.view_finder)
         container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
 
