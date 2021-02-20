@@ -9,7 +9,11 @@ plugins {
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
-
+    if (project.hasProperty('devBuild')) {
+        splits.abi.enable = false
+        splits.density.enable = false
+        aaptOptions.cruncherEnabled = false
+    }
     defaultConfig {
         applicationId "me.togaparty.notable_opencv"
         minSdkVersion rootProject.minSdkVersion
