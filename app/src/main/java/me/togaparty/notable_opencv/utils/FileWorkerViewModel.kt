@@ -1,5 +1,7 @@
 package me.togaparty.notable_opencv.utils
 
+import android.annotation.SuppressLint
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,14 +9,64 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.togaparty.notable_opencv.adapter.GalleryImage
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 
-class FileSaveViewModel: ViewModel() {
+class FileWorkerViewModel: ViewModel() {
+    @SuppressLint("Recycle")
+    fun loadImages(context: Context):  ArrayList<GalleryImage> {
+        val imageList = ArrayList<GalleryImage>()
+
+        val collection = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        }else {
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DISPLAY_NAME,
+        )
+        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Images.Media.RELATIVE_PATH + " like ? "
+        } else {
+            MediaStore.Images.Media.DATA + " like ? "
+        }
+        val selectionArgs = arrayOf("%Notable%")
+        val query = context.contentResolver.query(
+            collection,
+            projection,
+            selection,
+                selectionArgs,
+                null
+        )
+
+        query?.use {
+            Log.d("FileWorker", "Query is not null")
+            val idCol = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val nameCol = it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+            Log.d("FileWorker", it.count.toString())
+            while (it.moveToNext()) {
+                Log.d("FileWorker", "Cursor traversal")
+                val id = it.getLong(idCol)
+                val name = it.getString(nameCol)
+                val contentUri: Uri = ContentUris.withAppendedId(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    id
+                )
+                imageList.add(GalleryImage(contentUri,name))
+            }
+
+        }
+        Log.d("FileWorker", imageList.size.toString())
+        return imageList
+    }
 
     suspend fun saveImage(
         context: Context,
@@ -35,7 +87,7 @@ class FileSaveViewModel: ViewModel() {
 
                 val imageUri: Uri? =
                     context.contentResolver.insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
                         values
                     )
 
