@@ -34,7 +34,7 @@ import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.network.RetrofitUploader
-import me.togaparty.notable_opencv.utils.FileSaveViewModel
+import me.togaparty.notable_opencv.utils.FileWorkerViewModel
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
 
@@ -48,7 +48,7 @@ class PreviewImageFragment : Fragment() {
     private lateinit var outputCacheDirectory: File
     private lateinit var galleryDirectory: File
     private lateinit var navController: NavController
-    private lateinit var fileSaveViewModel: FileSaveViewModel
+    private lateinit var fileWorkerViewModel: FileWorkerViewModel
     private lateinit var retrofitUploader: RetrofitUploader
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +82,7 @@ class PreviewImageFragment : Fragment() {
                 Navigation.createNavigateOnClickListener(R.id.action_previewImage_pop, null))
         container.findViewById<Button>(R.id.crop).setOnClickListener {cropImage()}
         container.findViewById<Button>(R.id.process).setOnClickListener {processImage()}
-        fileSaveViewModel = FileSaveViewModel()
+        fileWorkerViewModel = FileWorkerViewModel()
         retrofitUploader = RetrofitUploader()
         GlobalScope.launch {
             container.post{
@@ -118,7 +118,7 @@ class PreviewImageFragment : Fragment() {
 
                     fileUri?.let {
                         GlobalScope.launch(Dispatchers.IO) {
-                        fileSaveViewModel.saveImage(
+                        fileWorkerViewModel.saveImage(
                             requireContext(),
                             "Notable",
                             fileName,
