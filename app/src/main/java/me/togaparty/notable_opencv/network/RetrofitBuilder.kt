@@ -22,8 +22,8 @@ class RetrofitBuilder {
                     logger.level = HttpLoggingInterceptor.Level.HEADERS
 
                     val httpBuilder = OkHttpClient.Builder()
-                            .connectTimeout(90, TimeUnit.SECONDS)
-                            .readTimeout(90, TimeUnit.SECONDS)
+                            .connectTimeout(270, TimeUnit.SECONDS)
+                            .readTimeout(270, TimeUnit.SECONDS)
                             .addInterceptor(logger)  /// show all JSON in logCat
                     client = httpBuilder.build()
 

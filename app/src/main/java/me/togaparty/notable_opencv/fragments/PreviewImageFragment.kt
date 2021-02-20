@@ -1,25 +1,20 @@
 package me.togaparty.notable_opencv.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
-import android.content.ContentValues
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -32,16 +27,16 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.yalantis.ucrop.UCrop
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
-import me.togaparty.notable_opencv.utils.FileUtils
+import me.togaparty.notable_opencv.network.RetrofitUploader
+import me.togaparty.notable_opencv.utils.FileWorkerViewModel
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
 
 
 class PreviewImageFragment : Fragment() {
@@ -53,7 +48,8 @@ class PreviewImageFragment : Fragment() {
     private lateinit var outputCacheDirectory: File
     private lateinit var galleryDirectory: File
     private lateinit var navController: NavController
-
+    private lateinit var fileWorkerViewModel: FileWorkerViewModel
+    private lateinit var retrofitUploader: RetrofitUploader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,11 +76,14 @@ class PreviewImageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         container = view as ConstraintLayout
         navController = container.findNavController()
+
         imageView = container.findViewById(R.id.imageView)
         container.findViewById<Button>(R.id.retake).setOnClickListener(
                 Navigation.createNavigateOnClickListener(R.id.action_previewImage_pop, null))
         container.findViewById<Button>(R.id.crop).setOnClickListener {cropImage()}
         container.findViewById<Button>(R.id.process).setOnClickListener {processImage()}
+        fileWorkerViewModel = FileWorkerViewModel()
+        retrofitUploader = RetrofitUploader()
         GlobalScope.launch {
             container.post{
                 setImageView()
@@ -104,54 +103,41 @@ class PreviewImageFragment : Fragment() {
     private fun cropImage() {
         fileUri?.let {
             UCrop.of(it, it)
-                //.withAspectRatio(16F, 9F)
                 .withMaxResultSize(imageView.width, imageView.height)
                 .start(requireContext(), this)
         }
     }
+    @SuppressLint("RestrictedApi")
     private fun processImage() {
         Log.d("Preview", "Processing Image")
-        val file = fileUri?.let { File(it.path!!) }!!
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setMessage("Do you want to save this image in the gallery?")
+
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setMessage("Do you want to save this image in the gallery?")
                 .setTitle("Save Image")
                 .setPositiveButton("Yes") { _, _ ->
-                    val fos = FileOutputStream(
-                            File(galleryDirectory,fileName))
-                    val bitmap = FileUtils.getBitmap(file)
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//                        activity?.contentResolver?.also { resolver ->
-//                            val contentValues = ContentValues().apply {
-//                                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-//                                put(MediaStore.MediaColumns.MIME_TYPE, "image/*")
-//                                put(MediaStore.MediaColumns.RELATIVE_PATH,
-//                                        Environment.DIRECTORY_PICTURES + File.pathSeparator + "Notable")
-//                            }
-//                            val imageUri: Uri? =
-//                                    resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-//                            fos = imageUri?.let { resolver.openOutputStream(it) }
-//                        }
-//                    } else {
-//                        val imagesDir =
-//                                Environment.getExternalStoragePublicDirectory(
-//                                        Environment.DIRECTORY_PICTURES + File.pathSeparator + "Notable")
-//                        val image = File(imagesDir, fileName)
-//                        fos = FileOutputStream(image)
-//                    }
-                    fos.use {
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-                        toast("Saved to Photos")
+
+                    fileUri?.let {
+                        GlobalScope.launch(Dispatchers.IO) {
+                        fileWorkerViewModel.saveImage(
+                            requireContext(),
+                            "Notable",
+                            fileName,
+                            it
+                        )}
                     }
-                    fos.close()
+                    toast("Image Saved")
                 }
-                .setNegativeButton("No") {_, _ ->
+                .setNegativeButton("No") { _, _ ->
                 }
                 .create()
                 .show()
-        fileUri?.let {
-            Log.d("PreviewDebug", it.toString())
-            FileUtils.uploadFile(file, it)
-        }
+            fileUri?.let {
+                Log.d("PreviewDebug", it.toString())
+                GlobalScope.launch(Dispatchers.IO) {
+                    retrofitUploader.uploadFile(File(it.path!!), it)
+                }
+            }
+
     }
     private fun setImageView() {
         Log.d("PreviewDebug", "FileURI is : $fileUri")

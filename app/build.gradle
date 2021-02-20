@@ -9,7 +9,11 @@ plugins {
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
-
+    if (project.hasProperty('devBuild')) {
+        splits.abi.enable = false
+        splits.density.enable = false
+        aaptOptions.cruncherEnabled = false
+    }
     defaultConfig {
         applicationId "me.togaparty.notable_opencv"
         minSdkVersion rootProject.minSdkVersion
@@ -63,14 +67,14 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+
 
     // For control over item selection of both touch and mouse driven selection
 
     //noinspection GradleDependency recycylerview is in release candidate version.
     implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc03"
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.palette:palette-ktx:1.0.0'
-
 
     // Navigation library
     def nav_version = "2.3.3"
@@ -101,7 +105,7 @@ dependencies {
     //Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava:2.9.0'
+
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'

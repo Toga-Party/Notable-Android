@@ -283,7 +283,7 @@ class CameraFragment : Fragment() {
 
         private const val TAG = "Notable:CameraX"
         private const val FILENAME_FORMAT = "EEE_dd_MM_yyyy_HHmmss"
-        private const val PHOTO_EXTENSION = ".jpg"
+        private const val PHOTO_EXTENSION = ".png"
     }
 
 

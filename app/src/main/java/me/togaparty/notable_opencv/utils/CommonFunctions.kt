@@ -2,11 +2,14 @@ package me.togaparty.notable_opencv.utils
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
+import java.io.File
 
 fun Context.toast(text: String?) {
     Toast.makeText(this, text, Toast.LENGTH_LONG).show()
@@ -21,6 +24,7 @@ fun Context.showDeniedDialog(title: String,
         it.setMessage(body)
     }.create().show()
 }
+
 fun Context.showPermissionRequestDialog(
     title: String,
     body: String,
@@ -38,4 +42,7 @@ fun Context.showPermissionRequestDialog(
             "You can accept the permissions needed in the Setting page")
         }
     }.create().show()
+
 }
+fun getBitmap(file: File): Bitmap
+        = BitmapFactory.decodeFile(file.absolutePath)

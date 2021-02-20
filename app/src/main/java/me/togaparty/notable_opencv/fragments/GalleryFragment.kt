@@ -11,11 +11,15 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.fragment_gallery.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.adapter.GalleryImageAdapter
 import me.togaparty.notable_opencv.adapter.GalleryImageClickListener
+import me.togaparty.notable_opencv.utils.FileWorkerViewModel
 import java.io.File
 
 class GalleryFragment : Fragment(),
@@ -25,8 +29,7 @@ class GalleryFragment : Fragment(),
     private val imageList = ArrayList<GalleryImage>()
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
-    private lateinit var galleryDirectory: File
-
+    private lateinit var fileWorkerViewModel: FileWorkerViewModel
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -35,7 +38,6 @@ class GalleryFragment : Fragment(),
         return inflater.inflate(R.layout.fragment_gallery, container, false)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -43,54 +45,27 @@ class GalleryFragment : Fragment(),
         if(!DashboardFragment.permissionsGranted(requireContext(), DashboardFragment.CAMERA_REQUIRED_PERMISSIONS)) {
             navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToDashboardFragment())
         }
-        galleryDirectory = MainActivity.getAppSpecificAlbumStorageDir(requireContext())
         // init adapter
         galleryAdapter = GalleryImageAdapter(imageList)
         galleryAdapter.listener = this
+        fileWorkerViewModel = FileWorkerViewModel()
         // init recyclerview
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
         recyclerView.adapter = galleryAdapter
         // load images
 
-        loadImages()
+        loadGallery()
     }
 
 
-    private fun loadImages() {
+    private fun loadGallery() {
 
-
-        val galleryFiles = galleryDirectory.listFiles()
-
-        if (galleryFiles != null) {
-            Log.d("GalleryFragment", "galleryFiles size: ${galleryFiles.size}")
-            for (files in galleryFiles) {
-                imageList.add(GalleryImage(Uri.fromFile(files).toString(), files.toString()))
-            }
+        GlobalScope.launch(Dispatchers.Main) {
+            imageList.addAll(fileWorkerViewModel.loadImages(requireContext()))
+            galleryAdapter.notifyDataSetChanged()
         }
-
-        /*
-        imageList.add(GalleryImage("https://i.ibb.co/gM5NNJX/butterfly.jpg", "Butterfly"))
-        imageList.add(GalleryImage("https://i.ibb.co/10fFGkZ/car-race.jpg", "Car Racing"))
-        imageList.add(GalleryImage("https://i.ibb.co/ygqHsHV/coffee-milk.jpg", "Coffee with Milk"))
-        imageList.add(GalleryImage("https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2020/02/322868_1100-1100x628.jpg", "Fox"))
-        imageList.add(GalleryImage("https://i.ibb.co/L1m1NxP/girl.jpg", "Mountain Girl"))
-        imageList.add(GalleryImage("https://i.ibb.co/wc9rSgw/desserts.jpg", "Desserts Table"))
-        imageList.add(GalleryImage("https://i.ibb.co/wdrdpKC/kitten.jpg", "Kitten"))
-        imageList.add(GalleryImage("https://i.ibb.co/dBCHzXQ/paris.jpg", "Paris Eiffel"))
-        imageList.add(GalleryImage("https://i.ibb.co/JKB0KPk/pizza.jpg", "Pizza Time"))
-        imageList.add(GalleryImage("https://i.ibb.co/VYYPZGk/salmon.jpg", "Salmon "))
-        imageList.add(GalleryImage("https://i.ibb.co/JvWpzYC/sunset.jpg", "Sunset in Beach"))
-        */
-        galleryAdapter.notifyDataSetChanged()
     }
     override fun onClick(position: Int) {
-        /*setFragmentResult("requestKey",
-            bundleOf("images" to imageList))
-        setFragmentResult("requestKey",
-            bundleOf("position" to position))
-
-        navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToGalleryFullscreenFragment())
-        */
         val bundle = Bundle()
             bundle.putSerializable("images", imageList)
             bundle.putInt("position", position)
