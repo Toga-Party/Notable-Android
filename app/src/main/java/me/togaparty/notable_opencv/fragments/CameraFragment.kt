@@ -22,6 +22,8 @@ import androidx.navigation.fragment.findNavController
 import com.google.common.util.concurrent.ListenableFuture
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
+import me.togaparty.notable_opencv.utils.ALL_REQUIRED_PERMISSIONS
+import me.togaparty.notable_opencv.utils.permissionsGranted
 import org.opencv.android.InstallCallbackInterface
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
@@ -79,7 +81,7 @@ class CameraFragment : Fragment() {
 
 
         navController = this.findNavController()
-        if(!DashboardFragment.permissionsGranted(requireContext(), DashboardFragment.CAMERA_REQUIRED_PERMISSIONS)) {
+        if(!permissionsGranted(requireContext(), ALL_REQUIRED_PERMISSIONS)) {
             navController.navigate(CameraFragmentDirections.actionCameraFragmentToDashboardFragment())
         }
         container = view as ConstraintLayout

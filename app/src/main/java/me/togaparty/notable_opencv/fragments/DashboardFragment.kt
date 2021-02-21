@@ -18,8 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.utils.showDeniedDialog
-import me.togaparty.notable_opencv.utils.showPermissionRequestDialog
+import me.togaparty.notable_opencv.utils.*
 
 class DashboardFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
@@ -41,13 +40,21 @@ class DashboardFragment : Fragment(), View.OnClickListener {
         view.findViewById<CardView>(R.id.files_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.settings_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.glossary_cardview).setOnClickListener(this)
+
+        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        val switchVal = sharedPref.getString(
+                R.string.summary_camera_permission_preference.toString(), "None")
+        if (switchVal != null) {
+            Log.d("Dashboard", switchVal)
+        }
     }
+
 
     override fun onClick(v: View?) {
         when(v!!.id){
             R.id.camera_cardview ->
                 when {
-                    permissionsGranted(requireContext(), CAMERA_REQUIRED_PERMISSIONS) -> {
+                    permissionsGranted(requireContext(), ALL_REQUIRED_PERMISSIONS) -> {
                         navController.navigate(
                             DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
                         )
@@ -59,13 +66,13 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             "Permission Required",
                             "Camera access and File access is required to use this feature."
                         ) {
-                            checkPermissions.launch(CAMERA_REQUIRED_PERMISSIONS.toTypedArray())
+                            checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
                         }
                     }
                     else -> {
-                        checkPermissions.launch(CAMERA_REQUIRED_PERMISSIONS.toTypedArray())
+                        checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
                         navDirections =
                                 DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
                     }
@@ -94,7 +101,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                     }
                 }
             R.id.settings_cardview -> navController.navigate(
-                    DashboardFragmentDirections.actionDashboardFragmentToSettingsFragment())
+                    DashboardFragmentDirections.actionDashboardFragmentToSettingsActivity())
             R.id.glossary_cardview -> navController.navigate(
                     DashboardFragmentDirections.actionDashboardFragmentToGlossaryFragment())
         }
@@ -142,28 +149,4 @@ class DashboardFragment : Fragment(), View.OnClickListener {
             }
     }
 
-
-    companion object {
-        fun permissionsGranted(context: Context, permissions: List<String>) = permissions.all {
-            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-        }
-        val CAMERA_REQUIRED_PERMISSIONS = mutableListOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE).apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                add(Manifest.permission.ACCESS_MEDIA_LOCATION)
-            } else {
-                add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-        }
-
-        val FILE_REQUIRED_PERMISSIONS = mutableListOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE).apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                add(Manifest.permission.ACCESS_MEDIA_LOCATION)
-            }  else {
-                add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-        }
-    }
 }

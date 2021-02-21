@@ -1,8 +1,6 @@
 package me.togaparty.notable_opencv.fragments
 
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,13 +12,13 @@ import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.adapter.GalleryImageAdapter
 import me.togaparty.notable_opencv.adapter.GalleryImageClickListener
+import me.togaparty.notable_opencv.utils.ALL_REQUIRED_PERMISSIONS
 import me.togaparty.notable_opencv.utils.FileWorkerViewModel
-import java.io.File
+import me.togaparty.notable_opencv.utils.permissionsGranted
 
 class GalleryFragment : Fragment(),
         GalleryImageClickListener {
@@ -42,7 +40,7 @@ class GalleryFragment : Fragment(),
         super.onViewCreated(view, savedInstanceState)
 
         navController = this.findNavController()
-        if(!DashboardFragment.permissionsGranted(requireContext(), DashboardFragment.CAMERA_REQUIRED_PERMISSIONS)) {
+        if(!permissionsGranted(requireContext(), ALL_REQUIRED_PERMISSIONS)) {
             navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToDashboardFragment())
         }
         // init adapter

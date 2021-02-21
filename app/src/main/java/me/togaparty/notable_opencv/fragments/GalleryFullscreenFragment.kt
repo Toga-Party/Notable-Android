@@ -11,7 +11,7 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.glide_image_fullscreen.view.*
+import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.helper.GlideApp
@@ -27,12 +27,6 @@ class GalleryFullscreenFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
-        /*setFragmentResultListener("requestKey")  { _ , bundle ->
-            Log.d("FullscreenGallery", "Bundle Retrieved.")
-            @Suppress("UNCHECKED_CAST")
-            imageList = ArrayList(bundle.getSerializable("images") as ArrayList<GalleryImage>)
-            selectedPosition = bundle.getInt("position")
-        }*/
         @Suppress("UNCHECKED_CAST")
         imageList = ArrayList(arguments?.getSerializable("images") as ArrayList<GalleryImage>)
         selectedPosition = requireArguments().getInt("position")
@@ -62,8 +56,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
         object : ViewPager.OnPageChangeListener {
             override fun onPageSelected(position: Int) {
-                // set gallery title
-                //tvGalleryTitle.text = imageList.get(position).title
+                Log.d("GalleryFullscreen", "$position")
             }
             override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
             }
@@ -74,7 +67,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     inner class GalleryPagerAdapter : PagerAdapter() {
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val layoutInflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val view = layoutInflater.inflate(R.layout.glide_image_fullscreen, container, false)
+            val view = layoutInflater.inflate(R.layout.gallery_image_fullscreen, container, false)
             val image = imageList[position]
 
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
