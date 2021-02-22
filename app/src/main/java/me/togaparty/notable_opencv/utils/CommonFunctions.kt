@@ -8,36 +8,32 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import java.io.File
+
 fun permissionsGranted(context: Context, permissions: List<String>) = permissions.all {
     ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
 }
 val ALL_REQUIRED_PERMISSIONS = mutableListOf(
         Manifest.permission.CAMERA,
-        Manifest.permission.READ_EXTERNAL_STORAGE).apply {
+        Manifest.permission.READ_EXTERNAL_STORAGE).also {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+        it.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
     } else {
-        add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        it.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     }
 }
 
 val FILE_REQUIRED_PERMISSIONS = mutableListOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE).apply {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        add(Manifest.permission.ACCESS_MEDIA_LOCATION)
-    }  else {
-        add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    }
+        Manifest.permission.READ_EXTERNAL_STORAGE).also {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            it.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+        }  else {
+            it.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
 }
-fun Context.toast(text: String?) {
-    Toast.makeText(this, text, Toast.LENGTH_LONG).show()
-}
+
 fun Fragment.toast(text: String?) {
     Toast.makeText(this.requireContext(), text, Toast.LENGTH_LONG).show()
 }

@@ -101,24 +101,31 @@ class SettingsActivity : AppCompatActivity(),
         private fun updatePreferences() {
             val context = preferenceManager.context
             val screen = preferenceManager.createPreferenceScreen(context).apply {
-
-                if(!permissionsGranted(requireContext(), listOf(Manifest.permission.CAMERA))) {
                     val cameraPreference = SwitchPreferenceCompat(context).apply{
                         key = "camera_permissions"
                         title = "Camera Permissions"
-                        setDefaultValue(false)
+                        switchTextOff = "Allow this app to use the Camera"
+                        switchTextOff = "Camera permission is enabled"
                     }
-                    addPreference(cameraPreference)
+
+                if(permissionsGranted(requireContext(), listOf(Manifest.permission.CAMERA))) {
+                    cameraPreference.setDefaultValue(true)
+                    cameraPreference.isEnabled = false
                 }
-                if(!permissionsGranted(requireContext(), FILE_REQUIRED_PERMISSIONS)) {
                     val filePreference = SwitchPreferenceCompat(context).apply{
                         key = "file_permissions"
                         title = "File Permissions"
-                        setDefaultValue(false)
+                        switchTextOff = "Allow this app to save and load files"
+                        switchTextOn = "File permission is enabled"
                     }
-                    addPreference(filePreference)
+                if(permissionsGranted(requireContext(), FILE_REQUIRED_PERMISSIONS)) {
+                    filePreference.setDefaultValue(true)
+                    filePreference.isEnabled = false
                 }
+                addPreference(filePreference)
+                addPreference(cameraPreference)
             }
+
             preferenceScreen = screen
         }
         override fun onResume() {
@@ -161,7 +168,7 @@ class SettingsActivity : AppCompatActivity(),
                 ) {
                     permissions ->
 
-                    if (permissions[Manifest.permission.CAMERA] == true &&
+                    if (permissions[Manifest.permission.CAMERA] == true ||
                             permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true){
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             if(permissions[Manifest.permission.ACCESS_MEDIA_LOCATION] == false) {

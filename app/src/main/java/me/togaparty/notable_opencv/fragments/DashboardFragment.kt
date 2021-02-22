@@ -2,7 +2,6 @@ package me.togaparty.notable_opencv.fragments
 
 import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -12,7 +11,6 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
@@ -117,8 +115,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                 ActivityResultContracts.RequestMultiplePermissions()
             ) {
                 permissions ->
-
-                if (permissions[Manifest.permission.CAMERA] == true &&
+                if (permissions[Manifest.permission.CAMERA] == true ||
                     permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true){
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             if(permissions[Manifest.permission.ACCESS_MEDIA_LOCATION] == true) {
@@ -130,16 +127,8 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                                         "You can accept the permissions needed in the Setting page")
                             }
                         } else {
-                            if(permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true) {
-                                navigateToFragment()
-                            } else {
-                                Log.d("Dashboard", "CheckPermissionLauncher 2")
-                                requireContext().showDeniedDialog(
-                                        "Access denied",
-                                        "You can accept the permissions needed in the Setting page")
-                            }
+                            navigateToFragment()
                         }
-
                 } else {
                     Log.d("Dashboard", "CheckPermissionLauncher 3")
                     requireContext().showDeniedDialog(

@@ -17,6 +17,7 @@ import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.adapter.GalleryImageAdapter
 import me.togaparty.notable_opencv.adapter.GalleryImageClickListener
 import me.togaparty.notable_opencv.utils.ALL_REQUIRED_PERMISSIONS
+import me.togaparty.notable_opencv.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_opencv.utils.FileWorkerViewModel
 import me.togaparty.notable_opencv.utils.permissionsGranted
 
@@ -40,7 +41,7 @@ class GalleryFragment : Fragment(),
         super.onViewCreated(view, savedInstanceState)
 
         navController = this.findNavController()
-        if(!permissionsGranted(requireContext(), ALL_REQUIRED_PERMISSIONS)) {
+        if(!permissionsGranted(requireContext(), FILE_REQUIRED_PERMISSIONS)) {
             navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToDashboardFragment())
         }
         // init adapter
@@ -57,9 +58,9 @@ class GalleryFragment : Fragment(),
 
 
     private fun loadGallery() {
-
+        val context = requireContext()
         GlobalScope.launch(Dispatchers.Main) {
-            imageList.addAll(fileWorkerViewModel.loadImages(requireContext()))
+            imageList.addAll(fileWorkerViewModel.loadImages(context))
             galleryAdapter.notifyDataSetChanged()
         }
     }
