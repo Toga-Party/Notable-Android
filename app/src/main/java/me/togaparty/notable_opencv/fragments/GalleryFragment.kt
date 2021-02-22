@@ -16,7 +16,6 @@ import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.adapter.GalleryImageAdapter
 import me.togaparty.notable_opencv.adapter.GalleryImageClickListener
-import me.togaparty.notable_opencv.utils.ALL_REQUIRED_PERMISSIONS
 import me.togaparty.notable_opencv.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_opencv.utils.FileWorkerViewModel
 import me.togaparty.notable_opencv.utils.permissionsGranted
@@ -70,8 +69,7 @@ class GalleryFragment : Fragment(),
             bundle.putInt("position", position)
         val fragmentTransaction = childFragmentManager.beginTransaction()
         val galleryFragment = GalleryFullscreenFragment()
-        val iF = InspectFragment()
-        galleryFragment.setArguments(bundle)
+        galleryFragment.arguments = bundle
         galleryFragment.show(fragmentTransaction, "gallery")
     }
     companion object

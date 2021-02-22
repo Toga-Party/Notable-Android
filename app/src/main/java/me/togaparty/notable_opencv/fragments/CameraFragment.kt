@@ -207,10 +207,15 @@ class CameraFragment : Fragment() {
                     }
         }
         fun setupImageCapture() {
+            val metrics = DisplayMetrics().also { previewView.display.getRealMetrics(it) }
+            val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
+            val rotation = previewView.display.rotation
             useCases = mutableListOf()
             enableImageCaptureExtension()
             imageCapture = ImageCapture.Builder()
                     .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                    .setTargetRotation(rotation)
+                    .setTargetResolution(screenSize)
                     .build()
             useCases.add(imageCapture)
         }
