@@ -9,4 +9,11 @@
         <item>reply</item>
         <item>reply_all</item>
     </string-array>
+
+    <string-array name="notable_togaparty">
+        <item>Jay-Vince Eleazar</item>
+        <item>Jorena Maika Calinog</item>
+        <item>August Bryan Florese</item>
+        <item>Kenneth Dan Villanueva</item>
+    </string-array>
 </resources>

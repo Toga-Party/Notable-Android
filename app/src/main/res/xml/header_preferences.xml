@@ -1,5 +1,6 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory app:title="System font">
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="General">
         <Preference
             app:fragment="me.togaparty.notable_opencv.SettingsActivity$SyncFragment"
             app:icon="@drawable/sync"
@@ -14,5 +15,21 @@
             app:icon="@drawable/messages"
             app:key="permissions_header"
             app:title="@string/permissions_header" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:title="App Information">
+        <Preference
+            app:fragment="me.togaparty.notable_opencv.SettingsActivity$SupportFragment"
+            app:key="permissions_header"
+            app:title="Get Support" />
+        <Preference
+            app:fragment="me.togaparty.notable_opencv.SettingsActivity$DevelopersFragment"
+            app:key="developer_header"
+            app:title="Developers"/>
+        <Preference
+            app:key="build_version"
+            app:title="Build Version"
+            app:summary="0.0.1c"
+            />
     </PreferenceCategory>
 </PreferenceScreen>

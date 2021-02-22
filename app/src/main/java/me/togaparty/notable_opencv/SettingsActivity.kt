@@ -196,4 +196,15 @@ class SettingsActivity : AppCompatActivity(),
             setPreferencesFromResource(R.xml.sync_preferences, rootKey)
         }
     }
+    class SupportFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.support_preferences, rootKey)
+        }
+    }
+    class DevelopersFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.developers, rootKey)
+        }
+    }
+
 }
