@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
@@ -54,7 +56,7 @@ class GalleryFullscreenFragment : DialogFragment() {
         currentImage = imageList[selectedPosition]
         fileUri = currentImage.imageUrl
         //Detect rar directory, exists = true
-        processed = false
+        processed = true
     }
 
     override fun onCreateView(
@@ -103,6 +105,16 @@ class GalleryFullscreenFragment : DialogFragment() {
                 }
                 R.id.fab_inspect -> {
                     toast("Inspect action")
+                    //val bundle = Bundle()
+                    //bundle.putParcelable("imageUri", currentImage.imageUrl);
+                    //inspectFragment.setArguments(bundle)
+                    //inspectFragment.show(fragmentTransaction, "inspect")
+                    val fragmentTransaction = childFragmentManager.beginTransaction()
+                    val inspectFragment = InspectFragment()
+                    fragmentTransaction.replace(R.id.fragment_container, inspectFragment)
+                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    fragmentTransaction.commit()
+
                 }
                 R.id.fab_process -> {
                     toast("Process action")

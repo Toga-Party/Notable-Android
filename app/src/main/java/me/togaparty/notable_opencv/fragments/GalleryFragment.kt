@@ -70,6 +70,7 @@ class GalleryFragment : Fragment(),
             bundle.putInt("position", position)
         val fragmentTransaction = childFragmentManager.beginTransaction()
         val galleryFragment = GalleryFullscreenFragment()
+        val iF = InspectFragment()
         galleryFragment.setArguments(bundle)
         galleryFragment.show(fragmentTransaction, "gallery")
     }
