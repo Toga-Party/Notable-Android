@@ -1,6 +1,9 @@
 package me.togaparty.notable_opencv.fragments
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -22,8 +25,10 @@ import kotlinx.coroutines.launch
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
+import me.togaparty.notable_opencv.network.RetrofitUploader
 import me.togaparty.notable_opencv.utils.FileWorkerViewModel
 import me.togaparty.notable_opencv.utils.toast
+import java.io.File
 
 
 class GalleryFullscreenFragment : DialogFragment() {
@@ -32,8 +37,11 @@ class GalleryFullscreenFragment : DialogFragment() {
     private lateinit var viewPager: ViewPager
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
     private lateinit var fileWorkerViewModel: FileWorkerViewModel
+    private lateinit var retrofitUploader: RetrofitUploader
     private lateinit var currentImage: GalleryImage
+    private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
+    private var processed: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +52,11 @@ class GalleryFullscreenFragment : DialogFragment() {
 
         selectedPosition = requireArguments().getInt("position")
         currentImage = imageList[selectedPosition]
-
-
+        fileUri = currentImage.imageUrl
+        //Detect rar directory, exists = true
+        processed = false
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,7 +65,6 @@ class GalleryFullscreenFragment : DialogFragment() {
         Log.d("GalleryFullscreenDebug", "Fullscreen called.")
         val view = inflater.inflate(R.layout.fragment_gallery_fullscreen, container, false)
         val floatingActionButton = view.findViewById<SpeedDialView>(R.id.speedDial)
-
         floatingActionButton.addActionItem(
             SpeedDialActionItem.Builder(R.id.fab_delete, R.drawable.ic_delete_black)
                 .setLabel(getString(R.string.delete))
@@ -63,14 +72,22 @@ class GalleryFullscreenFragment : DialogFragment() {
                 .setLabelClickable(false)
                 .create()
         )
-        floatingActionButton.addActionItem(
+        if(processed){
+            floatingActionButton.addActionItem(
             SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.ic_show_black)
                 .setLabel(getString(R.string.inspect))
                 .setTheme(R.style.Theme_Notable_OPENCV)
                 .setLabelClickable(false)
                 .create()
-        )
-
+        )}
+        else{
+            floatingActionButton.addActionItem(
+            SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
+                .setLabel(getString(R.string.process_music))
+                .setTheme(R.style.Theme_Notable_OPENCV)
+                .setLabelClickable(false)
+                .create()
+        )}
         floatingActionButton.setOnActionSelectedListener(OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.fab_delete -> {
@@ -87,9 +104,13 @@ class GalleryFullscreenFragment : DialogFragment() {
                 R.id.fab_inspect -> {
                     toast("Inspect action")
                 }
+                R.id.fab_process -> {
+                    toast("Process action")
+                }
             }
             true
         })
+        retrofitUploader = RetrofitUploader()
         viewPager = view.findViewById(R.id.viewPager)
         galleryPagerAdapter = GalleryPagerAdapter()
         viewPager.adapter = galleryPagerAdapter
@@ -97,6 +118,38 @@ class GalleryFullscreenFragment : DialogFragment() {
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
         setCurrentItem(selectedPosition)
         return view
+    }
+    @SuppressLint("RestrictedApi")
+    private fun processImage() {
+        Log.d("Preview", "Processing Image")
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage("Do you want to save this image in the gallery?")
+            .setTitle("Save Image")
+            .setPositiveButton("Yes") { _, _ ->
+
+                fileUri?.let {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        fileWorkerViewModel.saveImage(
+                            requireContext(),
+                            "Notable",
+                            currentImage.name,
+                            it
+                        )}
+                }
+                toast("Image Saved")
+            }
+            .setNegativeButton("No") { _, _ ->
+            }
+            .create()
+            .show()
+        fileUri?.let {
+            Log.d("PreviewDebug", it.toString())
+            GlobalScope.launch(Dispatchers.IO) {
+                retrofitUploader.uploadFile(File(it.path!!), it)
+            }
+        }
+
     }
     private fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
