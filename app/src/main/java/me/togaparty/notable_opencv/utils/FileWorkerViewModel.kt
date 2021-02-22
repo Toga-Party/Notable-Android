@@ -67,7 +67,13 @@ class FileWorkerViewModel: ViewModel() {
         return imageList
     }
     suspend fun deleteImage(fileUri: Uri, context: Context) {
-        //context.contentResolver.delete(fileUri, )
+        fileUri.let {
+            context.contentResolver
+                    .delete(
+                        it,
+                        "${MediaStore.Images.Media._ID} = ?",
+                        arrayOf("%Notable%"),
+                    ) }
     }
     suspend fun saveImage(
         context: Context,
