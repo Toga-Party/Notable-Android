@@ -19,9 +19,8 @@
     <PreferenceCategory
         app:title="App Information">
         <Preference
-            app:fragment="me.togaparty.notable_opencv.SettingsActivity$SupportFragment"
-            app:key="permissions_header"
-            app:title="Get Support" />
+            app:title="Get Support"
+            app:key="support_preference"/>
         <Preference
             app:fragment="me.togaparty.notable_opencv.SettingsActivity$DevelopersFragment"
             app:key="developer_header"
