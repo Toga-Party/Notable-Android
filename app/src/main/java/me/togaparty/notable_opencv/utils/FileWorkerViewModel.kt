@@ -66,7 +66,7 @@ class FileWorkerViewModel: ViewModel() {
         Log.d("FileWorker", imageList.size.toString())
         return imageList
     }
-    suspend fun deleteImage(fileUri: Uri, context: Context) {
+    fun deleteImage(fileUri: Uri, context: Context) {
         fileUri.let {
             context.contentResolver
                     .delete(
