@@ -9,10 +9,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -21,6 +21,7 @@ import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
+import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -31,24 +32,27 @@ import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_opencv.network.RetrofitUploader
 import me.togaparty.notable_opencv.utils.FileWorkerViewModel
+import me.togaparty.notable_opencv.utils.SharedViewModel
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
+import java.lang.IllegalArgumentException
 
 
 class GalleryFullscreenFragment : DialogFragment() {
 
-    private lateinit var imageList: ArrayList<*>
+    private lateinit var imageList: MutableList<*>
     private lateinit var viewPager: ViewPager
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
-    private lateinit var fileWorkerViewModel: FileWorkerViewModel
-    private lateinit var retrofitUploader: RetrofitUploader
+
     private lateinit var currentImage: GalleryImage
     private lateinit var navController: NavController
-    private lateinit var checkPermissions: ActivityResultLauncher<Array<String>>
     private var navDirections: NavDirections? = null
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
     private var processed: Boolean = false
+
+    private lateinit var retrofitUploader: RetrofitUploader
+    private lateinit var fileWorkerViewModel: FileWorkerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,31 +73,43 @@ class GalleryFullscreenFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.d("GalleryFullscreenDebug", "Fullscreen called.")
-        val view = inflater.inflate(R.layout.fragment_gallery_fullscreen, container, false)
-        val floatingActionButton = view.findViewById<SpeedDialView>(R.id.speedDial)
-        floatingActionButton.addActionItem(
-            SpeedDialActionItem.Builder(R.id.fab_delete, R.drawable.ic_delete_black)
-                .setLabel(getString(R.string.delete))
-                .setTheme(R.style.Theme_Notable_OPENCV)
-                .setLabelClickable(false)
-                .create()
+        val view = inflater.inflate(
+                R.layout.fragment_gallery_fullscreen,
+                container,
+                false
         )
-        if(processed){
-            floatingActionButton.addActionItem(
-            SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.ic_show_black)
-                .setLabel(getString(R.string.inspect))
-                .setTheme(R.style.Theme_Notable_OPENCV)
-                .setLabelClickable(false)
-                .create()
-        )}
-        else{
-            floatingActionButton.addActionItem(
-            SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
-                .setLabel(getString(R.string.process_music))
-                .setTheme(R.style.Theme_Notable_OPENCV)
-                .setLabelClickable(false)
-                .create()
-        )}
+        retrofitUploader = RetrofitUploader()
+
+        viewPager = view.findViewById(R.id.viewPager)
+        galleryPagerAdapter = GalleryPagerAdapter()
+        viewPager.adapter = galleryPagerAdapter
+        viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
+        viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
+
+        setCurrentItem(selectedPosition)
+        generateFloatingActionButton(view)
+        return view
+    }
+    private fun generateFloatingActionButton(view: View){
+        val floatingActionButton = view.findViewById<SpeedDialView>(R.id.speedDial)
+
+        floatingActionButton.addActionItem(
+                SpeedDialActionItem.Builder(R.id.fab_delete, R.drawable.ic_delete_black)
+                        .setLabel(getString(R.string.delete))
+                        .setTheme(R.style.Theme_Notable_OPENCV)
+                        .setLabelClickable(false)
+                        .create()
+        )
+        floatingActionButton.addActionItem(
+                SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
+                        .setLabel(getString(when(processed) {
+                            true -> R.string.inspect
+                            false -> R.string.process_music
+                        }))
+                        .setTheme(R.style.Theme_Notable_OPENCV)
+                        .setLabelClickable(false)
+                        .create()
+        )
         floatingActionButton.setOnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.fab_delete -> {
@@ -102,10 +118,15 @@ class GalleryFullscreenFragment : DialogFragment() {
                     Log.d("delete", currentImage.imageUrl.toString() + " " + currentImage.name)
                     GlobalScope.launch(Dispatchers.Main) {
                         Log.d("delete", "deleting")
-                        fileWorkerViewModel.deleteImage(currentImage.imageUrl, requireContext())
+                        fileWorkerViewModel.deleteImage(
+                                currentImage.imageUrl,
+                                requireContext()
+                        )
+                        imageList.removeAt(selectedPosition)
+                        viewPager.adapter?.notifyDataSetChanged()
+                        //Todo: Need to pop to backstack, since the view is already non existent.
                     }
-                    Log.d("delete", "done dleteing")
-                    //getActivity()?.onBackPressed();
+                    Log.d("delete", "done deleting")
                 }
                 R.id.fab_inspect -> {
                     toast("Inspect action")
@@ -114,13 +135,12 @@ class GalleryFullscreenFragment : DialogFragment() {
                     //inspectFragment.setArguments(bundle)
                     //inspectFragment.show(fragmentTransaction, "inspect")
                     navController.navigate(
-                    GalleryFullscreenFragmentDirections.actionGalleryFullscreenFragmentToInspectFragment())
+                            GalleryFullscreenFragmentDirections.actionGalleryFullscreenFragmentToInspectFragment())
 //                    val fragmentTransaction = childFragmentManager.beginTransaction()
 //                    val inspectFragment = InspectFragment()
 //                    fragmentTransaction.replace(R.id.fragment_container, inspectFragment)
 //                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
 //                    fragmentTransaction.commit()
-
                 }
                 R.id.fab_process -> {
                     toast("Process action")
@@ -128,14 +148,6 @@ class GalleryFullscreenFragment : DialogFragment() {
             }
             true
         }
-        retrofitUploader = RetrofitUploader()
-        viewPager = view.findViewById(R.id.viewPager)
-        galleryPagerAdapter = GalleryPagerAdapter()
-        viewPager.adapter = galleryPagerAdapter
-        viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
-        viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
-        setCurrentItem(selectedPosition)
-        return view
     }
     private fun navigateToFragment() {
         navController.navigate(navDirections!!)
@@ -174,12 +186,14 @@ class GalleryFullscreenFragment : DialogFragment() {
     }
     private fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
+        selectedPosition = position
     }
     // viewpager page change listener
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
         object : ViewPager.OnPageChangeListener {
             override fun onPageSelected(position: Int) {
                 Log.d("GalleryFullscreen", "$position")
+                setCurrentItem(position)
             }
             override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
             }
@@ -190,8 +204,10 @@ class GalleryFullscreenFragment : DialogFragment() {
     inner class GalleryPagerAdapter : PagerAdapter() {
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val layoutInflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
             val view = layoutInflater.inflate(R.layout.gallery_image_fullscreen, container, false)
             val image = imageList[position] as GalleryImage
+            view.ivFullscreenImage.tag = image.imageUrl
 
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
             circularProgressDrawable.strokeWidth = 5f
@@ -208,6 +224,21 @@ class GalleryFullscreenFragment : DialogFragment() {
             container.addView(view)
             return view
         }
+
+        override fun getItemPosition(`object`: Any): Int {
+            val imageView = `object` as ImageView
+            val tag = imageView.tag
+
+            var flag = false
+            imageList.forEach {
+                if((it as GalleryImage).imageUrl == tag){
+                    flag = true
+                    return@forEach
+                }
+            }
+            return if (flag) super.getItemPosition(`object`) else POSITION_NONE
+        }
+
         override fun getCount(): Int {
             return imageList.size
         }

@@ -1,7 +1,6 @@
 package me.togaparty.notable_opencv.fragments
 
 import android.Manifest
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -38,13 +37,6 @@ class DashboardFragment : Fragment(), View.OnClickListener {
         view.findViewById<CardView>(R.id.files_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.settings_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.glossary_cardview).setOnClickListener(this)
-
-        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
-        val switchVal = sharedPref.getString(
-                R.string.summary_camera_permission_preference.toString(), "None")
-        if (switchVal != null) {
-            Log.d("Dashboard", switchVal)
-        }
     }
 
 
@@ -104,8 +96,14 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                     DashboardFragmentDirections.actionDashboardFragmentToGlossaryFragment())
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        navDirections = null
+    }
+
     private fun navigateToFragment() {
-        navController.navigate(navDirections!!)
+        navDirections?.let { navController.navigate(it) }
     }
 
     private fun setPermissions() {

@@ -66,14 +66,13 @@ class FileWorkerViewModel: ViewModel() {
         Log.d("FileWorker", imageList.size.toString())
         return imageList
     }
+
     fun deleteImage(fileUri: Uri, context: Context) {
+        Log.d("FileWorker", "$fileUri")
         fileUri.let {
             context.contentResolver
-                    .delete(
-                        it,
-                        "${MediaStore.Images.Media._ID} = ?",
-                        arrayOf("%Notable%"),
-                    ) }
+                .delete( it, null, null)
+        }
     }
     suspend fun saveImage(
         context: Context,
@@ -151,5 +150,4 @@ class FileWorkerViewModel: ViewModel() {
                 e.printStackTrace()
             }
         }
-
 }
