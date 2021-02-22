@@ -9,9 +9,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
@@ -41,6 +44,9 @@ class GalleryFullscreenFragment : DialogFragment() {
     private lateinit var fileWorkerViewModel: FileWorkerViewModel
     private lateinit var retrofitUploader: RetrofitUploader
     private lateinit var currentImage: GalleryImage
+    private lateinit var navController: NavController
+    private lateinit var checkPermissions: ActivityResultLauncher<Array<String>>
+    private var navDirections: NavDirections? = null
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
     private var processed: Boolean = false
@@ -109,11 +115,13 @@ class GalleryFullscreenFragment : DialogFragment() {
                     //bundle.putParcelable("imageUri", currentImage.imageUrl);
                     //inspectFragment.setArguments(bundle)
                     //inspectFragment.show(fragmentTransaction, "inspect")
-                    val fragmentTransaction = childFragmentManager.beginTransaction()
-                    val inspectFragment = InspectFragment()
-                    fragmentTransaction.replace(R.id.fragment_container, inspectFragment)
-                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    fragmentTransaction.commit()
+                    navController.navigate(
+                    GalleryFullscreenFragmentDirections.actionGalleryFullscreenFragmentToInspectFragment())
+//                    val fragmentTransaction = childFragmentManager.beginTransaction()
+//                    val inspectFragment = InspectFragment()
+//                    fragmentTransaction.replace(R.id.fragment_container, inspectFragment)
+//                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+//                    fragmentTransaction.commit()
 
                 }
                 R.id.fab_process -> {
@@ -130,6 +138,9 @@ class GalleryFullscreenFragment : DialogFragment() {
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
         setCurrentItem(selectedPosition)
         return view
+    }
+    private fun navigateToFragment() {
+        navController.navigate(navDirections!!)
     }
     @SuppressLint("RestrictedApi")
     private fun processImage() {
