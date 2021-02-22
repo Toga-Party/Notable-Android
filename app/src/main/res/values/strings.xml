@@ -21,6 +21,9 @@
     <string name="image_gallery">Image Gallery</string>
     <string name="search_words">Search Words…</string>
     <string name="imageview3">ImageView3</string>
+    <!-- FAB -->
+    <string name="delete"> Delete Image</string>
+    <string name="inspect">Inspect Music</string>
 
     <string name="title_activity_settings">Notable Settings</string>
 

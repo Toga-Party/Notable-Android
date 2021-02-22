@@ -44,6 +44,12 @@
         tools:layout="@layout/fragment_glossary" >
     </fragment>
     <fragment
+        android:id="@+id/inspectFragment"
+        android:name="me.togaparty.notable_opencv.fragments.InspectFragment"
+        android:label="fragment_glossary"
+        tools:layout="@layout/fragment_glossary" >
+    </fragment>
+    <fragment
         android:id="@+id/previewImage"
         android:name="me.togaparty.notable_opencv.fragments.PreviewImageFragment"
         android:label="fragment_preview_image"
