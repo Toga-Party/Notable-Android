@@ -9,6 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_glossary.*
+import kotlinx.android.synthetic.main.fragment_inspect.*
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.MainRecyclerAdapter
 import me.togaparty.notable_opencv.model.AllCategory
@@ -74,7 +75,7 @@ class InspectFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_glossary, container, false)
+        return inflater.inflate(R.layout.fragment_inspect, container, false)
     }
 
     companion object
