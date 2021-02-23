@@ -110,19 +110,17 @@ class PreviewImageFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     private fun processImage() {
         Log.d("Preview", "Processing Image")
-
             val builder = AlertDialog.Builder(requireContext())
             builder.setMessage("Do you want to save this image in the gallery?")
                 .setTitle("Save Image")
                 .setPositiveButton("Yes") { _, _ ->
-
                     fileUri?.let {
                         GlobalScope.launch(Dispatchers.IO) {
                         fileWorker.saveImage(
-                            requireContext(),
-                            "Notable",
-                            fileName,
-                            it
+                                requireContext(),
+                                "Notable",
+                                fileName,
+                                it,
                         )}
                     }
                     toast("Image Saved")
