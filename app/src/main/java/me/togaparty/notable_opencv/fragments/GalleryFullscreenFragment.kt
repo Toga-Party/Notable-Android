@@ -10,11 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
+import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
@@ -32,10 +31,8 @@ import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_opencv.network.RetrofitUploader
 import me.togaparty.notable_opencv.utils.FileWorkerViewModel
-import me.togaparty.notable_opencv.utils.SharedViewModel
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
-import java.lang.IllegalArgumentException
 
 
 class GalleryFullscreenFragment : DialogFragment() {
@@ -59,7 +56,7 @@ class GalleryFullscreenFragment : DialogFragment() {
         setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         fileWorkerViewModel = FileWorkerViewModel()
         imageList = ArrayList(arguments?.getSerializable("images") as ArrayList<*>)
-
+        navController = this.findNavController()
         selectedPosition = requireArguments().getInt("position")
         currentImage = imageList[selectedPosition] as GalleryImage
         fileUri = currentImage.imageUrl
@@ -68,9 +65,9 @@ class GalleryFullscreenFragment : DialogFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         Log.d("GalleryFullscreenDebug", "Fullscreen called.")
         val view = inflater.inflate(
@@ -102,14 +99,19 @@ class GalleryFullscreenFragment : DialogFragment() {
         )
         floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
-                        .setLabel(getString(when(processed) {
-                            true -> R.string.inspect
-                            false -> R.string.process_music
-                        }))
+                        .setLabel(getString(R.string.process_music))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
         )
+        floatingActionButton.addActionItem(
+                SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
+                        .setLabel(getString(R.string.inspect))
+                        .setTheme(R.style.Theme_Notable_OPENCV)
+                        .setLabelClickable(false)
+                        .create()
+        )
+
         floatingActionButton.setOnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.fab_delete -> {
@@ -134,8 +136,10 @@ class GalleryFullscreenFragment : DialogFragment() {
                     //bundle.putParcelable("imageUri", currentImage.imageUrl);
                     //inspectFragment.setArguments(bundle)
                     //inspectFragment.show(fragmentTransaction, "inspect")
+                    //dismiss()
+//                    navController.navigate(R.id.inspectFragment)
                     navController.navigate(
-                            GalleryFullscreenFragmentDirections.actionGalleryFullscreenFragmentToInspectFragment())
+                    GalleryFragmentDirections.actionGalleryFragmentToInspectFragment())
 //                    val fragmentTransaction = childFragmentManager.beginTransaction()
 //                    val inspectFragment = InspectFragment()
 //                    fragmentTransaction.replace(R.id.fragment_container, inspectFragment)
@@ -144,6 +148,7 @@ class GalleryFullscreenFragment : DialogFragment() {
                 }
                 R.id.fab_process -> {
                     toast("Process action")
+                    processImage()
                 }
             }
             true
@@ -161,13 +166,13 @@ class GalleryFullscreenFragment : DialogFragment() {
             .setTitle("Save Image")
             .setPositiveButton("Yes") { _, _ ->
 
-                fileUri?.let {
+                currentImage.imageUrl?.let {
                     GlobalScope.launch(Dispatchers.IO) {
                         fileWorkerViewModel.saveImage(
-                            requireContext(),
-                            "Notable",
-                            currentImage.name,
-                            it
+                                requireContext(),
+                                "Notable",
+                                currentImage.name,
+                                it
                         )}
                 }
                 toast("Image Saved")
@@ -176,7 +181,7 @@ class GalleryFullscreenFragment : DialogFragment() {
             }
             .create()
             .show()
-        fileUri?.let {
+        currentImage.imageUrl?.let {
             Log.d("PreviewDebug", it.toString())
             GlobalScope.launch(Dispatchers.IO) {
                 retrofitUploader.uploadFile(File(it.path!!), it)

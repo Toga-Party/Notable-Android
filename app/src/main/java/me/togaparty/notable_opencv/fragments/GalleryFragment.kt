@@ -71,9 +71,13 @@ class GalleryFragment : Fragment(),
     private fun loadGallery() {
         //TODO: This is not updating at all.
         val context = requireContext()
+        if (imageList.isEmpty()) {
         GlobalScope.launch(Dispatchers.Main) {
-            imageList.addAll(fileWorkerViewModel.loadImages(context))
-            galleryAdapter.notifyDataSetChanged()
+
+                imageList.addAll(fileWorkerViewModel.loadImages(context))
+                galleryAdapter.notifyDataSetChanged()
+
+            }
         }
     }
     override fun onClick(position: Int) {

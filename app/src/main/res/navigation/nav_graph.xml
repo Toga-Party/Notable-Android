@@ -44,12 +44,6 @@
         tools:layout="@layout/fragment_glossary" >
     </fragment>
     <fragment
-        android:id="@+id/inspectFragment"
-        android:name="me.togaparty.notable_opencv.fragments.InspectFragment"
-        android:label="fragment_glossary"
-        tools:layout="@layout/fragment_glossary" >
-    </fragment>
-    <fragment
         android:id="@+id/previewImage"
         android:name="me.togaparty.notable_opencv.fragments.PreviewImageFragment"
         android:label="fragment_preview_image"
@@ -70,6 +64,9 @@
             android:id="@+id/action_galleryFragment_to_dashboardFragment"
             app:destination="@id/dashboardFragment"
             app:popUpTo="@id/dashboardFragment" />
+        <action
+            android:id="@+id/action_galleryFragment_to_inspectFragment"
+            app:destination="@id/inspectFragment" />
 
     </fragment>
     <fragment
@@ -81,10 +78,13 @@
             app:destination="@id/inspectFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
-            app:popUpTo="@id/galleryFullscreenFragment"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
+    <fragment
+        android:id="@+id/inspectFragment"
+        android:name="me.togaparty.notable_opencv.fragments.InspectFragment"
+        android:label="InspectFragment" />
     <activity
         android:id="@+id/settingsActivity"
         android:name="me.togaparty.notable_opencv.SettingsActivity"
