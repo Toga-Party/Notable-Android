@@ -25,6 +25,9 @@
     <string name="delete"> Delete Image</string>
     <string name="inspect">Inspect Music</string>
     <string name="process_music">Process Music</string>
+    <!-- Inspect Buttons -->
+    <string name="play_segment">Play Shown</string>
+    <string name="play_sheet">Play Sheet</string>
 
     <string name="title_activity_settings">Notable Settings</string>
 

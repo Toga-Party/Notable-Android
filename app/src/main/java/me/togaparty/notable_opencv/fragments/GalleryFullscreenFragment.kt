@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.android.synthetic.main.fragment_gallery.*
+import kotlinx.android.synthetic.main.fragment_preview_image.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -97,20 +98,21 @@ class GalleryFullscreenFragment : DialogFragment() {
                         .setLabelClickable(false)
                         .create()
         )
+        if(!processed){
         floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
                         .setLabel(getString(R.string.process_music))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
-        )
+        )} else{
         floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                         .setLabel(getString(R.string.inspect))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
-        )
+        )}
 
         floatingActionButton.setOnActionSelectedListener { actionItem ->
             when (actionItem.id) {
@@ -148,41 +150,18 @@ class GalleryFullscreenFragment : DialogFragment() {
             true
         }
     }
-    private fun navigateToFragment() {
-        navController.navigate(navDirections!!)
-    }
     @SuppressLint("RestrictedApi")
     private fun processImage() {
-        Log.d("Preview", "Processing Image")
-
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setMessage("Do you want to save this image in the gallery?")
-            .setTitle("Save Image")
-            .setPositiveButton("Yes") { _, _ ->
-
-                currentImage.imageUrl?.let {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        fileWorkerViewModel.saveImage(
-                                requireContext(),
-                                "Notable",
-                                currentImage.name,
-                                it
-                        )}
-                }
-                toast("Image Saved")
-            }
-            .setNegativeButton("No") { _, _ ->
-            }
-            .create()
-            .show()
+        Log.d("Process", "Processing Image")
         currentImage.imageUrl?.let {
-            Log.d("PreviewDebug", it.toString())
+            Log.d("Process", it.toString())
             GlobalScope.launch(Dispatchers.IO) {
                 retrofitUploader.uploadFile(File(it.path!!), it)
             }
         }
 
     }
+
     private fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
         selectedPosition = position
