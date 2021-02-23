@@ -136,15 +136,9 @@ class GalleryFullscreenFragment : DialogFragment() {
                     //bundle.putParcelable("imageUri", currentImage.imageUrl);
                     //inspectFragment.setArguments(bundle)
                     //inspectFragment.show(fragmentTransaction, "inspect")
-                    //dismiss()
-//                    navController.navigate(R.id.inspectFragment)
+                    dismiss()
                     navController.navigate(
                     GalleryFragmentDirections.actionGalleryFragmentToInspectFragment())
-//                    val fragmentTransaction = childFragmentManager.beginTransaction()
-//                    val inspectFragment = InspectFragment()
-//                    fragmentTransaction.replace(R.id.fragment_container, inspectFragment)
-//                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-//                    fragmentTransaction.commit()
                 }
                 R.id.fab_process -> {
                     toast("Process action")

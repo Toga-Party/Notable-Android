@@ -20,43 +20,6 @@ class InspectFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        val categoryItemList: MutableList<CategoryItem> = ArrayList()
-//        categoryItemList.add(CategoryItem(1,"Melody"))
-//        categoryItemList.add(CategoryItem(1,"Harmony"))
-//        categoryItemList.add(CategoryItem(1,"Rhythm"))
-//        categoryItemList.add(CategoryItem(1,"Tempo"))
-//        categoryItemList.add(CategoryItem(1,"Dynamics"))
-//
-//        val categoryItemList2: MutableList<CategoryItem> = ArrayList()
-//        categoryItemList2.add(CategoryItem(2,"Key"))
-//        categoryItemList2.add(CategoryItem(2,"Major"))
-//        categoryItemList2.add(CategoryItem(2,"Scale"))
-//        categoryItemList2.add(CategoryItem(2,"Half step"))
-//        categoryItemList2.add(CategoryItem(2,"Octave"))
-//
-//        val categoryItemList3: MutableList<CategoryItem> = ArrayList()
-//        categoryItemList3.add(CategoryItem(3,"Score"))
-//        categoryItemList3.add(CategoryItem(3,"Staff"))
-//        categoryItemList3.add(CategoryItem(3,"Grand Staff"))
-//        categoryItemList3.add(CategoryItem(3,"Note"))
-//        categoryItemList3.add(CategoryItem(3,"Clef"))
-//
-//        val categoryItemList4: MutableList<CategoryItem> = ArrayList()
-//        categoryItemList4.add(CategoryItem(4,"Largo"))
-//        categoryItemList4.add(CategoryItem(4,"Andante"))
-//        categoryItemList4.add(CategoryItem(4,"Allegreto"))
-//        categoryItemList4.add(CategoryItem(4,"Allegro"))
-//        categoryItemList4.add(CategoryItem(4,"Accelerando"))
-//
-//
-//        val allCategory: MutableList<AllCategory> = ArrayList()
-//        allCategory.add(AllCategory("General Terms", categoryItemList))
-//        allCategory.add(AllCategory("Key and Scales", categoryItemList2))
-//        allCategory.add(AllCategory("Music Notation", categoryItemList3))
-//        allCategory.add(AllCategory("Tempo Terms", categoryItemList4))
-
-//        setMainCategoryRecycler(allCategory)
-
     }
 
 //    private fun setMainCategoryRecycler(allCategory: List<AllCategory>){
