@@ -1,8 +1,8 @@
 package me.togaparty.notable_opencv.fragments
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.NavController
-import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
@@ -21,7 +20,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.android.synthetic.main.fragment_gallery.*
-import kotlinx.android.synthetic.main.fragment_preview_image.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,45 +28,42 @@ import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
+import me.togaparty.notable_opencv.helper.OnDismissListener
 import me.togaparty.notable_opencv.network.RetrofitUploader
-import me.togaparty.notable_opencv.utils.FileWorkerViewModel
+import me.togaparty.notable_opencv.utils.FileWorker
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
 
 
 class GalleryFullscreenFragment : DialogFragment() {
 
-    private lateinit var imageList: MutableList<*>
+    private lateinit var imageList: ArrayList<*>
     private lateinit var viewPager: ViewPager
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
 
     private lateinit var currentImage: GalleryImage
     private lateinit var navController: NavController
-    private var navDirections: NavDirections? = null
+
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
     private var processed: Boolean = false
 
     private lateinit var retrofitUploader: RetrofitUploader
-    private lateinit var fileWorkerViewModel: FileWorkerViewModel
+    private lateinit var fileWorker: FileWorker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
-        fileWorkerViewModel = FileWorkerViewModel()
+        //setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        fileWorker = FileWorker()
         imageList = ArrayList(arguments?.getSerializable("images") as ArrayList<*>)
-        navController = this.findNavController()
-        selectedPosition = requireArguments().getInt("position")
-        currentImage = imageList[selectedPosition] as GalleryImage
-        fileUri = currentImage.imageUrl
         //Detect rar directory, exists = true
         processed = true
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         Log.d("GalleryFullscreenDebug", "Fullscreen called.")
         val view = inflater.inflate(
@@ -76,18 +71,28 @@ class GalleryFullscreenFragment : DialogFragment() {
                 container,
                 false
         )
+
+        navController = this.findNavController()
         retrofitUploader = RetrofitUploader()
 
-        viewPager = view.findViewById(R.id.viewPager)
         galleryPagerAdapter = GalleryPagerAdapter()
+
+        viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
-
-        setCurrentItem(selectedPosition)
+        setCurrentItem(requireArguments().getInt("position"))
         generateFloatingActionButton(view)
+
         return view
     }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        val callback = parentFragment as? OnDismissListener
+        callback?.onDialogDismiss()
+    }
+
     private fun generateFloatingActionButton(view: View){
         val floatingActionButton = view.findViewById<SpeedDialView>(R.id.speedDial)
 
@@ -98,21 +103,21 @@ class GalleryFullscreenFragment : DialogFragment() {
                         .setLabelClickable(false)
                         .create()
         )
-        if(!processed){
         floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
                         .setLabel(getString(R.string.process_music))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
-        )} else{
+        )
         floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                         .setLabel(getString(R.string.inspect))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
-        )}
+        )
+
 
         floatingActionButton.setOnActionSelectedListener { actionItem ->
             when (actionItem.id) {
@@ -122,13 +127,17 @@ class GalleryFullscreenFragment : DialogFragment() {
                     Log.d("delete", currentImage.imageUrl.toString() + " " + currentImage.name)
                     GlobalScope.launch(Dispatchers.Main) {
                         Log.d("delete", "deleting")
-                        fileWorkerViewModel.deleteImage(
-                                currentImage.imageUrl,
-                                requireContext()
-                        )
-                        imageList.removeAt(selectedPosition)
-                        viewPager.adapter?.notifyDataSetChanged()
-                        //Todo: Need to pop to backstack, since the view is already non existent.
+
+                        if(imageList.isNotEmpty()){
+                            fileWorker.deleteImage(
+                                    currentImage.imageUrl,
+                                    requireContext()
+                            )
+                            imageList.removeAt(selectedPosition)
+                            viewPager.adapter?.notifyDataSetChanged()
+                        }
+
+                        if(imageList.isEmpty()) dismiss() else setCurrentItem(selectedPosition)
                     }
                     Log.d("delete", "done deleting")
                 }
@@ -140,7 +149,12 @@ class GalleryFullscreenFragment : DialogFragment() {
                     //inspectFragment.show(fragmentTransaction, "inspect")
                     dismiss()
                     navController.navigate(
-                    GalleryFragmentDirections.actionGalleryFragmentToInspectFragment())
+                            GalleryFragmentDirections.actionGalleryFragmentToInspectFragment())
+//                    val fragmentTransaction = childFragmentManager.beginTransaction()
+//                    val inspectFragment = InspectFragment()
+//                    fragmentTransaction.replace(R.id.fragment_container, inspectFragment)
+//                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+//                    fragmentTransaction.commit()
                 }
                 R.id.fab_process -> {
                     toast("Process action")
@@ -150,20 +164,20 @@ class GalleryFullscreenFragment : DialogFragment() {
             true
         }
     }
+
     @SuppressLint("RestrictedApi")
     private fun processImage() {
-        Log.d("Process", "Processing Image")
-        currentImage.imageUrl?.let {
-            Log.d("Process", it.toString())
+        fileUri?.let {
             GlobalScope.launch(Dispatchers.IO) {
                 retrofitUploader.uploadFile(File(it.path!!), it)
             }
         }
-
+        toast("Image Processed")
+        dismiss()
     }
-
     private fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
+        currentImage = imageList[position] as GalleryImage
         selectedPosition = position
     }
     // viewpager page change listener

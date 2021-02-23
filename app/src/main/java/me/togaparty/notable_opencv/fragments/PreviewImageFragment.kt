@@ -34,7 +34,7 @@ import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.network.RetrofitUploader
-import me.togaparty.notable_opencv.utils.FileWorkerViewModel
+import me.togaparty.notable_opencv.utils.FileWorker
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
 
@@ -48,7 +48,7 @@ class PreviewImageFragment : Fragment() {
     private lateinit var outputCacheDirectory: File
     private lateinit var galleryDirectory: File
     private lateinit var navController: NavController
-    private lateinit var fileWorkerViewModel: FileWorkerViewModel
+    private lateinit var fileWorker: FileWorker
     private lateinit var retrofitUploader: RetrofitUploader
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +82,7 @@ class PreviewImageFragment : Fragment() {
                 Navigation.createNavigateOnClickListener(R.id.action_previewImage_pop, null))
         container.findViewById<Button>(R.id.crop).setOnClickListener {cropImage()}
         container.findViewById<Button>(R.id.process).setOnClickListener {processImage()}
-        fileWorkerViewModel = FileWorkerViewModel()
+        fileWorker = FileWorker()
         retrofitUploader = RetrofitUploader()
         GlobalScope.launch {
             container.post{
@@ -110,19 +110,17 @@ class PreviewImageFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     private fun processImage() {
         Log.d("Preview", "Processing Image")
-
             val builder = AlertDialog.Builder(requireContext())
             builder.setMessage("Do you want to save this image in the gallery?")
                 .setTitle("Save Image")
                 .setPositiveButton("Yes") { _, _ ->
-
                     fileUri?.let {
                         GlobalScope.launch(Dispatchers.IO) {
-                        fileWorkerViewModel.saveImage(
-                            requireContext(),
-                            "Notable",
-                            fileName,
-                            it
+                        fileWorker.saveImage(
+                                requireContext(),
+                                "Notable",
+                                fileName,
+                                it,
                         )}
                     }
                     toast("Image Saved")
