@@ -9,14 +9,33 @@ import androidx.recyclerview.widget.RecyclerView
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.model.CategoryItem
 
-class CategoryItemAdapter(private val context:Context, private val categoryItem:List<CategoryItem>): RecyclerView.Adapter<CategoryItemAdapter.CategoryItemViewHolder>() {
+class CategoryItemAdapter(private val context:Context,
+                          private val categoryItem:List<CategoryItem>,
+                          private val listener : OnItemClickListener
+                          ) : RecyclerView.Adapter<CategoryItemAdapter.CategoryItemViewHolder>() {
 
-    class CategoryItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+
+    inner class CategoryItemViewHolder(inflater: LayoutInflater, parent: ViewGroup )
+        : RecyclerView.ViewHolder(inflater.inflate(R.layout.cat_row_items, parent, false)), View.OnClickListener {
         var itemText:TextView = itemView.findViewById(R.id.item_text)
+
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+            val position = adapterPosition
+            var itemtext = categoryItem[position].itemText
+            var itemdefinition = categoryItem[position].itemDefinition
+            if(position != RecyclerView.NO_POSITION){
+                listener.onItemClick(position, itemtext, itemdefinition)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItemViewHolder {
-       return CategoryItemViewHolder(LayoutInflater.from(context).inflate(R.layout.cat_row_items,parent,false))
+        val inflater = LayoutInflater.from(parent.context)
+       return CategoryItemViewHolder(inflater, parent)
     }
 
     override fun onBindViewHolder(holder: CategoryItemViewHolder, position: Int) {
@@ -25,5 +44,10 @@ class CategoryItemAdapter(private val context:Context, private val categoryItem:
 
     override fun getItemCount(): Int {
         return categoryItem.size
+    }
+
+
+    interface OnItemClickListener{
+        fun onItemClick(position: Int, itemtext: String, itemdefinition: String)
     }
 }
