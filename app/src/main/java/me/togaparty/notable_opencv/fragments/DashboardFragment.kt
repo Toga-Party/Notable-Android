@@ -56,15 +56,17 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             "Permission Required",
                             "Camera access and File access is required to use this feature."
                         ) {
-                            checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
+                            Log.d("Dashboard", "Launching required camera permissions.")
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
+                            checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
                         }
                     }
                     else -> {
-                        checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
+                        Log.d("Dashboard", "Launching required camera permissions.")
                         navDirections =
                                 DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
+                        checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
                     }
                 }
             R.id.files_cardview ->
@@ -79,15 +81,17 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             "Permission Required",
                             "File access is required to use this feature."
                         ) {
-                            checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
+                            Log.d("Dashboard", "Launching required file permissions.")
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment()
+                            checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
                         }
                     }
                     else -> {
-                        checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
+                        Log.d("Dashboard", "Launching required file permissions.")
                         navDirections =
                                 DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment()
+                        checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
                     }
                 }
             R.id.settings_cardview -> navController.navigate(

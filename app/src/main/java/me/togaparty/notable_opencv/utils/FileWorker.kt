@@ -18,7 +18,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 
-class FileWorkerViewModel: ViewModel() {
+class FileWorker: ViewModel() {
     @SuppressLint("Recycle")
     fun loadImages(context: Context):  ArrayList<GalleryImage> {
         val imageList = ArrayList<GalleryImage>()

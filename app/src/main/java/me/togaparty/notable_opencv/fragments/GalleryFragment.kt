@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,14 +22,13 @@ import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.adapter.GalleryImageClickListener
 import me.togaparty.notable_opencv.helper.GlideApp
+import me.togaparty.notable_opencv.helper.OnDismissListener
 import me.togaparty.notable_opencv.utils.FILE_REQUIRED_PERMISSIONS
-import me.togaparty.notable_opencv.utils.FileWorkerViewModel
-import me.togaparty.notable_opencv.utils.SharedViewModel
+import me.togaparty.notable_opencv.utils.FileWorker
 import me.togaparty.notable_opencv.utils.permissionsGranted
-import java.lang.IllegalArgumentException
 
 class GalleryFragment : Fragment(),
-        GalleryImageClickListener {
+        GalleryImageClickListener, OnDismissListener {
     // Gallery Column Count
     private val spanCount = 2
     private val imageList = ArrayList<GalleryImage>()
@@ -39,8 +36,7 @@ class GalleryFragment : Fragment(),
     private lateinit var navController: NavController
 
 
-    private lateinit var fileWorkerViewModel: FileWorkerViewModel
-    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var fileWorker: FileWorker
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -60,7 +56,7 @@ class GalleryFragment : Fragment(),
         // init adapter
         galleryAdapter = GalleryImageAdapter(imageList)
         galleryAdapter.listener = this
-        fileWorkerViewModel = FileWorkerViewModel()
+        fileWorker = FileWorker()
 
         // init recyclerview
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
@@ -68,14 +64,6 @@ class GalleryFragment : Fragment(),
         loadGallery()
     }
 
-    private fun loadGallery() {
-        //TODO: This is not updating at all.
-        val context = requireContext()
-        GlobalScope.launch(Dispatchers.Main) {
-            imageList.addAll(fileWorkerViewModel.loadImages(context))
-            galleryAdapter.notifyDataSetChanged()
-        }
-    }
     override fun onClick(position: Int) {
         val bundle = Bundle()
             bundle.putSerializable("images", imageList)
@@ -85,7 +73,17 @@ class GalleryFragment : Fragment(),
         galleryFragment.arguments = bundle
         galleryFragment.show(fragmentTransaction, "gallery")
     }
-
+    override fun onDialogDismiss() {
+        loadGallery()
+    }
+    private fun loadGallery() {
+        val context = requireContext()
+        if(imageList.isNotEmpty()) imageList.clear()
+        GlobalScope.launch(Dispatchers.Main) {
+            imageList.addAll(fileWorker.loadImages(context))
+            galleryAdapter.notifyDataSetChanged()
+        }
+    }
     inner class GalleryImageAdapter(private val itemList: List<GalleryImage>) : RecyclerView.Adapter<GalleryImageAdapter.ViewHolder>() {
         private var context: Context? = null
         var listener: GalleryImageClickListener? = null
@@ -131,7 +129,10 @@ class GalleryFragment : Fragment(),
 
         }
     }
+
     companion object
+
+
 
 
 }
