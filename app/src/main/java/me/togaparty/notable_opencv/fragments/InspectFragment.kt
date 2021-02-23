@@ -9,26 +9,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_inspect.*
 import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_opencv.utils.FileWorkerViewModel
+import me.togaparty.notable_opencv.utils.FileWorker
 
 class InspectFragment : Fragment() {
     //private lateinit var mainCategoryRecycler: RecyclerView
@@ -36,14 +30,14 @@ class InspectFragment : Fragment() {
     private lateinit var imageList: MutableList<*>
     private lateinit var viewPager: ViewPager
     private var selectedPosition: Int = 0
-    private lateinit var fileWorkerViewModel: FileWorkerViewModel
+    private lateinit var fileWorker: FileWorker
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fileWorkerViewModel = FileWorkerViewModel()
+        fileWorker = FileWorker()
         //imageList = ArrayList(arguments?.getSerializable("images") as ArrayList<*>)
-        imageList = fileWorkerViewModel.loadImages(requireContext())
+        imageList = fileWorker.loadImages(requireContext())
     }
 
 //    private fun setMainCategoryRecycler(allCategory: List<AllCategory>){

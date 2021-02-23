@@ -6,6 +6,8 @@ import android.util.Log
 import android.util.Size
 import android.view.*
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -79,7 +81,7 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val container = view as ConstraintLayout
         previewView = container.findViewById(R.id.view_finder)
-        container.findViewById<Button>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
+        container.findViewById<ImageButton>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
 
         processCameraProviderFuture = ProcessCameraProvider.getInstance(requireContext()).apply {
             addListener({

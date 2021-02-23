@@ -6,9 +6,7 @@ import android.content.DialogInterface
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.NavController
@@ -86,6 +84,8 @@ class GalleryFullscreenFragment : DialogFragment() {
 
         return view
     }
+
+
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
