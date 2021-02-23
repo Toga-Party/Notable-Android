@@ -1,7 +1,6 @@
 package me.togaparty.notable_opencv.fragments
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.net.Uri
@@ -12,9 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
-import androidx.navigation.NavDirections
+import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
@@ -45,7 +43,7 @@ class GalleryFullscreenFragment : DialogFragment() {
 
     private lateinit var currentImage: GalleryImage
     private lateinit var navController: NavController
-    private var navDirections: NavDirections? = null
+
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
     private var processed: Boolean = false
@@ -73,6 +71,8 @@ class GalleryFullscreenFragment : DialogFragment() {
                 container,
                 false
         )
+
+        navController = this.findNavController()
         retrofitUploader = RetrofitUploader()
 
         galleryPagerAdapter = GalleryPagerAdapter()
@@ -81,7 +81,6 @@ class GalleryFullscreenFragment : DialogFragment() {
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
-
         setCurrentItem(requireArguments().getInt("position"))
         generateFloatingActionButton(view)
 
@@ -106,14 +105,20 @@ class GalleryFullscreenFragment : DialogFragment() {
         )
         floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
-                        .setLabel(getString(when(processed) {
-                            true -> R.string.inspect
-                            false -> R.string.process_music
-                        }))
+                        .setLabel(getString(R.string.process_music))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
         )
+        floatingActionButton.addActionItem(
+                SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
+                        .setLabel(getString(R.string.inspect))
+                        .setTheme(R.style.Theme_Notable_OPENCV)
+                        .setLabelClickable(false)
+                        .create()
+        )
+
+
         floatingActionButton.setOnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.fab_delete -> {
@@ -132,13 +137,7 @@ class GalleryFullscreenFragment : DialogFragment() {
                             viewPager.adapter?.notifyDataSetChanged()
                         }
 
-                        if(imageList.isEmpty()) {
-                            Log.d("GalleryFragment", "This is empty turn back")
-                            dismiss()
-                        } else {
-                            setCurrentItem(selectedPosition)
-                        }
-                        //Todo: Need to pop to backstack, since the view is already non existent.
+                        if(imageList.isEmpty()) dismiss() else setCurrentItem(selectedPosition)
                     }
                     Log.d("delete", "done deleting")
                 }
@@ -148,8 +147,9 @@ class GalleryFullscreenFragment : DialogFragment() {
                     //bundle.putParcelable("imageUri", currentImage.imageUrl);
                     //inspectFragment.setArguments(bundle)
                     //inspectFragment.show(fragmentTransaction, "inspect")
+                    dismiss()
                     navController.navigate(
-                            GalleryFullscreenFragmentDirections.actionGalleryFullscreenFragmentToInspectFragment())
+                            GalleryFragmentDirections.actionGalleryFragmentToInspectFragment())
 //                    val fragmentTransaction = childFragmentManager.beginTransaction()
 //                    val inspectFragment = InspectFragment()
 //                    fragmentTransaction.replace(R.id.fragment_container, inspectFragment)
@@ -158,45 +158,22 @@ class GalleryFullscreenFragment : DialogFragment() {
                 }
                 R.id.fab_process -> {
                     toast("Process action")
+                    processImage()
                 }
             }
             true
         }
     }
-    private fun navigateToFragment() {
-        navController.navigate(navDirections!!)
-    }
+
     @SuppressLint("RestrictedApi")
     private fun processImage() {
-        Log.d("Preview", "Processing Image")
-
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setMessage("Do you want to save this image in the gallery?")
-            .setTitle("Save Image")
-            .setPositiveButton("Yes") { _, _ ->
-
-                fileUri?.let {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        fileWorker.saveImage(
-                            requireContext(),
-                            "Notable",
-                            currentImage.name,
-                            it
-                        )}
-                }
-                toast("Image Saved")
-            }
-            .setNegativeButton("No") { _, _ ->
-            }
-            .create()
-            .show()
         fileUri?.let {
-            Log.d("PreviewDebug", it.toString())
             GlobalScope.launch(Dispatchers.IO) {
                 retrofitUploader.uploadFile(File(it.path!!), it)
             }
         }
-
+        toast("Image Processed")
+        dismiss()
     }
     private fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
