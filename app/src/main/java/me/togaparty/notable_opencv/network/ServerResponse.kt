@@ -1,6 +1,5 @@
 package me.togaparty.notable_opencv.network
 
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class ServerResponse(

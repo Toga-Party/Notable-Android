@@ -1,8 +1,6 @@
 package me.togaparty.notable_opencv.fragments
 
 import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -12,14 +10,12 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.utils.showDeniedDialog
-import me.togaparty.notable_opencv.utils.showPermissionRequestDialog
+import me.togaparty.notable_opencv.utils.*
 
 class DashboardFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
@@ -43,11 +39,12 @@ class DashboardFragment : Fragment(), View.OnClickListener {
         view.findViewById<CardView>(R.id.glossary_cardview).setOnClickListener(this)
     }
 
+
     override fun onClick(v: View?) {
         when(v!!.id){
             R.id.camera_cardview ->
                 when {
-                    permissionsGranted(requireContext(), CAMERA_REQUIRED_PERMISSIONS) -> {
+                    permissionsGranted(requireContext(), ALL_REQUIRED_PERMISSIONS) -> {
                         navController.navigate(
                             DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
                         )
@@ -59,15 +56,17 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             "Permission Required",
                             "Camera access and File access is required to use this feature."
                         ) {
-                            checkPermissions.launch(CAMERA_REQUIRED_PERMISSIONS.toTypedArray())
+                            Log.d("Dashboard", "Launching required camera permissions.")
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
+                            checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
                         }
                     }
                     else -> {
-                        checkPermissions.launch(CAMERA_REQUIRED_PERMISSIONS.toTypedArray())
+                        Log.d("Dashboard", "Launching required camera permissions.")
                         navDirections =
                                 DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
+                        checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
                     }
                 }
             R.id.files_cardview ->
@@ -82,25 +81,33 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             "Permission Required",
                             "File access is required to use this feature."
                         ) {
-                            checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
+                            Log.d("Dashboard", "Launching required file permissions.")
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment()
+                            checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
                         }
                     }
                     else -> {
-                        checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
+                        Log.d("Dashboard", "Launching required file permissions.")
                         navDirections =
                                 DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment()
+                        checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
                     }
                 }
             R.id.settings_cardview -> navController.navigate(
-                    DashboardFragmentDirections.actionDashboardFragmentToSettingsFragment())
+                    DashboardFragmentDirections.actionDashboardFragmentToSettingsActivity())
             R.id.glossary_cardview -> navController.navigate(
                     DashboardFragmentDirections.actionDashboardFragmentToGlossaryFragment())
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        navDirections = null
+    }
+
     private fun navigateToFragment() {
-        navController.navigate(navDirections!!)
+        navDirections?.let { navController.navigate(it) }
     }
 
     private fun setPermissions() {
@@ -110,8 +117,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                 ActivityResultContracts.RequestMultiplePermissions()
             ) {
                 permissions ->
-
-                if (permissions[Manifest.permission.CAMERA] == true &&
+                if (permissions[Manifest.permission.CAMERA] == true ||
                     permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true){
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             if(permissions[Manifest.permission.ACCESS_MEDIA_LOCATION] == true) {
@@ -123,16 +129,8 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                                         "You can accept the permissions needed in the Setting page")
                             }
                         } else {
-                            if(permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true) {
-                                navigateToFragment()
-                            } else {
-                                Log.d("Dashboard", "CheckPermissionLauncher 2")
-                                requireContext().showDeniedDialog(
-                                        "Access denied",
-                                        "You can accept the permissions needed in the Setting page")
-                            }
+                            navigateToFragment()
                         }
-
                 } else {
                     Log.d("Dashboard", "CheckPermissionLauncher 3")
                     requireContext().showDeniedDialog(
@@ -142,28 +140,4 @@ class DashboardFragment : Fragment(), View.OnClickListener {
             }
     }
 
-
-    companion object {
-        fun permissionsGranted(context: Context, permissions: List<String>) = permissions.all {
-            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-        }
-        val CAMERA_REQUIRED_PERMISSIONS = mutableListOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE).apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                add(Manifest.permission.ACCESS_MEDIA_LOCATION)
-            } else {
-                add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-        }
-
-        val FILE_REQUIRED_PERMISSIONS = mutableListOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE).apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                add(Manifest.permission.ACCESS_MEDIA_LOCATION)
-            }  else {
-                add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-        }
-    }
 }

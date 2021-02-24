@@ -5,20 +5,24 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.OutputStream
 
-class FileWorkerViewModel: ViewModel() {
+class FileWorker: ViewModel() {
     @SuppressLint("Recycle")
     fun loadImages(context: Context):  ArrayList<GalleryImage> {
         val imageList = ArrayList<GalleryImage>()
@@ -29,8 +33,8 @@ class FileWorkerViewModel: ViewModel() {
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         }
         val projection = arrayOf(
-            MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DISPLAY_NAME,
         )
         val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MediaStore.Images.Media.RELATIVE_PATH + " like ? "
@@ -39,9 +43,9 @@ class FileWorkerViewModel: ViewModel() {
         }
         val selectionArgs = arrayOf("%Notable%")
         val query = context.contentResolver.query(
-            collection,
-            projection,
-            selection,
+                collection,
+                projection,
+                selection,
                 selectionArgs,
                 null
         )
@@ -56,10 +60,10 @@ class FileWorkerViewModel: ViewModel() {
                 val id = it.getLong(idCol)
                 val name = it.getString(nameCol)
                 val contentUri: Uri = ContentUris.withAppendedId(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    id
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        id
                 )
-                imageList.add(GalleryImage(contentUri,name))
+                imageList.add(GalleryImage(contentUri, name))
             }
 
         }
@@ -67,6 +71,15 @@ class FileWorkerViewModel: ViewModel() {
         return imageList
     }
 
+<<<<<<< HEAD:app/src/main/java/me/togaparty/notable_opencv/utils/FileWorker.kt
+    fun deleteImage(fileUri: Uri, context: Context) {
+        Log.d("FileWorker", "$fileUri")
+        fileUri.let {
+            context.contentResolver
+                .delete(it, null, null)
+        }
+    }
+=======
     suspend fun  deleteImage(
         context: Context,
         fileName: String,
@@ -118,19 +131,20 @@ class FileWorkerViewModel: ViewModel() {
     }
 
 
+>>>>>>> origin/experimental:app/src/main/java/me/togaparty/notable_opencv/utils/FileWorkerViewModel.kt
     suspend fun saveImage(
-        context: Context,
-        directory: String,
-        fileName: String,
-        fileUri: Uri
+            context: Context,
+            directory: String,
+            fileName: String,
+            fileUri: Uri
     ){
-        val bitmap = getBitmap(File(fileUri.path!!))
+
         return withContext(Dispatchers.IO){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val values = contentValues(fileName).apply{
                     put(
-                        MediaStore.Images.Media.RELATIVE_PATH,
-                        Environment.DIRECTORY_PICTURES + File.separator + directory)
+                            MediaStore.Images.Media.RELATIVE_PATH,
+                            Environment.DIRECTORY_PICTURES + File.separator + directory)
                     put(MediaStore.Images.Media.IS_PENDING, true)
                 }
                 // RELATIVE_PATH and IS_PENDING are introduced in API 29.
@@ -138,25 +152,24 @@ class FileWorkerViewModel: ViewModel() {
                 val imageUri: Uri? =
                     context.contentResolver.insert(
                             MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                        values
+                            values
                     )
 
                 if (imageUri != null) {
                     saveImageOutput(
-                        bitmap,
-                        context.contentResolver.openOutputStream(imageUri)
+                            fileUri,
+                            context.contentResolver.openOutputStream(imageUri)
                     )
                     values.put(MediaStore.Images.Media.IS_PENDING, false)
                     context.contentResolver.update(
-                        imageUri,
-                        values,
-                        null, null)
+                            imageUri,
+                            values,
+                            null, null)
                 }
             } else {
 
                 val saveDirectory = File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                            ,File.separator + directory)
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), File.separator + directory)
 
                 if (!saveDirectory.exists()) {
                     saveDirectory.mkdirs()
@@ -164,19 +177,31 @@ class FileWorkerViewModel: ViewModel() {
                 val saveFile = System.currentTimeMillis().toString() + ".png"
                 val file = File(saveDirectory, saveFile)
 
-                saveImageOutput(bitmap, FileOutputStream(file))
+                saveImageOutput(fileUri, FileOutputStream(file))
 
                 val values = contentValues(fileName)
                 values.put(MediaStore.Images.Media.DATA, file.absolutePath)
 
                 // .DATA is deprecated in API 29
                 context.contentResolver.insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    values
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        values
                 )
             }
         }
 
+    }
+    private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degrees.toFloat())
+        return Bitmap.createBitmap(
+                bitmap,
+                0,
+                0,
+                bitmap.width,
+                bitmap.height,
+                matrix,
+                true)
     }
 
     private fun contentValues(fileName: String) : ContentValues =
@@ -185,7 +210,30 @@ class FileWorkerViewModel: ViewModel() {
             put(MediaStore.Images.Media.MIME_TYPE, "image/*")
 
         }
-    private fun saveImageOutput(bitmap: Bitmap, outputStream: OutputStream?)  =
+    private fun saveImageOutput(fileUri: Uri, outputStream: OutputStream?) {
+
+        var bitmap = BitmapFactory.decodeFile(fileUri.path!!)
+        var exif: ExifInterface? = null
+        try {
+            val pictureFile = File(fileUri.path!!)
+            exif = ExifInterface(pictureFile.absolutePath)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        var orientation = ExifInterface.ORIENTATION_NORMAL
+
+        if (exif != null) {
+            orientation =
+                    exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        }
+
+        bitmap = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateBitmap(bitmap, 270)
+            else -> bitmap
+        }
         outputStream?.let {
             try {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
@@ -194,5 +242,5 @@ class FileWorkerViewModel: ViewModel() {
                 e.printStackTrace()
             }
         }
-
+    }
 }

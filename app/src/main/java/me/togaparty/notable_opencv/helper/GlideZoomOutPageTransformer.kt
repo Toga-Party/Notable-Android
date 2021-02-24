@@ -2,6 +2,7 @@ package me.togaparty.notable_opencv.helper
 
 import android.view.View
 import androidx.viewpager.widget.ViewPager
+import kotlin.math.abs
 
 private const val MIN_SCALE = 0.75f
 class GlideZoomOutPageTransformer : ViewPager.PageTransformer {
@@ -26,7 +27,7 @@ class GlideZoomOutPageTransformer : ViewPager.PageTransformer {
                     // Counteract the default slide transition
                     translationX = pageWidth * -position
                     // Scale the page down (between MIN_SCALE and 1)
-                    val scaleFactor = (MIN_SCALE + (1 - MIN_SCALE) * (1 - Math.abs(position)))
+                    val scaleFactor = (MIN_SCALE + (1 - MIN_SCALE) * (1 - abs(position)))
                     scaleX = scaleFactor
                     scaleY = scaleFactor
                 }

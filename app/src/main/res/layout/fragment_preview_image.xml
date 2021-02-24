@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".fragments.PreviewImageFragment">
 
     <ImageView
@@ -15,51 +15,16 @@
         android:scaleType="fitXY"
         android:visibility="visible" />
 
-    <Button
-        android:id="@+id/retake"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="40dp"
-        android:background="@drawable/button_bg_preview"
-        android:fontFamily="@font/amiko_bold"
-        android:text="@string/retake"
-        android:textSize="11dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_percent="0.28" />
+    <com.leinardi.android.speeddial.SpeedDialView
+        android:id="@+id/speedDial2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|end"
+        app:sdMainFabClosedBackgroundColor="#FFEB3B"
+        app:sdMainFabClosedSrc="@drawable/ic_list_black"
+        app:sdMainFabOpenedBackgroundColor="#F6F4DF"
+        app:sdMainFabOpenedSrc="@drawable/ic_fab_open_black" />
 
-    <Button
-        android:id="@+id/crop"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintWidth_percent="0.28"
-        android:background="@drawable/button_bg_preview"
-        android:fontFamily="@font/amiko_bold"
-        android:textSize="11dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="40dp"
-        android:text="@string/crop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/process"
-        app:layout_constraintStart_toEndOf="@+id/retake" />
-
-    <Button
-        android:id="@+id/process"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="40dp"
-        android:background="@drawable/button_bg_preview"
-        android:fontFamily="@font/amiko_bold"
-        android:text="@string/process"
-        android:textSize="11dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintWidth_percent="0.30" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

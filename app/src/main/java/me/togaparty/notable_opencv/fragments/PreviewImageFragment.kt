@@ -13,19 +13,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.leinardi.android.speeddial.SpeedDialActionItem
+import com.leinardi.android.speeddial.SpeedDialView
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -34,7 +34,7 @@ import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.network.RetrofitUploader
-import me.togaparty.notable_opencv.utils.FileWorkerViewModel
+import me.togaparty.notable_opencv.utils.FileWorker
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
 
@@ -43,12 +43,12 @@ class PreviewImageFragment : Fragment() {
 
     private lateinit var fileName: String
     private var fileUri: Uri? = null
-    private lateinit var container: ConstraintLayout
+    private lateinit var container: RelativeLayout
     private lateinit var imageView: ImageView
     private lateinit var outputCacheDirectory: File
     private lateinit var galleryDirectory: File
     private lateinit var navController: NavController
-    private lateinit var fileWorkerViewModel: FileWorkerViewModel
+    private lateinit var fileWorker: FileWorker
     private lateinit var retrofitUploader: RetrofitUploader
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,26 +63,20 @@ class PreviewImageFragment : Fragment() {
         }
 
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.fragment_preview_image, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        container = view as ConstraintLayout
+        container = view as RelativeLayout
         navController = container.findNavController()
-
         imageView = container.findViewById(R.id.imageView)
-        container.findViewById<Button>(R.id.retake).setOnClickListener(
-                Navigation.createNavigateOnClickListener(R.id.action_previewImage_pop, null))
-        container.findViewById<Button>(R.id.crop).setOnClickListener {cropImage()}
-        container.findViewById<Button>(R.id.process).setOnClickListener {processImage()}
-        fileWorkerViewModel = FileWorkerViewModel()
+        loadSpeedDials(container) //goes BBRRR
+        fileWorker = FileWorker()
         retrofitUploader = RetrofitUploader()
         GlobalScope.launch {
             container.post{
@@ -95,12 +89,47 @@ class PreviewImageFragment : Fragment() {
         Log.d("PreviewDebug", "On Activity result is called.")
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             Log.d("PreviewDebug", "Image cropped successfully")
-            fileUri = data?.let { UCrop.getOutput(data) }!!
+            fileUri = data?.let { UCrop.getOutput(it) }
             Log.d("PreviewDebug", "Received uri: $fileUri")
+            setImageView()
         }
     }
+    private fun loadSpeedDials(container: RelativeLayout) {
+        val floatingActionButton = container.findViewById<SpeedDialView>(R.id.speedDial2)
+        floatingActionButton.addActionItem(
+                SpeedDialActionItem.Builder(R.id.process, R.drawable.sync)
+                        .setLabel(getString(R.string.process_music))
+                        .setTheme(R.style.Theme_Notable_OPENCV)
+                        .setLabelClickable(false)
+                        .create()
+        )
+        floatingActionButton.addActionItem(
+                SpeedDialActionItem.Builder(R.id.crop, R.drawable.ic_crop)
+                        .setLabel(getString(R.string.crop))
+                        .setTheme(R.style.Theme_Notable_OPENCV)
+                        .setLabelClickable(false)
+                        .create()
+        )
+        floatingActionButton.addActionItem(
+            SpeedDialActionItem.Builder(R.id.retake, R.drawable.ic_arrow_back_24px)
+                .setLabel(getString(R.string.retake))
+                .setTheme(R.style.Theme_Notable_OPENCV)
+                .setLabelClickable(false)
+                .create()
+        )
+        floatingActionButton.setOnActionSelectedListener { actionItem ->
 
+            when(actionItem.id) {
+                R.id.retake -> navController.navigate(PreviewImageFragmentDirections.actionPreviewImagePop())
+                R.id.process -> processImage()
+                R.id.crop -> cropImage()
+                else -> throw IllegalAccessError("this shouldn't happen in the first place")
+            }
+            true
+        }
+    }
     private fun cropImage() {
+        Log.d("PreviewDebug", "Before cropping: $fileUri")
         fileUri?.let {
             UCrop.of(it, it)
                 .withMaxResultSize(imageView.width, imageView.height)
@@ -110,19 +139,17 @@ class PreviewImageFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     private fun processImage() {
         Log.d("Preview", "Processing Image")
-
             val builder = AlertDialog.Builder(requireContext())
             builder.setMessage("Do you want to save this image in the gallery?")
                 .setTitle("Save Image")
                 .setPositiveButton("Yes") { _, _ ->
-
                     fileUri?.let {
                         GlobalScope.launch(Dispatchers.IO) {
-                        fileWorkerViewModel.saveImage(
-                            requireContext(),
-                            "Notable",
-                            fileName,
-                            it
+                        fileWorker.saveImage(
+                                requireContext(),
+                                "Notable",
+                                fileName,
+                                it,
                         )}
                     }
                     toast("Image Saved")
@@ -140,7 +167,7 @@ class PreviewImageFragment : Fragment() {
 
     }
     private fun setImageView() {
-        Log.d("PreviewDebug", "FileURI is : $fileUri")
+        Log.d("PreviewDebug", "SetImageView is called")
         val options = RequestOptions()
             .format(DecodeFormat.PREFER_RGB_565)
             .placeholder(ColorDrawable(Color.WHITE))

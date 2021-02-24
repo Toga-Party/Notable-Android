@@ -27,21 +27,16 @@
             android:id="@+id/action_dashboardFragment_to_glossaryFragment"
             app:destination="@id/glossaryFragment" />
         <action
-            android:id="@+id/action_dashboardFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
-        <action
             android:id="@+id/action_dashboardFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
         <action
             android:id="@+id/action_dashboardFragment_to_galleryFragment"
             app:destination="@id/galleryFragment" />
+        <action
+            android:id="@+id/action_dashboardFragment_to_settingsActivity"
+            app:destination="@id/settingsActivity" />
 
     </fragment>
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="me.togaparty.notable_opencv.fragments.SettingsFragment"
-        android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/glossaryFragment"
         android:name="me.togaparty.notable_opencv.fragments.GlossaryFragment"
@@ -63,15 +58,24 @@
         android:name="me.togaparty.notable_opencv.fragments.GalleryFragment"
         android:label="GalleryFragment" >
         <action
-            android:id="@+id/action_galleryFragment_to_galleryFullscreenFragment"
-            app:destination="@id/galleryFullscreenFragment" />
-        <action
             android:id="@+id/action_galleryFragment_to_dashboardFragment"
             app:destination="@id/dashboardFragment"
             app:popUpTo="@id/dashboardFragment" />
+        <action
+            android:id="@+id/action_galleryFragment_to_inspectFragment"
+            app:destination="@id/inspectFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/galleryFullscreenFragment"
         android:name="me.togaparty.notable_opencv.fragments.GalleryFullscreenFragment"
         android:label="GalleryFullscreenFragment" />
+    <fragment
+        android:id="@+id/inspectFragment"
+        android:name="me.togaparty.notable_opencv.fragments.InspectFragment"
+        android:label="InspectFragment" />
+    <activity
+        android:id="@+id/settingsActivity"
+        android:name="me.togaparty.notable_opencv.SettingsActivity"
+        android:label="SettingsActivity" />
 </navigation>
