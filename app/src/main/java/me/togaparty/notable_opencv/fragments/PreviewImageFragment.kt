@@ -16,7 +16,9 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.bumptech.glide.load.DecodeFormat
@@ -29,12 +31,15 @@ import com.leinardi.android.speeddial.SpeedDialView
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
+import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.network.RetrofitUploader
 import me.togaparty.notable_opencv.utils.FileWorker
+import me.togaparty.notable_opencv.utils.ImageListProvider
 import me.togaparty.notable_opencv.utils.showDialog
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
@@ -51,7 +56,7 @@ class PreviewImageFragment : Fragment() {
     private lateinit var navController: NavController
     private lateinit var fileWorker: FileWorker
     private lateinit var retrofitUploader: RetrofitUploader
-
+    private val model: ImageListProvider by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -136,17 +141,33 @@ class PreviewImageFragment : Fragment() {
 
         showDialog("Save image", "Do you want to save this image in the gallery?") {
             fileUri?.let {
-                GlobalScope.launch(Dispatchers.IO) {
-                    fileWorker.saveImage(
-                            requireContext(),
-                            "Notable",
-                            fileName,
-                            it,
-                    )
+                lifecycleScope.launch {
+                    val savingOperation = async(Dispatchers.IO) {
+                        fileWorker.saveImage(
+                                requireContext(),
+                                "Notable",
+                                fileName,
+                                it,
+                        )
+                    }
+                    savingOperation.await()
+                    var image: GalleryImage? = null
+                    val queryOperation = async(Dispatchers.IO) {
+                        Log.d("Preview", "Query operation called.")
+                        image = fileWorker.getLatestImage(requireContext())
+
+                    }
+                    queryOperation.await()
+                    image?.let {
+                        Log.d("Preview", "Adding to list")
+                        model.addtoList(it)
+                    }
+                    Log.d("Preview", "Navigating to Gallery")
+                    navController.navigate(PreviewImageFragmentDirections.actionPreviewImageToGalleryFragment())
+                    toast("Image Saved")
                 }
+
             }
-            navController.navigate(PreviewImageFragmentDirections.actionPreviewImageToGalleryFragment())
-            toast("Image Saved")
         }
     }
     private fun setImageView() {

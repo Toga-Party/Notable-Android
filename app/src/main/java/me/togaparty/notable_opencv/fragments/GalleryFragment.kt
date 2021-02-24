@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -15,9 +16,6 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.item_gallery_image.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.adapter.GalleryImageClickListener
@@ -25,16 +23,18 @@ import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.OnDismissListener
 import me.togaparty.notable_opencv.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_opencv.utils.FileWorker
+import me.togaparty.notable_opencv.utils.ImageListProvider
 import me.togaparty.notable_opencv.utils.permissionsGranted
 
 class GalleryFragment : Fragment(),
         GalleryImageClickListener, OnDismissListener {
     // Gallery Column Count
     private val spanCount = 2
-    private val imageList = ArrayList<GalleryImage>()
+
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
 
+    private val model: ImageListProvider by activityViewModels()
 
     private lateinit var fileWorker: FileWorker
 
@@ -54,37 +54,31 @@ class GalleryFragment : Fragment(),
             navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToDashboardFragment())
         }
         // init adapter
-        galleryAdapter = GalleryImageAdapter(imageList)
+        galleryAdapter = GalleryImageAdapter(model.imageList.value)
         galleryAdapter.listener = this
         fileWorker = FileWorker()
-
+        model.imageList.observe(viewLifecycleOwner, {
+            Log.d("GalleryFragment", "Something changed")
+            galleryAdapter.notifyDataSetChanged()
+        })
         // init recyclerview
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
         recyclerView.adapter = galleryAdapter
-        loadGallery()
     }
+
 
     override fun onClick(position: Int) {
         val bundle = Bundle()
-            bundle.putSerializable("images", imageList)
             bundle.putInt("position", position)
         val fragmentTransaction = childFragmentManager.beginTransaction()
         val galleryFragment = GalleryFullscreenFragment()
         galleryFragment.arguments = bundle
         galleryFragment.show(fragmentTransaction, "gallery")
     }
-    override fun onDialogDismiss() {
-        loadGallery()
-    }
-    private fun loadGallery() {
-        val context = requireContext()
-        if(imageList.isNotEmpty()) imageList.clear()
-        GlobalScope.launch(Dispatchers.Main) {
-            imageList.addAll(fileWorker.loadImages(context))
-            galleryAdapter.notifyDataSetChanged()
-        }
-    }
-    inner class GalleryImageAdapter(private val itemList: List<GalleryImage>) : RecyclerView.Adapter<GalleryImageAdapter.ViewHolder>() {
+//    override fun onDialogDismiss() {
+//        galleryAdapter.notifyDataSetChanged()
+//    }
+    inner class GalleryImageAdapter(private val itemList: ArrayList<GalleryImage>?) : RecyclerView.Adapter<GalleryImageAdapter.ViewHolder>() {
         private var context: Context? = null
         var listener: GalleryImageClickListener? = null
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryImageAdapter.ViewHolder {
@@ -95,14 +89,14 @@ class GalleryFragment : Fragment(),
             return ViewHolder(view)
         }
         override fun getItemCount(): Int {
-            return itemList.size
+            return itemList?.size ?: 0
         }
         override fun onBindViewHolder(holder: GalleryImageAdapter.ViewHolder, position: Int) {
             holder.bind()
         }
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             fun bind() {
-                val image = itemList[adapterPosition]
+                val image = itemList!![adapterPosition]
 
                 val circularProgressDrawable = context?.let { CircularProgressDrawable(it) }
                 if (circularProgressDrawable != null) {
@@ -112,7 +106,6 @@ class GalleryFragment : Fragment(),
                     circularProgressDrawable.centerRadius = 30f
                 }
                 circularProgressDrawable?.start()
-
 
                 // load image
                 GlideApp.with(context!!)
@@ -129,8 +122,12 @@ class GalleryFragment : Fragment(),
 
         }
     }
+    override fun onDialogDismiss() {
 
+    }
     companion object
+
+    override
 
 
 
