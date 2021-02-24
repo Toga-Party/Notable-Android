@@ -9,14 +9,27 @@ import androidx.recyclerview.widget.RecyclerView
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.model.Inspect_Prediction
 
-class PredictionsAdapter (private val predictions: List<Inspect_Prediction>) : RecyclerView.Adapter<PredictionsAdapter.ViewHolder>() {
+
+class PredictionsAdapter(private val predictions: List<Inspect_Prediction>,private val listener : OnItemClickListener) : RecyclerView.Adapter<PredictionsAdapter.ViewHolder>() {
+
+    interface OnItemClickListener{
+        fun onItemClick(position: Int, view: TextView)
+    }
     // Provide a direct reference to each of the views within a data item
     // Used to cache the views within the item layout for fast access
-    inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
-        // Your holder should contain and initialize a member variable
-        // for any view that will be set as you render a row
-        val symbolTextView = itemView.findViewById<TextView>(R.id.symbol_name)
-        val toGalleryButton = itemView.findViewById<Button>(R.id.toGlossary_button)
+    inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView), View.OnClickListener {
+        val symbolTextView: TextView = itemView.findViewById<TextView>(R.id.symbol_name)
+        val toGalleryButton: Button = itemView.findViewById<Button>(R.id.toGlossary_button)
+        init {
+            toGalleryButton.setOnClickListener(this)
+        }
+        override fun onClick(v: View?) {
+            val position = adapterPosition
+            if(position != RecyclerView.NO_POSITION){
+                listener.onItemClick(position, symbolTextView)
+            }
+
+        }
     }
     // Usually involves inflating a layout from XML and returning the holder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PredictionsAdapter.ViewHolder {

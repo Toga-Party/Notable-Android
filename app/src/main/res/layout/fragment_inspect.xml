@@ -32,7 +32,7 @@
         android:layout_marginEnd="28dp"
         android:layout_marginBottom="12dp"
         android:contentDescription="@string/image_gallery"
-        android:src="@drawable/musicnote"
+        android:src="@drawable/ic_inspect_banner"
         app:layout_constraintBottom_toTopOf="@+id/innerLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.2"

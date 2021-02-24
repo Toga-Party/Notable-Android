@@ -9,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,13 +30,11 @@ import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_opencv.model.Inspect_Prediction
 import me.togaparty.notable_opencv.utils.FileWorker
 
-class InspectFragment : Fragment() {
-    //private lateinit var mainCategoryRecycler: RecyclerView
-    //private var mainRecyclerAdapter: MainRecyclerAdapter? = null
+class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     private lateinit var imageList: MutableList<*>
     private lateinit var viewPager: ViewPager
-    private var selectedPosition: Int = 0
     private lateinit var fileWorker: FileWorker
+    private var selectedPosition: Int = 0
     lateinit var predictions: ArrayList<Inspect_Prediction>
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
 
@@ -57,15 +57,15 @@ class InspectFragment : Fragment() {
                 false
         )
         // Lookup the recyclerview in activity layout
-        val inspect_recycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
+        val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
         val rows = Inspect_Prediction.createPredictionList(12)
         // Create adapter passing in the sample data
-        val adapter = PredictionsAdapter(rows)
+        val adapter = PredictionsAdapter(rows,this)
         // Attach the adapter to the recyclerview to populate items
-        inspect_recycler.adapter = adapter
+        inspectRecycler.adapter = adapter
         // Set layout manager to position the items
-        inspect_recycler.layoutManager = LinearLayoutManager(requireContext())
+        inspectRecycler.layoutManager = LinearLayoutManager(requireContext())
         viewPager = view.findViewById(R.id.viewPagerBanner)
         galleryPagerAdapter = GalleryPagerAdapter()
         viewPager.adapter = galleryPagerAdapter
@@ -73,6 +73,11 @@ class InspectFragment : Fragment() {
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
 
         return view
+    }
+    override fun onItemClick(position: Int, view: TextView) {
+        //Button Click event exposes aligned TextView control
+        Toast.makeText(this.context, view.text.toString() +" $position clicked", Toast.LENGTH_SHORT).show()
+        Log.d("Click", view.text.toString() + " $position clicked")
     }
     private fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
