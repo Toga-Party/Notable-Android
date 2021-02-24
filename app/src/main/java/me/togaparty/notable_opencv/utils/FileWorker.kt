@@ -71,7 +71,6 @@ class FileWorker: ViewModel() {
         return imageList
     }
 
-<<<<<<< HEAD:app/src/main/java/me/togaparty/notable_opencv/utils/FileWorker.kt
     fun deleteImage(fileUri: Uri, context: Context) {
         Log.d("FileWorker", "$fileUri")
         fileUri.let {
@@ -79,59 +78,7 @@ class FileWorker: ViewModel() {
                 .delete(it, null, null)
         }
     }
-=======
-    suspend fun  deleteImage(
-        context: Context,
-        fileName: String,
-    ) {
-        return withContext(Dispatchers.IO) {
-            val collection = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-            }else {
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            }
-            val projection = arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DISPLAY_NAME,
-            )
-            val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                MediaStore.Images.Media.RELATIVE_PATH + " like ? "
-            } else {
-                MediaStore.Images.Media.DATA + " like ? "
-            }
-            val selectionArgs = arrayOf("%Notable/${fileName}")
-            val query = context.contentResolver.query(
-                collection,
-                projection,
-                selection,
-                selectionArgs,
-                null
-            )
-            var uri: Uri? = null
-            var contentId = 0.toLong()
-            query?.use {
-                Log.d("FileWorker", "Query is not null")
-                val idCol = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                val nameCol = it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-                Log.d("FileWorker", it.count.toString())
-                while (it.moveToNext()) {
-                    Log.d("FileWorker", "Cursor traversal")
-                    contentId = it.getLong(idCol)
-                    val name = it.getString(nameCol)
-                    uri = ContentUris.withAppendedId(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        contentId
-                    )
-                }
-            }
-            uri?.let {
-                context.contentResolver
-                    .delete(it, "${MediaStore.Images.Media._ID} = ?", selectionArgs) }
-        }
-    }
 
-
->>>>>>> origin/experimental:app/src/main/java/me/togaparty/notable_opencv/utils/FileWorkerViewModel.kt
     suspend fun saveImage(
             context: Context,
             directory: String,
