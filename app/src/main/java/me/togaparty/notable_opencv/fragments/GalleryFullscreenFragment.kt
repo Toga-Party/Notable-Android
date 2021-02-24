@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -162,7 +163,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     @SuppressLint("RestrictedApi")
     private fun processImage() {
         fileUri?.let {
-            GlobalScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(Dispatchers.IO) {
                 retrofitUploader.uploadFile(File(it.path!!), it)
             }
         }

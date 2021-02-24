@@ -44,31 +44,6 @@ class FileWorker{
         }
         return imageList
     }
-    fun query(context: Context): Cursor? {
-        val collection = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        }else {
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        }
-        val projection = arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DISPLAY_NAME,
-        )
-        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            MediaStore.Images.Media.RELATIVE_PATH + " like ? "
-        } else {
-            MediaStore.Images.Media.DATA + " like ? "
-        }
-        val selectionArgs = arrayOf("%Notable%")
-        return context.contentResolver.query(
-                collection,
-                projection,
-                selection,
-                selectionArgs,
-                MediaStore.Images.ImageColumns.DATE_ADDED
-        )
-
-    }
     fun getLatestImage(context: Context): GalleryImage? {
         var image: GalleryImage? = null
         query(context)?.use { cursor ->
@@ -153,6 +128,30 @@ class FileWorker{
                 Log.d("SAVING", "Filename: $result")
             }
         }
+    }
+    private fun query(context: Context): Cursor? {
+        val collection = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        }else {
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+        val projection = arrayOf(
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DISPLAY_NAME,
+        )
+        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Images.Media.RELATIVE_PATH + " like ? "
+        } else {
+            MediaStore.Images.Media.DATA + " like ? "
+        }
+        val selectionArgs = arrayOf("%Notable%")
+        return context.contentResolver.query(
+                collection,
+                projection,
+                selection,
+                selectionArgs,
+                MediaStore.Images.ImageColumns.DATE_ADDED
+        )
 
     }
     private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {

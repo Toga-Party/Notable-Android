@@ -5,9 +5,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
 import android.view.*
-import android.widget.Button
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
