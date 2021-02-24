@@ -28,11 +28,10 @@ import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_opencv.network.RetrofitUploader
+import me.togaparty.notable_opencv.network.RetrofitWorker
 import me.togaparty.notable_opencv.utils.FileWorker
 import me.togaparty.notable_opencv.utils.ImageListProvider
 import me.togaparty.notable_opencv.utils.toast
-import java.io.File
 
 
 class GalleryFullscreenFragment : DialogFragment() {
@@ -47,7 +46,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     private var selectedPosition: Int = 0
     private var processed: Boolean = false
 
-    private lateinit var retrofitUploader: RetrofitUploader
+    private lateinit var retrofitWorker: RetrofitWorker
     private lateinit var fileWorker: FileWorker
 
     private val model: ImageListProvider by activityViewModels()
@@ -56,6 +55,7 @@ class GalleryFullscreenFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         //setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         fileWorker = FileWorker()
+        retrofitWorker = RetrofitWorker()
         //Detect rar directory, exists = true
         processed = true
     }
@@ -73,10 +73,8 @@ class GalleryFullscreenFragment : DialogFragment() {
         )
 
         navController = this.findNavController()
-        retrofitUploader = RetrofitUploader()
 
         galleryPagerAdapter = GalleryPagerAdapter()
-
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
@@ -162,11 +160,11 @@ class GalleryFullscreenFragment : DialogFragment() {
 
     @SuppressLint("RestrictedApi")
     private fun processImage() {
-        fileUri?.let {
-            lifecycleScope.launch(Dispatchers.IO) {
-                retrofitUploader.uploadFile(File(it.path!!), it)
-            }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            retrofitWorker.uploadFile(currentImage, requireContext())
         }
+
         toast("Image Processed")
         dismiss()
     }

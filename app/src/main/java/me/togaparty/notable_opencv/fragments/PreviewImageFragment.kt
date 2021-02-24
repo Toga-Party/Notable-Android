@@ -37,7 +37,7 @@ import me.togaparty.notable_opencv.MainActivity
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.helper.GlideApp
-import me.togaparty.notable_opencv.network.RetrofitUploader
+import me.togaparty.notable_opencv.network.RetrofitWorker
 import me.togaparty.notable_opencv.utils.FileWorker
 import me.togaparty.notable_opencv.utils.ImageListProvider
 import me.togaparty.notable_opencv.utils.showDialog
@@ -55,7 +55,7 @@ class PreviewImageFragment : Fragment() {
     private lateinit var galleryDirectory: File
     private lateinit var navController: NavController
     private lateinit var fileWorker: FileWorker
-    private lateinit var retrofitUploader: RetrofitUploader
+    private lateinit var retrofitWorker: RetrofitWorker
     private val model: ImageListProvider by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +84,7 @@ class PreviewImageFragment : Fragment() {
         container.findViewById<ImageButton>(R.id.save_button_1).setOnClickListener { saveImage() }
         loadSpeedDials(container) //goes BBRRR
         fileWorker = FileWorker()
-        retrofitUploader = RetrofitUploader()
+        retrofitWorker = RetrofitWorker()
         GlobalScope.launch {
             container.post{
                 setImageView()
@@ -142,8 +142,9 @@ class PreviewImageFragment : Fragment() {
         showDialog("Save image", "Do you want to save this image in the gallery?") {
             fileUri?.let {
                 lifecycleScope.launch {
+                    var image: GalleryImage? = null
                     val savingOperation = async(Dispatchers.IO) {
-                        fileWorker.saveImage(
+                        image = fileWorker.saveImage(
                                 requireContext(),
                                 "Notable",
                                 fileName,
@@ -151,13 +152,6 @@ class PreviewImageFragment : Fragment() {
                         )
                     }
                     savingOperation.await()
-                    var image: GalleryImage? = null
-                    val queryOperation = async(Dispatchers.IO) {
-                        Log.d("Preview", "Query operation called.")
-                        image = fileWorker.getLatestImage(requireContext())
-
-                    }
-                    queryOperation.await()
                     image?.let {
                         Log.d("Preview", "Adding to list")
                         model.addtoList(it)

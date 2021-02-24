@@ -44,24 +44,7 @@ class FileWorker{
         }
         return imageList
     }
-    fun getLatestImage(context: Context): GalleryImage? {
-        var image: GalleryImage? = null
-        query(context)?.use { cursor ->
-            cursor.moveToFirst()
 
-            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            Log.d("FileWorker", "Number of files got ${cursor.count}")
-            val id = cursor.getLong(idCol)
-            val name = cursor.getString(nameCol)
-            val contentUri: Uri = ContentUris.withAppendedId(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    id
-            )
-            image = GalleryImage(contentUri, name)
-        }
-        return image
-    }
     fun deleteImage(fileUri: Uri, context: Context) {
         Log.d("FileWorker", "$fileUri")
         fileUri.let {
@@ -73,12 +56,13 @@ class FileWorker{
     fun saveImage(
             context: Context,
             directory: String,
-            fileName: String,
-            fileUri: Uri
-    ){
-       // return withContext(Dispatchers.IO){
+            filename: String,
+            uri: Uri
+    ): GalleryImage? {
+
+        var image: GalleryImage? = null
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val values = contentValues(fileName).apply{
+                val values = contentValues(filename).apply{
                     put(
                             MediaStore.Images.Media.RELATIVE_PATH,
                             Environment.DIRECTORY_PICTURES + File.separator + directory)
@@ -94,7 +78,7 @@ class FileWorker{
 
                 if (imageUri != null) {
                     saveImageOutput(
-                            fileUri,
+                            uri,
                             context.contentResolver.openOutputStream(imageUri)
                     )
                     values.put(MediaStore.Images.Media.IS_PENDING, false)
@@ -102,12 +86,14 @@ class FileWorker{
                             imageUri,
                             values,
                             null, null)
-                    Log.d("SAVING", "Filename: $imageUri")
+                    image = GalleryImage(imageUri, filename)
                 }
             } else {
 
                 val saveDirectory = File(
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), File.separator + directory)
+                        Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES
+                        ),File.separator + directory)
 
                 if (!saveDirectory.exists()) {
                     saveDirectory.mkdirs()
@@ -115,20 +101,21 @@ class FileWorker{
                 val saveFile = System.currentTimeMillis().toString() + ".png"
                 val file = File(saveDirectory, saveFile)
 
-                saveImageOutput(fileUri, FileOutputStream(file))
+                saveImageOutput(uri, FileOutputStream(file))
 
-                val values = contentValues(fileName)
+                val values = contentValues(filename)
                 values.put(MediaStore.Images.Media.DATA, file.absolutePath)
 
                 // .DATA is deprecated in API 29
-                val result = context.contentResolver.insert(
+                val imageUri = context.contentResolver.insert(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                         values
                 )
-                Log.d("SAVING", "Filename: $result")
+                image = imageUri?.let { GalleryImage(it, filename) }
             }
-        }
+        return image
     }
+
     private fun query(context: Context): Cursor? {
         val collection = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
             MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
@@ -168,11 +155,11 @@ class FileWorker{
     }
 
     private fun contentValues(fileName: String) : ContentValues =
-        ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-            put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+            ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/*")
 
-        }
+            }
     private fun saveImageOutput(fileUri: Uri, outputStream: OutputStream?) {
 
         var bitmap = BitmapFactory.decodeFile(fileUri.path!!)
@@ -205,5 +192,7 @@ class FileWorker{
                 e.printStackTrace()
             }
         }
-    //}
+
+    }
 }
+

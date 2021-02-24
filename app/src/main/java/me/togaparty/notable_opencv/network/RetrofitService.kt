@@ -9,7 +9,7 @@ import retrofit2.http.*
 interface RetrofitService {
     //@Headers("Content-Type: application/json")
     @Multipart
-    @POST("/predict")
+    @POST(WebURL.header)
     fun upload(
         @Part image: MultipartBody.Part,
         @Part("file_name") name: RequestBody
