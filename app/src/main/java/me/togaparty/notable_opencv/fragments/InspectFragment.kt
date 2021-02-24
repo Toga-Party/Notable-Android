@@ -60,7 +60,7 @@ class InspectFragment : Fragment() {
         val inspect_recycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
         val rows = Inspect_Prediction.createPredictionList(12)
-        // Create adapter passing in the sample user data
+        // Create adapter passing in the sample data
         val adapter = PredictionsAdapter(rows)
         // Attach the adapter to the recyclerview to populate items
         inspect_recycler.adapter = adapter
