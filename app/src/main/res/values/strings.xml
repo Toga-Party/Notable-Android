@@ -48,5 +48,6 @@
     <string name="summary_file_storage_permission_preference" />
 
     <string name="camera_button">camera_button</string>
+    <string name="save_button">save_button</string>
 
 </resources>
