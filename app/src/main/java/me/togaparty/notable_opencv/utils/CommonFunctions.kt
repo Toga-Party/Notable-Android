@@ -66,3 +66,20 @@ fun Context.showPermissionRequestDialog(
 }
 fun getBitmap(file: File): Bitmap
         = BitmapFactory.decodeFile(file.absolutePath)
+fun Fragment.showDialog(
+        title: String,
+        body: String,
+        callback: () -> Unit
+) {
+    AlertDialog.Builder(requireContext()).also {
+        it.setTitle(title)
+        it.setMessage(body)
+        it.setPositiveButton("Yes") { _, _ ->
+            callback()
+        }
+        it.setNegativeButton("No") {_,_ ->
+
+        }
+    }.create().show()
+
+}

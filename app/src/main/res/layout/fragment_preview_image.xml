@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/save_button"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".fragments.PreviewImageFragment">
 
     <ImageView
@@ -26,5 +27,17 @@
         app:sdMainFabClosedSrc="@drawable/ic_list_black"
         app:sdMainFabOpenedBackgroundColor="#F6F4DF"
         app:sdMainFabOpenedSrc="@drawable/ic_fab_open_black" />
+
+    <ImageButton
+        android:id="@+id/save_button_1"
+        android:layout_width="64dp"
+        android:layout_height="65dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="4dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/button_background"
+        android:contentDescription="@string/save_button"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_save_button_foreground" />
 
 </RelativeLayout>

@@ -52,6 +52,10 @@
             android:id="@+id/action_previewImage_pop"
             app:popUpTo="@id/previewImage"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_previewImage_to_galleryFragment"
+            app:destination="@id/galleryFragment"
+            app:popUpTo="@id/dashboardFragment" />
     </fragment>
     <fragment
         android:id="@+id/galleryFragment"

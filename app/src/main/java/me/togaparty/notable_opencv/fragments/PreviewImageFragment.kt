@@ -2,7 +2,6 @@ package me.togaparty.notable_opencv.fragments
 
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
-import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -13,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
@@ -35,6 +35,7 @@ import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.network.RetrofitUploader
 import me.togaparty.notable_opencv.utils.FileWorker
+import me.togaparty.notable_opencv.utils.showDialog
 import me.togaparty.notable_opencv.utils.toast
 import java.io.File
 
@@ -75,6 +76,7 @@ class PreviewImageFragment : Fragment() {
         container = view as RelativeLayout
         navController = container.findNavController()
         imageView = container.findViewById(R.id.imageView)
+        container.findViewById<ImageButton>(R.id.save_button_1).setOnClickListener { saveImage() }
         loadSpeedDials(container) //goes BBRRR
         fileWorker = FileWorker()
         retrofitUploader = RetrofitUploader()
@@ -97,13 +99,6 @@ class PreviewImageFragment : Fragment() {
     private fun loadSpeedDials(container: RelativeLayout) {
         val floatingActionButton = container.findViewById<SpeedDialView>(R.id.speedDial2)
         floatingActionButton.addActionItem(
-                SpeedDialActionItem.Builder(R.id.process, R.drawable.sync)
-                        .setLabel(getString(R.string.process_music))
-                        .setTheme(R.style.Theme_Notable_OPENCV)
-                        .setLabelClickable(false)
-                        .create()
-        )
-        floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.crop, R.drawable.ic_crop)
                         .setLabel(getString(R.string.crop))
                         .setTheme(R.style.Theme_Notable_OPENCV)
@@ -121,7 +116,6 @@ class PreviewImageFragment : Fragment() {
 
             when(actionItem.id) {
                 R.id.retake -> navController.navigate(PreviewImageFragmentDirections.actionPreviewImagePop())
-                R.id.process -> processImage()
                 R.id.crop -> cropImage()
                 else -> throw IllegalAccessError("this shouldn't happen in the first place")
             }
@@ -137,34 +131,23 @@ class PreviewImageFragment : Fragment() {
         }
     }
     @SuppressLint("RestrictedApi")
-    private fun processImage() {
+    private fun saveImage() {
         Log.d("Preview", "Processing Image")
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setMessage("Do you want to save this image in the gallery?")
-                .setTitle("Save Image")
-                .setPositiveButton("Yes") { _, _ ->
-                    fileUri?.let {
-                        GlobalScope.launch(Dispatchers.IO) {
-                        fileWorker.saveImage(
-                                requireContext(),
-                                "Notable",
-                                fileName,
-                                it,
-                        )}
-                    }
-                    toast("Image Saved")
-                }
-                .setNegativeButton("No") { _, _ ->
-                }
-                .create()
-                .show()
+
+        showDialog("Save image", "Do you want to save this image in the gallery?") {
             fileUri?.let {
-                Log.d("PreviewDebug", it.toString())
                 GlobalScope.launch(Dispatchers.IO) {
-                    retrofitUploader.uploadFile(File(it.path!!), it)
+                    fileWorker.saveImage(
+                            requireContext(),
+                            "Notable",
+                            fileName,
+                            it,
+                    )
                 }
             }
-
+            navController.navigate(PreviewImageFragmentDirections.actionPreviewImageToGalleryFragment())
+            toast("Image Saved")
+        }
     }
     private fun setImageView() {
         Log.d("PreviewDebug", "SetImageView is called")

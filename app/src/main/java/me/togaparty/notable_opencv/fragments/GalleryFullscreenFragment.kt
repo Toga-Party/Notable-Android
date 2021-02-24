@@ -56,6 +56,7 @@ class GalleryFullscreenFragment : DialogFragment() {
         imageList = ArrayList(arguments?.getSerializable("images") as ArrayList<*>)
         //Detect rar directory, exists = true
         processed = true
+
     }
 
     override fun onCreateView(
@@ -179,6 +180,7 @@ class GalleryFullscreenFragment : DialogFragment() {
         viewPager.setCurrentItem(position, false)
         currentImage = imageList[position] as GalleryImage
         selectedPosition = position
+        fileUri = currentImage.imageUrl
     }
     // viewpager page change listener
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
