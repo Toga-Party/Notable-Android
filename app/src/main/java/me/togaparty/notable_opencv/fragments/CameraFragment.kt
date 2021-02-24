@@ -54,7 +54,7 @@ class CameraFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        outputDirectory = MainActivity.getOutputDirectory(requireContext())
+        outputDirectory = MainActivity.getOutputCacheDirectory(requireContext())
         processCameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
     }
     override fun onResume() {
@@ -78,7 +78,7 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if (!PermissionsFragment.allPermissionsGranted(requireContext())) {
             Log.d("CameraDebug", "Called to navigate to PermissionsFragment")
-            setFragmentResult("requestKey", bundleOf("cameraFragment" to "CameraFragment"))
+            setFragmentResult("requestKey", bundleOf("actionDirection" to "CameraFragment"))
             navController.navigate(CameraFragmentDirections.actionCameraFragmentToPermissionsFragment())
         }
 

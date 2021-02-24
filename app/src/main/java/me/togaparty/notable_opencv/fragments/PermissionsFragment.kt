@@ -42,12 +42,9 @@ class PermissionsFragment : Fragment() {
         if (!allPermissionsGranted(requireContext())) {
             callRequestPermissions()
         } else {
-            navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentPop())
+            navigateToFragment()
         }
     }
-    private fun callRequestPermissions() = requestPermissions(
-            REQUIRED_PERMISSIONS.toTypedArray(), REQUEST_CODE_PERMISSIONS)
-
     override fun onDestroyView() {
         super.onDestroyView()
         actionHandler.clear()
@@ -85,11 +82,11 @@ class PermissionsFragment : Fragment() {
 
                         val dialog = builder.create()
                         dialog.show()
-                        navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentPop())
+                        navigateToFragment()
                     }
                 }
                 Toast.makeText(requireContext(), "Permission request granted", Toast.LENGTH_SHORT).show()
-                navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentPop())
+                navigateToFragment()
             }
         } else {
             Toast.makeText(requireContext(),
@@ -97,7 +94,14 @@ class PermissionsFragment : Fragment() {
                 Toast.LENGTH_SHORT).show()
         }
     }
-
+    private fun navigateToFragment() : Any =
+            when (actionDirection) {
+                "toCamera" -> navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentToCameraFragment())
+                "toGallery"-> navController.navigate(PermissionsFragmentDirections.actionPermissionsFragmentToGalleryFragment())
+                else -> ""
+            }
+    private fun callRequestPermissions() = requestPermissions(
+            REQUIRED_PERMISSIONS.toTypedArray(), REQUEST_CODE_PERMISSIONS)
 
     companion object {
 
