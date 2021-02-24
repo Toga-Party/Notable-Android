@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
@@ -20,8 +22,10 @@ import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
+import me.togaparty.notable_opencv.adapter.PredictionsAdapter
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
+import me.togaparty.notable_opencv.model.Inspect_Prediction
 import me.togaparty.notable_opencv.utils.FileWorker
 
 class InspectFragment : Fragment() {
@@ -31,6 +35,7 @@ class InspectFragment : Fragment() {
     private lateinit var viewPager: ViewPager
     private var selectedPosition: Int = 0
     private lateinit var fileWorker: FileWorker
+    lateinit var predictions: ArrayList<Inspect_Prediction>
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,15 +43,8 @@ class InspectFragment : Fragment() {
         fileWorker = FileWorker()
         //imageList = ArrayList(arguments?.getSerializable("images") as ArrayList<*>)
         imageList = fileWorker.loadImages(requireContext())
-    }
 
-//    private fun setMainCategoryRecycler(allCategory: List<AllCategory>){
-//        //mainCategoryRecycler = findViewById(R.id.main_recycler)
-//        val layoutManager:RecyclerView.LayoutManager = LinearLayoutManager(this.context)
-//        main_recycler!!.layoutManager = layoutManager
-//        mainRecyclerAdapter = this.context?.let { MainRecyclerAdapter(it,allCategory) }
-//        main_recycler!!.adapter = mainRecyclerAdapter
-//    }
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -58,16 +56,16 @@ class InspectFragment : Fragment() {
                 container,
                 false
         )
-//        GlobalScope.launch(Dispatchers.Main) {
-//            imageList.addAll(fileWorkerViewModel.loadImages(requireContext()))
-////            galleryAdapter.notifyDataSetChanged()
-//        }
-
-//        viewPager = view.findViewById(R.id.viewPagerBanner)
-//        viewPager.adapter = galleryPagerAdapter
-//        viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
-//        viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
-
+        // Lookup the recyclerview in activity layout
+        val inspect_recycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
+        // Initialize predictions
+        val rows = Inspect_Prediction.createPredictionList(12)
+        // Create adapter passing in the sample user data
+        val adapter = PredictionsAdapter(rows)
+        // Attach the adapter to the recyclerview to populate items
+        inspect_recycler.adapter = adapter
+        // Set layout manager to position the items
+        inspect_recycler.layoutManager = LinearLayoutManager(requireContext())
         viewPager = view.findViewById(R.id.viewPagerBanner)
         galleryPagerAdapter = GalleryPagerAdapter()
         viewPager.adapter = galleryPagerAdapter

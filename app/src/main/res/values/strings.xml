@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notable_OPENCV</string>
+    <string name="app_name">Notable!</string>
     <string name="button_send">Take Photo</string>
     <string name="preview_image">Preview Image</string>
     <string name="gallery">Gallery</string>
@@ -26,6 +26,7 @@
     <!-- Inspect Buttons -->
     <string name="play_segment">Play Shown</string>
     <string name="play_sheet">Play Sheet</string>
+    <string name="review">Review</string>
 
     <string name="title_activity_settings">Notable Settings</string>
 
