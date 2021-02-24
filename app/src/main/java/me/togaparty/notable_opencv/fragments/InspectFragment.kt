@@ -10,8 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -23,28 +23,22 @@ import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.adapter.PredictionsAdapter
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_opencv.model.Inspect_Prediction
-import me.togaparty.notable_opencv.utils.FileWorker
+import me.togaparty.notable_opencv.utils.ImageListProvider
+import me.togaparty.notable_opencv.utils.toast
 
 class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
-    private lateinit var imageList: MutableList<*>
+    //private lateinit var mainCategoryRecycler: RecyclerView
+    //private var mainRecyclerAdapter: MainRecyclerAdapter? = null
     private lateinit var viewPager: ViewPager
-    private lateinit var fileWorker: FileWorker
     private var selectedPosition: Int = 0
-    lateinit var predictions: ArrayList<Inspect_Prediction>
+    private val model: ImageListProvider by activityViewModels()
+    //lateinit var predictions: ArrayList<Inspect_Prediction>
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        fileWorker = FileWorker()
-        //imageList = ArrayList(arguments?.getSerializable("images") as ArrayList<*>)
-        imageList = fileWorker.loadImages(requireContext())
-
-    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -76,7 +70,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     }
     override fun onItemClick(position: Int, view: TextView) {
         //Button Click event exposes aligned TextView control
-        Toast.makeText(this.context, view.text.toString() +" $position clicked", Toast.LENGTH_SHORT).show()
+        toast(view.text.toString() +" $position clicked")
         Log.d("Click", view.text.toString() + " $position clicked")
     }
     private fun setCurrentItem(position: Int) {
@@ -102,8 +96,10 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             val layoutInflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
             val view = layoutInflater.inflate(R.layout.fragment_inspect_image, container, false)
-            val image = imageList[position] as GalleryImage
-            view.inspectImage.tag = image.imageUrl
+            val image = model.getGalleryImage(position)
+            if (image != null) {
+                view.inspectImage.tag = image.imageUrl
+            }
 
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
             circularProgressDrawable.strokeWidth = 5f
@@ -111,12 +107,14 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             circularProgressDrawable.start()
 
             // load image
-            GlideApp.with(context!!)
-                    .load(image.imageUrl)
-                    .placeholder(circularProgressDrawable)
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(view.inspectImage)
+            if (image != null) {
+                GlideApp.with(context!!)
+                        .load(image.imageUrl)
+                        .placeholder(circularProgressDrawable)
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(view.inspectImage)
+            }
             container.addView(view)
             return view
         }
@@ -126,8 +124,8 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             val tag = imageView.tag
 
             var flag = false
-            imageList.forEach {
-                if((it as GalleryImage).imageUrl == tag){
+            model.imageList.value?.forEach {
+                if(it.imageUrl == tag){
                     flag = true
                     return@forEach
                 }
@@ -136,7 +134,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         }
 
         override fun getCount(): Int {
-            return imageList.size
+            return model.getImageListSize() ?:0
         }
         override fun isViewFromObject(view: View, obj: Any): Boolean {
             return view === obj as View

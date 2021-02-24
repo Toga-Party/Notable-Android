@@ -20,14 +20,13 @@ import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.adapter.GalleryImageClickListener
 import me.togaparty.notable_opencv.helper.GlideApp
-import me.togaparty.notable_opencv.helper.OnDismissListener
 import me.togaparty.notable_opencv.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_opencv.utils.FileWorker
 import me.togaparty.notable_opencv.utils.ImageListProvider
 import me.togaparty.notable_opencv.utils.permissionsGranted
 
 class GalleryFragment : Fragment(),
-        GalleryImageClickListener, OnDismissListener {
+        GalleryImageClickListener {
     // Gallery Column Count
     private val spanCount = 2
 
@@ -122,9 +121,7 @@ class GalleryFragment : Fragment(),
 
         }
     }
-    override fun onDialogDismiss() {
 
-    }
     companion object
 
     override

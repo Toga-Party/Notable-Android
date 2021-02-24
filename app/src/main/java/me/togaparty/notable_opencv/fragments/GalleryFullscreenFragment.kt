@@ -2,7 +2,6 @@ package me.togaparty.notable_opencv.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -28,7 +27,6 @@ import me.togaparty.notable_opencv.R
 import me.togaparty.notable_opencv.adapter.GalleryImage
 import me.togaparty.notable_opencv.helper.GlideApp
 import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_opencv.helper.OnDismissListener
 import me.togaparty.notable_opencv.network.RetrofitUploader
 import me.togaparty.notable_opencv.utils.FileWorker
 import me.togaparty.notable_opencv.utils.ImageListProvider
@@ -87,13 +85,6 @@ class GalleryFullscreenFragment : DialogFragment() {
         generateFloatingActionButton(view)
 
         return view
-    }
-
-
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        val callback = parentFragment as? OnDismissListener
-        callback?.onDialogDismiss()
     }
 
     private fun generateFloatingActionButton(view: View){
@@ -202,8 +193,10 @@ class GalleryFullscreenFragment : DialogFragment() {
             val layoutInflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
             val view = layoutInflater.inflate(R.layout.gallery_image_fullscreen, container, false)
-            val image = model.imageList.value!![position]
-            view.ivFullscreenImage.tag = image.imageUrl
+            val image = model.getGalleryImage(position)
+            if (image != null) {
+                view.ivFullscreenImage.tag = image.imageUrl
+            }
 
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
             circularProgressDrawable.strokeWidth = 5f
@@ -211,12 +204,14 @@ class GalleryFullscreenFragment : DialogFragment() {
             circularProgressDrawable.start()
 
             // load image
-            GlideApp.with(context!!)
-                .load(image.imageUrl)
-                .placeholder(circularProgressDrawable)
-                .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(view.ivFullscreenImage)
+            if (image != null) {
+                GlideApp.with(context!!)
+                        .load(image.imageUrl)
+                        .placeholder(circularProgressDrawable)
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(view.ivFullscreenImage)
+            }
             container.addView(view)
             return view
         }
@@ -226,7 +221,7 @@ class GalleryFullscreenFragment : DialogFragment() {
             val tag = imageView.tag
 
             var flag = false
-            model.imageList.value!!.forEach {
+            model.imageList.value?.forEach {
                 if(it.imageUrl == tag){
                     flag = true
                     return@forEach
@@ -236,7 +231,7 @@ class GalleryFullscreenFragment : DialogFragment() {
         }
 
         override fun getCount(): Int {
-            return model.getImageListSize()!!
+            return model.getImageListSize() ?: 0
         }
         override fun isViewFromObject(view: View, obj: Any): Boolean {
             return view === obj as View
