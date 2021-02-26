@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="48dp"
             android:fontFamily="@font/amiko"
-            android:maxLines="10"
+            android:maxLines="12"
             android:padding="10dp"
             android:scrollbars="vertical"
             android:text="Definition"

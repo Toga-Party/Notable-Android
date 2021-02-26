@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,9 +30,12 @@ import java.nio.charset.Charset
 class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
     private var mainRecyclerAdapter: MainRecyclerAdapter? = null
     private lateinit var navController: NavController
+    private lateinit var glossary_edit_text: EditText
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        glossary_edit_text = view.findViewById(R.id.edit_text_glossary)
+//        mainRecyclerAdapter = view.findViewById(R.id.main_recycler)
 
         navController = this.findNavController()
 
@@ -135,7 +139,7 @@ class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
         }
 
 
-        val allCategory: MutableList<AllCategory> = ArrayList()
+        var allCategory: MutableList<AllCategory> = ArrayList()
         allCategory.add(AllCategory("Lines", categoryItemList))
         allCategory.add(AllCategory("Clefs", categoryItemList2))
         allCategory.add(AllCategory("Notes", categoryItemList3))
@@ -145,6 +149,22 @@ class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
         allCategory.add(AllCategory("Key Signatures", categoryItemList7))
 
         setMainCategoryRecycler(allCategory)
+
+        glossary_edit_text.addTextChangedListener(object:TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                mainRecyclerAdapter?.getFilter()?.filter(s)
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
     }
 
 
