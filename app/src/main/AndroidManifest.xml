@@ -3,7 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="me.togaparty.notable_opencv">
 
-    <uses-feature android:name="android.hardware.camera.any" />
+    <uses-feature android:name="android.hardware.camera.any"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -24,7 +31,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Notable_OPENCV"
         android:usesCleartextTraffic="true"
-        tools:targetApi="m">
+        tools:targetApi="m"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
@@ -39,7 +47,7 @@
         </activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <meta-data

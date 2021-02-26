@@ -67,8 +67,7 @@ fun Context.showPermissionRequestDialog(
     }.create().show()
 
 }
-fun getBitmap(file: File): Bitmap
-        = BitmapFactory.decodeFile(file.absolutePath)
+
 fun Fragment.showDialog(
         title: String,
         body: String,

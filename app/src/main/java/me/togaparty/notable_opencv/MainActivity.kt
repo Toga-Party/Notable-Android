@@ -28,22 +28,24 @@ class MainActivity : AppCompatActivity() {
         }
         fun getOutputCacheDirectory(context: Context): File {
             val appContext = context.applicationContext
-            val externalCacheDir = context.externalCacheDirs.firstOrNull()?.let {
-                File(it, "Notable_OPENCV").apply { mkdir() }}
-            return if (externalCacheDir != null && externalCacheDir.exists())
-                externalCacheDir else appContext.cacheDir
-        }
-        fun getAppSpecificAlbumStorageDir(context: Context): File {
-            val appContext = context.applicationContext
-            return if (isExternalStorageReadable() and isExternalStorageWritable()) {
-                val externalFilesDir = context.getExternalFilesDirs(Environment.DIRECTORY_PICTURES)
-                        .firstOrNull()?.let {
-                            File(it, "Notable_OPENCV").apply { mkdir() }}
-                if (externalFilesDir != null && externalFilesDir.exists())
-                    externalFilesDir else appContext.filesDir
-            } else {
-                appContext.filesDir
+            if (isExternalStorageWritable() && isExternalStorageReadable()) {
+                val externalCacheDir = appContext.externalCacheDirs.firstOrNull()?.let {
+                    File(it, "Notable").apply { mkdir() }}
+                return if (externalCacheDir != null && externalCacheDir.exists())
+                    externalCacheDir else appContext.cacheDir
             }
+            return appContext.cacheDir
+        }
+        fun externalAppSpecificStorage(context: Context): File {
+            val appContext = context.applicationContext
+            if (isExternalStorageWritable() && isExternalStorageReadable()) {
+                return appContext.getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS)
+                    .first().let{
+                        File(it, "Notable").apply { mkdir() }
+                    }
+
+            }
+            return appContext.filesDir
         }
 
         fun deleteCache(context: Context) {

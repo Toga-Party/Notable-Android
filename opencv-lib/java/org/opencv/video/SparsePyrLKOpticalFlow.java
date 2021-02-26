@@ -169,6 +169,7 @@ public class SparsePyrLKOpticalFlow extends SparseOpticalFlow {
     private static native void setTermCriteria_0(long nativeObj, int crit_type, int crit_maxCount, double crit_epsilon);
 
     // C++:  int cv::SparsePyrLKOpticalFlow::getFlags()
+    @SuppressWarnings("JavaJniMissingFunction")
     private static native int getFlags_0(long nativeObj);
 
     // C++:  void cv::SparsePyrLKOpticalFlow::setFlags(int flags)
