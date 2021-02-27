@@ -15,7 +15,7 @@ import java.lang.Exception
 
 class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
-    private val fileWorker = FileWorker(viewModelScope, getApplication())
+    private val fileWorker = FileWorker(getApplication())
     private val retrofitWorker = RetrofitWorker(getApplication())
     private val newList = arrayListOf<GalleryImage>()
     private val imageList = MutableLiveData<List<GalleryImage>>().apply {
@@ -38,13 +38,13 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
             returnedImage?.let {
                 if(it.processed == true) {
                     newList[position] = it.copy(processed = true)
-                    /*newList[position] =
-                        image.copy(
-                                pngFiles = image.pngFiles?.toMutableMap(),
-                                wavFiles = image.wavFiles?.toMutableMap(),
-                                textFiles = image.textFiles?.toMutableMap(),
-                        )
-                    */
+//                    newList[position] =
+//                        it.copy(
+//                                imageFiles = image.imageFiles?.toMutableMap(),
+//                                wavFiles = image.wavFiles?.toMutableMap(),
+//                                textFiles = image.textFiles?.toMutableMap(),
+//                        )
+
                     withContext(Dispatchers.Main) {
                         imageList.value = newList
                     }

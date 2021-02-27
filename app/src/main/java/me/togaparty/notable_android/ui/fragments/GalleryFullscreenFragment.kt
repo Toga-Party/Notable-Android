@@ -72,72 +72,95 @@ class GalleryFullscreenFragment : DialogFragment() {
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
+
+        setCurrentItem(requireArguments().getInt("position"))
+        generateFloatingActionButton(view)
+
         model.getList().observe(viewLifecycleOwner, {
             Log.d("GFSF", "Something changed")
             viewPager.adapter?.notifyDataSetChanged()
             if(model.getImageListSize() == 0) dismiss() else setCurrentItem(selectedPosition)
-            Log.d("GFSF", "Current item is processed? ${currentImage.processed}")
+            editFloatingActionButton()
         })
-        setCurrentItem(requireArguments().getInt("position"))
-        generateFloatingActionButton(view)
+
 
         return view
     }
-
+    private fun editFloatingActionButton() {
+        val floatingActionButton = view?.findViewById<SpeedDialView>(R.id.speedDial)
+        if (currentImage.processed == true) {
+            floatingActionButton?.removeActionItem(1)
+            floatingActionButton?.addActionItem(
+                SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
+                    .setLabel(getString(R.string.inspect))
+                    .setTheme(R.style.Theme_Notable_OPENCV)
+                    .setLabelClickable(false)
+                    .create()
+            )
+        } else {
+            floatingActionButton?.removeActionItem(1)
+            floatingActionButton?.addActionItem(
+                SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
+                    .setLabel(getString(R.string.process_music))
+                    .setTheme(R.style.Theme_Notable_OPENCV)
+                    .setLabelClickable(false)
+                    .create()
+            )
+        }
+    }
     private fun generateFloatingActionButton(view: View){
         val floatingActionButton = view.findViewById<SpeedDialView>(R.id.speedDial)
 
-        floatingActionButton.addActionItem(
+            floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_delete, R.drawable.ic_delete_black)
-                        .setLabel(getString(R.string.delete))
-                        .setTheme(R.style.Theme_Notable_OPENCV)
-                        .setLabelClickable(false)
-                        .create()
-        )
-        floatingActionButton.addActionItem(
-                SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
-                        .setLabel(getString(R.string.process_music))
-                        .setTheme(R.style.Theme_Notable_OPENCV)
-                        .setLabelClickable(false)
-                        .create()
-        )
-        floatingActionButton.addActionItem(
-                SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
-                        .setLabel(getString(R.string.inspect))
-                        .setTheme(R.style.Theme_Notable_OPENCV)
-                        .setLabelClickable(false)
-                        .create()
-        )
+                    .setLabel(getString(R.string.delete))
+                    .setTheme(R.style.Theme_Notable_OPENCV)
+                    .setLabelClickable(false)
+                    .create()
+            )
+            floatingActionButton.addActionItem( when(currentImage.processed == true) {
 
+                true -> SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
+                    .setLabel(getString(R.string.inspect))
+                    .setTheme(R.style.Theme_Notable_OPENCV)
+                    .setLabelClickable(false)
+                    .create()
+                else -> SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
+                    .setLabel(getString(R.string.process_music))
+                    .setTheme(R.style.Theme_Notable_OPENCV)
+                    .setLabelClickable(false)
+                    .create()
+            })
 
-        floatingActionButton.setOnActionSelectedListener { actionItem ->
-            when (actionItem.id) {
-                R.id.fab_delete -> {
-                    toast("Delete action")
-                    Log.d("delete", "delete launched")
-                    //Log.d("delete", currentImage.imageUrl.toString() + " " + currentImage.name)
-                    GlobalScope.launch(Dispatchers.Main) {
-                        Log.d("delete", "deleting")
+            floatingActionButton.setOnActionSelectedListener { actionItem ->
+                when (actionItem.id) {
+                    R.id.fab_delete -> {
+                        toast("Delete action")
+                        Log.d("delete", "delete launched")
+                        //Log.d("delete", currentImage.imageUrl.toString() + " " + currentImage.name)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            Log.d("delete", "deleting")
 
-                        if(model.getImageListSize() != 0){
-                            model.deleteGalleryImage(selectedPosition, currentImage.imageUrl)
+                            if(model.getImageListSize() != 0){
+                                model.deleteGalleryImage(selectedPosition, currentImage.imageUrl)
+                            }
                         }
+                        Log.d("delete", "done deleting")
                     }
-                    Log.d("delete", "done deleting")
-                }
-                R.id.fab_inspect -> {
-                    toast("Inspect action")
-                    dismiss()
-                    navController.navigate(
+                    R.id.fab_inspect -> {
+                        toast("Inspect action")
+                        dismiss()
+                        navController.navigate(
                             GalleryFragmentDirections.actionGalleryFragmentToInspectFragment())
+                    }
+                    R.id.fab_process -> {
+                        toast("Process action")
+                        processImage()
+                    }
                 }
-                R.id.fab_process -> {
-                    toast("Process action")
-                    processImage()
-                }
+                true
             }
-            true
-        }
+
     }
 
     @SuppressLint("RestrictedApi")
@@ -161,6 +184,7 @@ class GalleryFullscreenFragment : DialogFragment() {
         currentImage = model.getGalleryImage(position)
         selectedPosition = position
         fileUri = currentImage.imageUrl
+        editFloatingActionButton()
     }
     // viewpager page change listener
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =

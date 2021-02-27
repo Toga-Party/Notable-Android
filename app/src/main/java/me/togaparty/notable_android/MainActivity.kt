@@ -48,9 +48,5 @@ class MainActivity : AppCompatActivity() {
             return appContext.filesDir
         }
 
-        fun deleteCache(context: Context) {
-            getOutputCacheDirectory(context).deleteRecursively()
-        }
-
     }
 }
