@@ -41,9 +41,9 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                     newList[position] = it.copy(processed = true)
                     newList[position] =
                         it.copy(
-                                imageFiles = image.imageFiles?.toMutableMap(),
-                                wavFiles = image.wavFiles?.toMutableMap(),
-                                textFiles = image.textFiles?.toMutableMap(),
+                                imageFiles = image.imageFiles.toMutableMap(),
+                                wavFiles = image.wavFiles.toMutableMap(),
+                                textFiles = image.textFiles.toMutableMap(),
                         )
 
                     withContext(Dispatchers.Main) {
