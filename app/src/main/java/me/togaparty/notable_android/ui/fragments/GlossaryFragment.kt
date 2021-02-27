@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.fragments
+package me.togaparty.notable_android.ui.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_glossary.*
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.ui.adapter.MainRecyclerAdapter
-import me.togaparty.notable_opencv.ui.items.AllCategory
-import me.togaparty.notable_opencv.ui.items.CategoryItem
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.ui.adapter.MainRecyclerAdapter
+import me.togaparty.notable_android.ui.items.AllCategory
+import me.togaparty.notable_android.ui.items.CategoryItem
 
 class GlossaryFragment : Fragment() {
     //private lateinit var mainCategoryRecycler: RecyclerView

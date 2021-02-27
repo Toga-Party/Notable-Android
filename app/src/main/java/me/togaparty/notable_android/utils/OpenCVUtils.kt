@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.utils
+package me.togaparty.notable_android.utils
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -65,7 +65,7 @@ class OpenCVUtils {
         Canny(this, edges, low, high, aperture, l2Gradient)
     }
 
-    fun cornerHarris(
+    private fun cornerHarris(
         src: Mat,
         dst: Mat,
         blockSize: Int = 7,
@@ -122,7 +122,7 @@ class OpenCVUtils {
         }
         return atan(median(slopes)) * 180.0 / PI
     }
-    fun median(slopes: MatOfFloat): Float {
+    private fun median(slopes: MatOfFloat): Float {
 
         val array = slopes.toArray()
 

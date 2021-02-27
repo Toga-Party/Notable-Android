@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="me.togaparty.notable_opencv">
+    package="me.togaparty.notable_android">
 
     <uses-feature android:name="android.hardware.camera.any"
         android:required="false" />
@@ -34,10 +34,10 @@
         tools:targetApi="m"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".SettingsActivity"
+            android:name="me.togaparty.notable_android.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".MainActivity"
+            android:name="me.togaparty.notable_android.MainActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

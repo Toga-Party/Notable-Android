@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.helper
+package me.togaparty.notable_android.helper
 
 import android.view.View
 import androidx.viewpager.widget.ViewPager

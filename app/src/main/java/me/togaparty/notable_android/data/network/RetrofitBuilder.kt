@@ -1,13 +1,14 @@
-package me.togaparty.notable_opencv.data.network
+package me.togaparty.notable_android.data.network
 
+import me.togaparty.notable_android.utils.Constants
 import retrofit2.Retrofit
 
 class RetrofitBuilder {
     companion object {
-        internal var retrofitInstance : Retrofit? = null
+        private var retrofitInstance : Retrofit? = null
         init {
             retrofitInstance = Retrofit.Builder()
-                    .baseUrl(WebURL.url)
+                    .baseUrl(Constants.url)
                     //.addConverterFactory(OkhttpClientBuilder.gsonConverterFactory)
                     .client(OkhttpClientBuilder.okHttpClient)
                     .build()

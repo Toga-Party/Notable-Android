@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.data
+package me.togaparty.notable_android.data
 
 import android.app.Application
 import android.net.Uri
@@ -8,8 +8,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
-import me.togaparty.notable_opencv.data.files.FileWorker
-import me.togaparty.notable_opencv.data.network.RetrofitWorker
+import me.togaparty.notable_android.data.files.FileWorker
+import me.togaparty.notable_android.data.network.RetrofitWorker
 import java.lang.Exception
 
 
@@ -20,7 +20,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     private val newList = arrayListOf<GalleryImage>()
     private val imageList = MutableLiveData<List<GalleryImage>>().apply {
         value = ArrayList()
-        newList.addAll(fileWorker.loadImages())
+        viewModelScope.launch { newList.addAll(fileWorker.loadImages()) }
         value = newList
     }
 

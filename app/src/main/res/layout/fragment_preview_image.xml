@@ -5,7 +5,7 @@
     android:id="@+id/save_button"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.PreviewImageFragment">
+    tools:context="me.togaparty.notable_android.ui.fragments.PreviewImageFragment">
 
     <ImageView
         android:id="@+id/imageView"

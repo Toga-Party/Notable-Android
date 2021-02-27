@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv
+package me.togaparty.notable_android
 
 import android.content.Context
 import android.os.Bundle

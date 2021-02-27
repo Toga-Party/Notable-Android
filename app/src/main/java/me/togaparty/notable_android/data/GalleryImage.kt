@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.data
+package me.togaparty.notable_android.data
 
 import android.net.Uri
 

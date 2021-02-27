@@ -6,7 +6,7 @@
     app:startDestination="@id/dashboardFragment">
     <fragment
         android:id="@+id/cameraFragment"
-        android:name="me.togaparty.notable_opencv.ui.fragments.CameraFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.CameraFragment"
         android:label="fragment_camera"
         tools:layout="@layout/fragment_camera" >
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/dashboardFragment"
-        android:name="me.togaparty.notable_opencv.ui.fragments.DashboardFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.DashboardFragment"
         android:label="fragment_dashboard"
         tools:layout="@layout/fragment_dashboard" >
 
@@ -39,13 +39,13 @@
     </fragment>
     <fragment
         android:id="@+id/glossaryFragment"
-        android:name="me.togaparty.notable_opencv.ui.fragments.GlossaryFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.GlossaryFragment"
         android:label="fragment_glossary"
         tools:layout="@layout/fragment_glossary" >
     </fragment>
     <fragment
         android:id="@+id/previewImage"
-        android:name="me.togaparty.notable_opencv.ui.fragments.PreviewImageFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.PreviewImageFragment"
         android:label="fragment_preview_image"
         tools:layout="@layout/fragment_preview_image">
         <action
@@ -59,7 +59,7 @@
     </fragment>
     <fragment
         android:id="@+id/galleryFragment"
-        android:name="me.togaparty.notable_opencv.ui.fragments.GalleryFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.GalleryFragment"
         android:label="fragment_gallery"
         tools:layout="@layout/fragment_gallery">
         <action
@@ -73,12 +73,12 @@
     </fragment>
     <fragment
         android:id="@+id/galleryFullscreenFragment"
-        android:name="me.togaparty.notable_opencv.ui.fragments.GalleryFullscreenFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.GalleryFullscreenFragment"
         android:label="GalleryFullscreenFragment"
         tools:layout="@layout/fragment_gallery_fullscreen"/>
     <fragment
         android:id="@+id/inspectFragment"
-        android:name="me.togaparty.notable_opencv.ui.fragments.InspectFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.InspectFragment"
         android:label="fragment_inspect"
         tools:layout="@layout/fragment_inspect">
         <action
@@ -89,12 +89,12 @@
     </fragment>
     <fragment
         android:id="@+id/wikiFragment"
-        android:name="me.togaparty.notable_opencv.ui.fragments.WikiFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.WikiFragment"
         android:label="fragment_wiki"
         tools:layout="@layout/fragment_wiki" />
     <activity
         android:id="@+id/settingsActivity"
-        android:name="me.togaparty.notable_opencv.SettingsActivity"
+        android:name="me.togaparty.notable_android.SettingsActivity"
         android:label="SettingsActivity"
         tools:layout="@layout/settings_activity"/>
 </navigation>

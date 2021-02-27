@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.fragments
+package me.togaparty.notable_android.ui.fragments
 
 //import kotlinx.android.synthetic.main.fragment_glossary.*
 //import me.togaparty.notable_opencv.adapter.MainRecyclerAdapter
@@ -22,13 +22,13 @@ import kotlinx.android.synthetic.main.fragment_inspect.*
 import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.ui.adapter.PredictionsAdapter
-import me.togaparty.notable_opencv.helper.GlideApp
-import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_opencv.ui.items.InspectPrediction
-import me.togaparty.notable_opencv.data.ImageListProvider
-import me.togaparty.notable_opencv.utils.toast
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
+import me.togaparty.notable_android.helper.GlideApp
+import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
+import me.togaparty.notable_android.data.InspectPrediction
+import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.utils.toast
 
 class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     //private lateinit var mainCategoryRecycler: RecyclerView

@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.items
+package me.togaparty.notable_android.data
 
 class InspectPrediction (val symbol: String, val in_Glossary: Boolean) {
     companion object {

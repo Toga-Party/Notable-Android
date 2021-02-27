@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.fragments
+package me.togaparty.notable_android.ui.fragments
 
 import android.Manifest
 import android.os.Build
@@ -14,9 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.fragments.DashboardFragmentDirections
-import me.togaparty.notable_opencv.utils.*
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.utils.*
 
 class DashboardFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController

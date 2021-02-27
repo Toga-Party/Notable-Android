@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.fragments
+package me.togaparty.notable_android.ui.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -22,13 +22,12 @@ import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import kotlinx.android.synthetic.main.item_gallery_image.view.*
 import kotlinx.coroutines.*
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.data.GalleryImage
-import me.togaparty.notable_opencv.fragments.GalleryFragmentDirections
-import me.togaparty.notable_opencv.helper.GlideApp
-import me.togaparty.notable_opencv.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_opencv.data.ImageListProvider
-import me.togaparty.notable_opencv.utils.toast
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.data.GalleryImage
+import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.helper.GlideApp
+import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
+import me.togaparty.notable_android.utils.toast
 
 
 class GalleryFullscreenFragment : DialogFragment() {

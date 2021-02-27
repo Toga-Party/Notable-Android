@@ -1,7 +1,7 @@
-package me.togaparty.notable_opencv.data.network
+package me.togaparty.notable_android.data.network
 
 import android.content.Context
-import me.togaparty.notable_opencv.data.GalleryImage
+import me.togaparty.notable_android.data.GalleryImage
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
@@ -10,12 +10,7 @@ import java.util.zip.ZipInputStream
 class RetrofitWorker(val context: Context) {
 
     fun uploadFile(currentImage: GalleryImage) : GalleryImage {
-        val image = GalleryImage(
-            processed = true,
-            imageUrl = currentImage.imageUrl,
-            name = currentImage.name,
-        )
-//    val serviceWorker = RetrofitBuilder.getRetrofit()
+        //    val serviceWorker = RetrofitBuilder.getRetrofit()
 //    val filename = image.name.toRequestBody("text/plain".toMediaTypeOrNull())
 //
 //    var imageToSend: MultipartBody.Part?
@@ -86,7 +81,11 @@ class RetrofitWorker(val context: Context) {
 //                }
 //            })
 //        } ?: context.toast("Upload failed")
-        return image
+        return GalleryImage(
+                processed = true,
+                imageUrl = currentImage.imageUrl,
+                name = currentImage.name,
+        )
     }
 
     internal fun extractFile(zipIn: ZipInputStream, fileOutputStream: FileOutputStream) {

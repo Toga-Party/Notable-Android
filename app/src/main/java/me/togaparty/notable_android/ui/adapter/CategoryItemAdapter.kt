@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.adapter
+package me.togaparty.notable_android.ui.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.ui.items.CategoryItem
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.ui.items.CategoryItem
 
 class CategoryItemAdapter(private val context:Context, private val categoryItem:List<CategoryItem>): RecyclerView.Adapter<CategoryItemAdapter.CategoryItemViewHolder>() {
 

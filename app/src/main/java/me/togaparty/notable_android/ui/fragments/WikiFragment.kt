@@ -1,11 +1,12 @@
-package me.togaparty.notable_opencv.ui.fragments
+package me.togaparty.notable_android.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import me.togaparty.notable_opencv.R
+import androidx.fragment.app.Fragment
+import me.togaparty.notable_android.R
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

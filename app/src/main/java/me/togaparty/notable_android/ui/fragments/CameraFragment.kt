@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.fragments
+package me.togaparty.notable_android.ui.fragments
 
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -22,11 +22,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.common.util.concurrent.ListenableFuture
-import me.togaparty.notable_opencv.MainActivity
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.fragments.CameraFragmentDirections
-import me.togaparty.notable_opencv.utils.ALL_REQUIRED_PERMISSIONS
-import me.togaparty.notable_opencv.utils.permissionsGranted
+import me.togaparty.notable_android.MainActivity
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.utils.ALL_REQUIRED_PERMISSIONS
+import me.togaparty.notable_android.utils.permissionsGranted
 import org.opencv.android.InstallCallbackInterface
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader

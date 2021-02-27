@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.fragments
+package me.togaparty.notable_android.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -16,14 +16,14 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.item_gallery_image.view.*
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.data.GalleryImage
-import me.togaparty.notable_opencv.ui.adapter.GalleryImageClickListener
-import me.togaparty.notable_opencv.fragments.GalleryFragmentDirections
-import me.togaparty.notable_opencv.helper.GlideApp
-import me.togaparty.notable_opencv.utils.FILE_REQUIRED_PERMISSIONS
-import me.togaparty.notable_opencv.data.ImageListProvider
-import me.togaparty.notable_opencv.utils.permissionsGranted
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.data.GalleryImage
+import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
+import me.togaparty.notable_android.helper.GlideApp
+import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
+import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.utils.permissionsGranted
+
 
 class GalleryFragment : Fragment(),
         GalleryImageClickListener {
@@ -33,7 +33,7 @@ class GalleryFragment : Fragment(),
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
 
-    internal val model: ImageListProvider by activityViewModels()
+    private val model: ImageListProvider by activityViewModels()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,

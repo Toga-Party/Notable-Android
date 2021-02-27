@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.adapter
+package me.togaparty.notable_android.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.ui.items.InspectPrediction
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.data.InspectPrediction
 
 
 class PredictionsAdapter(private val predictions: List<InspectPrediction>, private val listener : OnItemClickListener) : RecyclerView.Adapter<PredictionsAdapter.ViewHolder>() {

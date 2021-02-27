@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv
+package me.togaparty.notable_android
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

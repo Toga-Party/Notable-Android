@@ -1,10 +1,12 @@
-package me.togaparty.notable_opencv.helper
+package me.togaparty.notable_android.helper
 
 import android.widget.RelativeLayout
 import android.os.Build
 import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
+
+
 internal class SquareLayout: RelativeLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)

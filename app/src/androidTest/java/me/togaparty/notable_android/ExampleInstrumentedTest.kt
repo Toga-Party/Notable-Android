@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv
+package me.togaparty.notable_android
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry

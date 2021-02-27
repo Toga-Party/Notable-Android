@@ -1,4 +1,4 @@
-package me.togaparty.notable_opencv.ui.fragments
+package me.togaparty.notable_android.ui.fragments
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -29,14 +29,13 @@ import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.*
-import me.togaparty.notable_opencv.MainActivity
-import me.togaparty.notable_opencv.R
-import me.togaparty.notable_opencv.data.GalleryImage
-import me.togaparty.notable_opencv.fragments.PreviewImageFragmentDirections
-import me.togaparty.notable_opencv.helper.GlideApp
-import me.togaparty.notable_opencv.data.ImageListProvider
-import me.togaparty.notable_opencv.utils.showDialog
-import me.togaparty.notable_opencv.utils.toast
+import me.togaparty.notable_android.MainActivity
+import me.togaparty.notable_android.R
+import me.togaparty.notable_android.data.GalleryImage
+import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.helper.GlideApp
+import me.togaparty.notable_android.utils.showDialog
+import me.togaparty.notable_android.utils.toast
 import java.io.File
 
 
@@ -51,7 +50,7 @@ class PreviewImageFragment : Fragment() {
     private lateinit var outputCacheDirectory: File
     private lateinit var navController: NavController
 
-    internal val model: ImageListProvider by activityViewModels()
+    private val model: ImageListProvider by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
