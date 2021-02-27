@@ -41,17 +41,9 @@ class GalleryFullscreenFragment : DialogFragment() {
 
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
-    private var processed: Boolean = false
-
 
     internal val model: ImageListProvider by activityViewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        //setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
-        //Detect rar directory, exists = true
-        processed = true
-    }
 
     @SuppressLint("LogConditional")
     override fun onCreateView(
