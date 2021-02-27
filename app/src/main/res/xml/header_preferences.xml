@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory app:title="General">
         <Preference
-            app:fragment="me.togaparty.notable_opencv.SettingsActivity$SyncFragment"
+            app:fragment="me.togaparty.notable_android.SettingsActivity$SyncFragment"
             app:icon="@drawable/sync"
             app:key="sync_header"
             app:title="@string/sync_header" />
@@ -11,7 +11,7 @@
     <PreferenceCategory
         app:title="System">
         <Preference
-            app:fragment="me.togaparty.notable_opencv.SettingsActivity$PermissionsFragment"
+            app:fragment="me.togaparty.notable_android.SettingsActivity$PermissionsFragment"
             app:icon="@drawable/messages"
             app:key="permissions_header"
             app:title="@string/permissions_header" />
@@ -22,7 +22,7 @@
             app:title="Get Support"
             app:key="support_preference"/>
         <Preference
-            app:fragment="me.togaparty.notable_opencv.SettingsActivity$DevelopersFragment"
+            app:fragment="me.togaparty.notable_android.SettingsActivity$DevelopersFragment"
             app:key="developer_header"
             app:title="Developers"/>
         <Preference
