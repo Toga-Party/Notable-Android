@@ -7,7 +7,20 @@
     android:layout_height="match_parent"
     tools:context=".fragments.GlossaryFragment">
 
-        <EditText
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/amiko_bold"
+        android:lineSpacingExtra="10sp"
+        android:text="Glossary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/edit_text_glossary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
         android:id="@+id/edit_text_glossary"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -24,37 +37,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:fontFamily="@font/amiko_bold"
-        android:lineSpacingExtra="10sp"
-        android:text="Glossary"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/edit_text_glossary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.887" />
-
-<!--    <com.mancj.materialsearchbar.MaterialSearchBar-->
-<!--        android:id="@+id/material_searchbar_glossary"-->
-<!--        style="@style/MaterialSearchBarLight"-->
-<!--        android:layout_width="384dp"-->
-<!--        android:layout_height="43dp"-->
-<!--        android:layout_alignParentTop="true"-->
-<!--        android:layout_marginBottom="16dp"-->
-<!--        android:background="@drawable/rounded_edittext"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/main_recycler"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.481"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:mt_hint="Search"-->
-<!--        app:mt_speechMode="false"-->
-<!--        tools:ignore="MissingConstraints" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/main_recycler"
