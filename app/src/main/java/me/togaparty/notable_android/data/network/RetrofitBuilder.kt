@@ -5,7 +5,7 @@ import retrofit2.Retrofit
 
 class RetrofitBuilder {
     companion object {
-        private var retrofitInstance : Retrofit? = null
+        internal var retrofitInstance : Retrofit? = null
         init {
             retrofitInstance = Retrofit.Builder()
                     .baseUrl(Constants.url)

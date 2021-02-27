@@ -22,6 +22,7 @@ import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.permissionsGranted
 
 
@@ -45,7 +46,6 @@ class GalleryFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d("Gallery", "onViewCreatedCalled")
         navController = this.findNavController()
         if(!permissionsGranted(requireContext(), FILE_REQUIRED_PERMISSIONS)) {
             navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToDashboardFragment())
@@ -53,11 +53,10 @@ class GalleryFragment : Fragment(),
         // init adapter
         //model = ViewModelProvider(this).get(ImageListProvider::class.java)
         galleryAdapter = GalleryImageAdapter(model.getList().value as MutableList<GalleryImage>)
-        //Log.d("GalleryModel", "Size: ${(model.getList().value as MutableList<GalleryImage>).size}")
         galleryAdapter.listener = this
 
         model.getList().observe(viewLifecycleOwner, {
-            Log.d("GalleryFragment", "Something changed")
+            Log.d(TAG, "Gallery: Something changed")
             galleryAdapter.notifyDataSetChanged()
         })
         // init recyclerview

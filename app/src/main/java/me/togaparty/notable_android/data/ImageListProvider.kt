@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import me.togaparty.notable_android.data.files.FileWorker
 import me.togaparty.notable_android.data.network.RetrofitWorker
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import java.lang.Exception
 
 
@@ -31,19 +32,19 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
             val job = async {
                 returnedImage = retrofitWorker.uploadFile(image)
             }
-            Log.d("Upload", "Waiting for upload to finish")
+            Log.d(TAG, "ImageListProvider: Waiting for upload to finish")
             job.await()
-            Log.d("Upload", "Upload finished")
+            Log.d(TAG, "ImageListProvider: Upload finished")
 
             returnedImage?.let {
                 if(it.processed == true) {
                     newList[position] = it.copy(processed = true)
-//                    newList[position] =
-//                        it.copy(
-//                                imageFiles = image.imageFiles?.toMutableMap(),
-//                                wavFiles = image.wavFiles?.toMutableMap(),
-//                                textFiles = image.textFiles?.toMutableMap(),
-//                        )
+                    newList[position] =
+                        it.copy(
+                                imageFiles = image.imageFiles?.toMutableMap(),
+                                wavFiles = image.wavFiles?.toMutableMap(),
+                                textFiles = image.textFiles?.toMutableMap(),
+                        )
 
                     withContext(Dispatchers.Main) {
                         imageList.value = newList

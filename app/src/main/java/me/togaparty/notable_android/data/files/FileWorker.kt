@@ -16,6 +16,7 @@ import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.data.GalleryImage
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -44,6 +45,7 @@ class FileWorker(val context: Context){
 
                     val checkDir = File(outputDirectory, File(name).nameWithoutExtension)
                     if (checkDir.exists()) {
+                        Log.d(TAG, "FileWorker: This is processed")
                         tempImage.processed = true
                         tempImage.addWavFiles(getOtherFiles(checkDir, "wav"))
                         tempImage.addTextFiles(getOtherFiles(checkDir, "txt"))
@@ -59,7 +61,7 @@ class FileWorker(val context: Context){
     }
 
     fun deleteImage(fileUri: Uri) {
-        Log.d("FileWorker", "$fileUri")
+        Log.d(TAG, "$fileUri")
         fileUri.let {
             context.contentResolver
                 .delete(it, null, null)

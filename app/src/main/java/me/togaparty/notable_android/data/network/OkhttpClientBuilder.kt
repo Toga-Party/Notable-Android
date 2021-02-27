@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 class OkhttpClientBuilder {
 
     companion object {
-        private var client: OkHttpClient? = null
+        internal var client: OkHttpClient? = null
         //private var gson: GsonConverterFactory? = null
 
         val okHttpClient: OkHttpClient

@@ -2,6 +2,7 @@ package me.togaparty.notable_android.ui.fragments
 
 //import kotlinx.android.synthetic.main.fragment_glossary.*
 //import me.togaparty.notable_opencv.adapter.MainRecyclerAdapter
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +29,7 @@ import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.data.InspectPrediction
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
 
 class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
@@ -82,8 +84,9 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     // viewpager page change listener
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
             object : ViewPager.OnPageChangeListener {
+                @SuppressLint("LogConditional")
                 override fun onPageSelected(position: Int) {
-                    Log.d("GalleryFullscreen", "$position")
+                    Log.d(TAG, "Inspect Fragment: $position")
                     setCurrentItem(position)
                 }
                 override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {

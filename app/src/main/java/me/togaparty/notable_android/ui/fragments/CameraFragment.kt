@@ -25,6 +25,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.utils.ALL_REQUIRED_PERMISSIONS
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.permissionsGranted
 import org.opencv.android.InstallCallbackInterface
 import org.opencv.android.LoaderCallbackInterface
@@ -123,7 +124,6 @@ class CameraFragment : Fragment() {
         processCameraProvider.unbindAll()
         fun previewUseCase() : Preview {
             val display = previewView.display
-            Log.d("CameraX", "preview: $display.rotation")
             val metrics = DisplayMetrics().also { display.getRealMetrics(it) }
             return Preview.Builder()
                     .setTargetRotation(display.rotation)
@@ -135,7 +135,6 @@ class CameraFragment : Fragment() {
         }
         fun captureUseCase(): ImageCapture {
             val display = previewView.display
-            Log.d("CameraX", "capture: $display.rotation")
             val metrics = DisplayMetrics().also { display.getRealMetrics(it) }
             imageCapture = ImageCapture.Builder()
                     .setTargetRotation(display.rotation)
@@ -203,7 +202,6 @@ class CameraFragment : Fragment() {
             }
         }
 
-        private const val TAG = "Notable:CameraX"
         private const val FILENAME_FORMAT = "EEE_dd_MM_yyyy_HHmmss"
         private const val PHOTO_EXTENSION = ".png"
     }

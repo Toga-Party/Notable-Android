@@ -27,6 +27,7 @@ import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
 
 
@@ -58,7 +59,6 @@ class GalleryFullscreenFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("GalleryFullscreenDebug", "Fullscreen called.")
         val view = inflater.inflate(
                 R.layout.fragment_gallery_fullscreen,
                 container,
@@ -77,7 +77,7 @@ class GalleryFullscreenFragment : DialogFragment() {
         generateFloatingActionButton(view)
 
         model.getList().observe(viewLifecycleOwner, {
-            Log.d("GFSF", "Something changed")
+            Log.d(TAG, "Fullscreen: Something changed")
             viewPager.adapter?.notifyDataSetChanged()
             if(model.getImageListSize() == 0) dismiss() else setCurrentItem(selectedPosition)
             editFloatingActionButton()
@@ -136,16 +136,15 @@ class GalleryFullscreenFragment : DialogFragment() {
                 when (actionItem.id) {
                     R.id.fab_delete -> {
                         toast("Delete action")
-                        Log.d("delete", "delete launched")
-                        //Log.d("delete", currentImage.imageUrl.toString() + " " + currentImage.name)
+                        Log.d(TAG, "Full screen: delete launched")
                         GlobalScope.launch(Dispatchers.Main) {
-                            Log.d("delete", "deleting")
+                            Log.d(TAG, "Full screen: deleting")
 
                             if(model.getImageListSize() != 0){
                                 model.deleteGalleryImage(selectedPosition, currentImage.imageUrl)
                             }
                         }
-                        Log.d("delete", "done deleting")
+                        Log.d(TAG, "Full screen: deleted")
                     }
                     R.id.fab_inspect -> {
                         toast("Inspect action")
@@ -173,9 +172,9 @@ class GalleryFullscreenFragment : DialogFragment() {
                     model.uploadImage(currentImage, selectedPosition)
                 }
             }
-            Log.d("ImageProcessing", "Waiting until coroutine ends")
+            Log.d(TAG, "Full screen: waiting for image to finish processing")
             job.join()
-            Log.d("ImageProcessing", "Finished processing the image")
+            Log.d(TAG, "Full screen: finished processing the image")
         }
         dismiss()
     }
@@ -190,7 +189,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
         object : ViewPager.OnPageChangeListener {
             override fun onPageSelected(position: Int) {
-                Log.d("GalleryFullscreen", "$position")
+                Log.d(TAG, "Full screen: Gallery Position $position")
                 setCurrentItem(position)
             }
             override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {

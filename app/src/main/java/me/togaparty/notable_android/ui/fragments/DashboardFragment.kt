@@ -16,6 +16,7 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.utils.*
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
 class DashboardFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
@@ -56,14 +57,14 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             "Permission Required",
                             "Camera access and File access is required to use this feature."
                         ) {
-                            Log.d("Dashboard", "Launching required camera permissions.")
+                            Log.d(TAG, "Dashboard: Launching required camera permissions.")
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
                             checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
                         }
                     }
                     else -> {
-                        Log.d("Dashboard", "Launching required camera permissions.")
+                        Log.d(TAG, "Dashboard: Launching required camera permissions.")
                         navDirections =
                                 DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
                         checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
@@ -81,14 +82,14 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             "Permission Required",
                             "File access is required to use this feature."
                         ) {
-                            Log.d("Dashboard", "Launching required file permissions.")
+                            Log.d(TAG, "Dashboard: Launching required file permissions.")
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment()
                             checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
                         }
                     }
                     else -> {
-                        Log.d("Dashboard", "Launching required file permissions.")
+                        Log.d(TAG, "Dashboard: Launching required file permissions.")
                         navDirections =
                                 DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment()
                         checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
@@ -123,7 +124,6 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             if(permissions[Manifest.permission.ACCESS_MEDIA_LOCATION] == true) {
                                 navigateToFragment()
                             } else {
-                                Log.d("Dashboard", "CheckPermissionLauncher 1")
                                 requireContext().showDeniedDialog(
                                         "Access denied",
                                         "You can accept the permissions needed in the Setting page")
@@ -132,7 +132,6 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                             navigateToFragment()
                         }
                 } else {
-                    Log.d("Dashboard", "CheckPermissionLauncher 3")
                     requireContext().showDeniedDialog(
                              "Access denied",
                             "You can accept the permissions needed in the Setting page")
