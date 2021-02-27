@@ -208,6 +208,4 @@ class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
     companion object
 
 
-
-
 }

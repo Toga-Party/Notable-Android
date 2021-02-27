@@ -7,23 +7,27 @@
     android:layout_height="match_parent"
     tools:context="me.togaparty.notable_android.ui.fragments.GlossaryFragment">
 
-        <EditText
+    <EditText
         android:id="@+id/edit_text_glossary"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintWidth_percent="0.9"
         android:layout_marginBottom="44dp"
+        android:autofillHints=""
         android:background="@drawable/rounded_edittext"
         android:drawableEnd="@drawable/search_icon"
         android:hint="@string/search_words"
         android:inputType="text"
-        android:textSize="14sp"
         android:padding="10dip"
+        android:textColor="@android:color/primary_text_light"
+        android:textColorHighlight="?android:attr/textColorHighlight"
+        android:textColorHint="?android:attr/textColorHint"
+        android:textColorLink="?android:attr/textColorLink"
+        android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/main_recycler"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.07"
         app:layout_constraintStart_toStartOf="parent"
-        android:autofillHints="" />
+        app:layout_constraintWidth_percent="0.9" />
 
     <TextView
         android:layout_width="wrap_content"
