@@ -68,9 +68,6 @@
         android:name="me.togaparty.notable_opencv.fragments.GlossaryFragment"
         android:label="fragment_glossary"
         tools:layout="@layout/fragment_glossary" >
-        <action
-            android:id="@+id/action_glossaryFragment_to_glossaryDefinitionFragment"
-            app:destination="@id/glossaryDefinitionFragment" />
     </fragment>
     <fragment
         android:id="@+id/previewImage"
@@ -97,19 +94,4 @@
         android:id="@+id/galleryFullscreenFragment"
         android:name="me.togaparty.notable_opencv.fragments.GalleryFullscreenFragment"
         android:label="GalleryFullscreenFragment" />
-    <fragment
-        android:id="@+id/glossaryDefinitionFragment"
-        android:name="me.togaparty.notable_opencv.fragments.GlossaryDefinitionFragment"
-        android:label="fragment_glossary_definition"
-        tools:layout="@layout/fragment_glossary_definition">
-
-        <argument
-            android:name="term"
-            android:defaultValue="None"/>
-
-        <argument
-            android:name="definition"
-            android:defaultValue="None"/>
-
-    </fragment>
 </navigation>
