@@ -42,6 +42,9 @@
         android:name="me.togaparty.notable_android.ui.fragments.GlossaryFragment"
         android:label="fragment_glossary"
         tools:layout="@layout/fragment_glossary" >
+        <action
+            android:id="@+id/action_glossaryFragment_to_glossaryDefinitionFragment"
+            app:destination="@id/glossaryDefinitionFragment" />
     </fragment>
     <fragment
         android:id="@+id/previewImage"
@@ -76,6 +79,22 @@
         android:name="me.togaparty.notable_android.ui.fragments.GalleryFullscreenFragment"
         android:label="GalleryFullscreenFragment"
         tools:layout="@layout/fragment_gallery_fullscreen"/>
+    <fragment
+        android:id="@+id/glossaryDefinitionFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.GlossaryDefinitionFragment"
+        android:label="fragment_glossary_definition"
+        tools:layout="@layout/fragment_glossary_definition">
+
+        <argument
+            android:name="term"
+            android:defaultValue="None"/>
+
+        <argument
+            android:name="definition"
+            android:defaultValue="None"/>
+
+    </fragment>
+        
     <fragment
         android:id="@+id/inspectFragment"
         android:name="me.togaparty.notable_android.ui.fragments.InspectFragment"

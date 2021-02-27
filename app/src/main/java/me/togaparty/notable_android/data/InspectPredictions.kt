@@ -2,7 +2,6 @@ package me.togaparty.notable_android.data
 
 class InspectPrediction (val symbol: String, val in_Glossary: Boolean) {
     companion object {
-        private var lastEntry = 0
         fun createPredictionList(num_Symbols: Int) : ArrayList<InspectPrediction> {
             val predictionsList = ArrayList<InspectPrediction>()
             val sampleList: List<String> = listOf("clef-C3", "timeSignature-2/3", "rest-eighth","keySignature-GM","note-A#5_sixteenth","note-B5_quarter","note-F4_half","barline")

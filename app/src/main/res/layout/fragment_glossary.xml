@@ -7,6 +7,28 @@
     android:layout_height="match_parent"
     tools:context="me.togaparty.notable_android.ui.fragments.GlossaryFragment">
 
+    <EditText
+        android:id="@+id/edit_text_glossary"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="44dp"
+        android:autofillHints=""
+        android:background="@drawable/rounded_edittext"
+        android:drawableEnd="@drawable/search_icon"
+        android:hint="@string/search_words"
+        android:inputType="text"
+        android:padding="10dip"
+        android:textColor="@android:color/primary_text_light"
+        android:textColorHighlight="?android:attr/textColorHighlight"
+        android:textColorHint="?android:attr/textColorHint"
+        android:textColorLink="?android:attr/textColorLink"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/main_recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.9" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,25 +40,25 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/edit_text_glossary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/edit_text_glossary"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintWidth_percent="0.9"
-        android:layout_marginBottom="44dp"
-        android:background="@drawable/rounded_edittext"
-        android:drawableEnd="@drawable/search_icon"
-        android:hint="@string/search_words"
-        android:inputType="text"
-        android:textSize="14sp"
-        android:padding="10dip"
-        app:layout_constraintBottom_toTopOf="@+id/main_recycler"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:autofillHints="" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.887" />
+
+<!--    <com.mancj.materialsearchbar.MaterialSearchBar-->
+<!--        android:id="@+id/material_searchbar_glossary"-->
+<!--        style="@style/MaterialSearchBarLight"-->
+<!--        android:layout_width="384dp"-->
+<!--        android:layout_height="43dp"-->
+<!--        android:layout_alignParentTop="true"-->
+<!--        android:layout_marginBottom="16dp"-->
+<!--        android:background="@drawable/rounded_edittext"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/main_recycler"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.481"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:mt_hint="Search"-->
+<!--        app:mt_speechMode="false"-->
+<!--        tools:ignore="MissingConstraints" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/main_recycler"

@@ -8,6 +8,5 @@
         android:layout_width="204dp"
         android:layout_height="20dp"
         android:id="@+id/wikitest"
-        android:text="@string/hello_blank_fragment" />
-
+        android:text="@string/wiki"/>
 </FrameLayout>

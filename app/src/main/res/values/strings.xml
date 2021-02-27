@@ -50,7 +50,8 @@
 
     <string name="camera_button">camera_button</string>
     <string name="save_button">save_button</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="term">Term</string>
+    <string name="definition">Definition</string>
+    <string name="wiki">Wiki</string>
 
 </resources>

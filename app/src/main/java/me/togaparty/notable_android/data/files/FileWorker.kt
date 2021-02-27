@@ -29,32 +29,30 @@ class FileWorker(val context: Context){
     fun loadImages():  ArrayList<GalleryImage> {
         val imageList = ArrayList<GalleryImage>()
 
-            val outputDirectory = MainActivity.externalAppSpecificStorage(context)
-            query()?.use {  cursor ->
-                val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+        val outputDirectory = MainActivity.externalAppSpecificStorage(context)
+        query()?.use {  cursor ->
+            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
 
-                while (cursor.moveToNext()) {
-                    val id = cursor.getLong(idCol)
-                    val name = cursor.getString(nameCol)
-                    val contentUri: Uri = ContentUris.withAppendedId(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            id
-                    )
-                    val tempImage = GalleryImage(contentUri, name)
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idCol)
+                val name = cursor.getString(nameCol)
+                val contentUri: Uri = ContentUris.withAppendedId(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        id
+                )
+                val tempImage = GalleryImage(contentUri, name)
 
-                    val checkDir = File(outputDirectory, File(name).nameWithoutExtension)
-                    if (checkDir.exists()) {
-                        Log.d(TAG, "FileWo44                                                                                                                                                               rker: This is processed")
-                        tempImage.processed = true
-                        tempImage.addWavFiles(getOtherFiles(checkDir, "wav"))
-                        tempImage.addTextFiles(getOtherFiles(checkDir, "txt"))
-                        tempImage.addImageFiles(getOtherFiles(checkDir, "images"))
-                    }
-                    imageList.add(tempImage)
-
+                val checkDir = File(outputDirectory, File(name).nameWithoutExtension)
+                if (checkDir.exists()) {
+                    Log.d(TAG, "FileWo44                                                                                                                                                               rker: This is processed")
+                    tempImage.processed = true
+                    tempImage.addWavFiles(getOtherFiles(checkDir, "wav"))
+                    tempImage.addTextFiles(getOtherFiles(checkDir, "txt"))
+                    tempImage.addImageFiles(getOtherFiles(checkDir, "images"))
                 }
-
+                imageList.add(tempImage)
+            }
         }
 
         return imageList
