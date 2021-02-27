@@ -29,6 +29,7 @@ import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
+import java.io.IOException
 
 
 class GalleryFullscreenFragment : DialogFragment() {
@@ -158,15 +159,11 @@ class GalleryFullscreenFragment : DialogFragment() {
     private fun processImage() {
         //var image: GalleryImage? = null
         GlobalScope.launch(Dispatchers.Default + NonCancellable) {
-
-            val job : Job = launch (context = Dispatchers.IO) {
-                coroutineScope {
-                    model.uploadImage(currentImage, selectedPosition)
-                }
+            try {
+            model.uploadImage(currentImage, selectedPosition)
+            } catch (ex: IOException) {
+                toast("Upload failed")
             }
-            Log.d(TAG, "Full screen: waiting for image to finish processing")
-            job.join()
-            Log.d(TAG, "Full screen: finished processing the image")
         }
         dismiss()
     }
@@ -181,7 +178,6 @@ class GalleryFullscreenFragment : DialogFragment() {
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
         object : ViewPager.OnPageChangeListener {
             override fun onPageSelected(position: Int) {
-                Log.d(TAG, "Full screen: Gallery Position $position")
                 setCurrentItem(position)
             }
             override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {

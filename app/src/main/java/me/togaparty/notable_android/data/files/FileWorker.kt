@@ -45,7 +45,7 @@ class FileWorker(val context: Context){
 
                     val checkDir = File(outputDirectory, File(name).nameWithoutExtension)
                     if (checkDir.exists()) {
-                        Log.d(TAG, "FileWorker: This is processed")
+                        Log.d(TAG, "FileWo44                                                                                                                                                               rker: This is processed")
                         tempImage.processed = true
                         tempImage.addWavFiles(getOtherFiles(checkDir, "wav"))
                         tempImage.addTextFiles(getOtherFiles(checkDir, "txt"))
