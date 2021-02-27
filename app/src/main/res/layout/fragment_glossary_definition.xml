@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/yellow"
-    tools:context=".fragments.GlossaryDefinitionFragment">
+    tools:context="me.togaparty.notable_android.ui.fragments.GlossaryDefinitionFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
@@ -27,8 +27,8 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="72dp"
             android:fontFamily="@font/amiko_bold"
-            android:text="Term"
-            android:textSize="26dp"
+            android:text="@string/term"
+            android:textSize="26sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.049"
             app:layout_constraintStart_toStartOf="parent"
@@ -51,8 +51,8 @@
             android:maxLines="12"
             android:padding="10dp"
             android:scrollbars="vertical"
-            android:text="Definition"
-            android:textSize="20dp"
+            android:text="@string/definition"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.15"
             app:layout_constraintStart_toStartOf="parent"

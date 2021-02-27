@@ -15,7 +15,7 @@
         android:layout_marginTop="52dp"
         android:fontFamily="@font/amiko_bold"
         android:lineSpacingExtra="10sp"
-        android:text="Image Gallery"
+        android:text="@string/image_gallery"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="23sp"
         app:layout_constraintBottom_toTopOf="@+id/innerLayout"
@@ -37,7 +37,8 @@
         app:layout_constraintHeight_percent="0.2"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintWidth_percent="0.5" />
+        app:layout_constraintWidth_percent="0.5"
+        android:contentDescription="@string/image_gallery" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/innerLayout"

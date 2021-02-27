@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notable_OPENCV</string>
+    <string name="app_name">Notable!</string>
     <string name="button_send">Take Photo</string>
     <string name="preview_image">Preview Image</string>
     <string name="gallery">Gallery</string>
@@ -15,7 +15,43 @@
     <string name="retake">Retake</string>
     <string name="crop">Crop</string>
     <string name="process">Process</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="textview">TextView</string>
+    <string name="image_gallery">Image Gallery</string>
+    <string name="search_words">Search Words…</string>
+    <string name="imageview3">ImageView3</string>
+    <string name="wikitest">Welcome to Wiki</string>
+    <!-- Gallery FAB -->
+    <string name="delete"> Delete Image</string>
+    <string name="inspect">Inspect Music</string>
+    <string name="process_music">Process Music</string>
+    <!-- Inspect Buttons -->
+    <string name="play_segment">Play Shown</string>
+    <string name="play_sheet">Play Sheet</string>
+    <string name="review">Review</string>
+
+    <string name="title_activity_settings">Notable Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="permissions_header">Permissions</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="summary_camera_permission_preference" />
+    <string name="summary_file_storage_permission_preference" />
+
+    <string name="camera_button">camera_button</string>
+    <string name="save_button">save_button</string>
+    <string name="term">Term</string>
+    <string name="definition">Definition</string>
+    <string name="wiki">Wiki</string>
 
 </resources>

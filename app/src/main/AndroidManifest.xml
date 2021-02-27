@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="me.togaparty.notable_opencv">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="me.togaparty.notable_android">
 
-    <uses-feature android:name="android.hardware.camera.any" />
+    <uses-feature android:name="android.hardware.camera.any"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -18,11 +31,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Notable_OPENCV"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".fragments.MainActivity"></activity>
-        <activity android:name=".NotableGlideActivity" />
+        android:usesCleartextTraffic="true"
+        tools:targetApi="m"
+        tools:ignore="GoogleAppIndexingWarning">
+
         <activity
-            android:name=".MainActivity"
+            android:name="me.togaparty.notable_android.SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name="me.togaparty.notable_android.MainActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,7 +49,7 @@
         </activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <meta-data
