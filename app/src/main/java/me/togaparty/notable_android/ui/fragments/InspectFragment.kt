@@ -1,9 +1,8 @@
 package me.togaparty.notable_android.ui.fragments
 
-//import kotlinx.android.synthetic.main.fragment_glossary.*
-//import me.togaparty.notable_opencv.adapter.MainRecyclerAdapter
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import me.togaparty.notable_android.R
+import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
@@ -31,17 +31,27 @@ import me.togaparty.notable_android.data.InspectPrediction
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
+//TODO: When you are going to finish the InspectFragment implementation
+// Delete commented code that's marked with <*> and uncomment the code marked with <?>
 
 class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
-    //private lateinit var mainCategoryRecycler: RecyclerView
-    //private var mainRecyclerAdapter: MainRecyclerAdapter? = null
+
     private lateinit var viewPager: ViewPager
     private var selectedPosition: Int = 0
     internal val model: ImageListProvider by activityViewModels()
-    //lateinit var predictions: ArrayList<InspectPrediction>
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
+    private var currentPosition : Int? = null
+    internal lateinit var currentImage: GalleryImage
 
-
+    private var wavFiles: Map<String,Uri>? = null
+    private var textFiles: Map<String,Uri>? = null
+    private var imageFiles: ArrayList<Uri>? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            currentPosition = requireArguments().getInt("position")
+        }
+    }
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -52,7 +62,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 container,
                 false
         )
-        //model = ViewModelProvider(this).get(ImageListProvider::class.java)
+
         // Lookup the recyclerview in activity layout
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
@@ -69,6 +79,14 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
 
+        //<?>
+        //currentPosition?.let{
+            //currentImage = model.getGalleryImage(it)
+            //wavFiles = currentImage.wavFiles
+            //textFiles = currentImage.textFiles
+
+            //imageFiles = currentImage.imageFiles.flatMap { (_, values) -> arrayListOf(values)}
+        //}
         return view
     }
     override fun onItemClick(position: Int, view: TextView) {
@@ -83,26 +101,30 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     // viewpager page change listener
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
-            object : ViewPager.OnPageChangeListener {
-                @SuppressLint("LogConditional")
-                override fun onPageSelected(position: Int) {
-                    Log.d(TAG, "Inspect Fragment: $position")
-                    setCurrentItem(position)
-                }
-                override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
-                }
-                override fun onPageScrollStateChanged(arg0: Int) {
-                }
+        object : ViewPager.OnPageChangeListener {
+            @SuppressLint("LogConditional")
+            override fun onPageSelected(position: Int) {
+                Log.d(TAG, "Inspect Fragment: $position")
+                setCurrentItem(position)
             }
+            override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
+            }
+            override fun onPageScrollStateChanged(arg0: Int) {
+            }
+        }
     //Gallery adapter
     inner class GalleryPagerAdapter : PagerAdapter() {
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val layoutInflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
             val view = layoutInflater.inflate(R.layout.fragment_inspect_image, container, false)
-            val image = model.getGalleryImage(position)
-            view.inspectImage.tag = image.imageUrl
 
+            val image = model.getGalleryImage(position)//TODO:<*>
+            if(!::currentImage.isInitialized) {
+                throw ExceptionInInitializerError("Current Image is not initialized")
+            }
+
+            view.inspectImage.tag = image.imageUrl
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f
@@ -110,7 +132,10 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
             // load image
             GlideApp.with(context!!)
-                    .load(image.imageUrl)
+
+                    .load(image.imageUrl)//TODO:<*>
+                    //TODO:<?>
+                    //.load(imageFiles.get(position))
                     .placeholder(circularProgressDrawable)
                     .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -118,20 +143,20 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             container.addView(view)
             return view
         }
-
-        override fun getItemPosition(`object`: Any): Int {
-            val imageView = `object` as ImageView
-            val tag = imageView.tag
-
-            var flag = false
-            model.getList().value?.forEach {
-                if(it.imageUrl == tag){
-                    flag = true
-                    return@forEach
-                }
-            }
-            return if (flag) super.getItemPosition(`object`) else POSITION_NONE
-        }
+// Only needed when updating the adapter especially when deleting files.
+//        override fun getItemPosition(`object`: Any): Int {
+//            val imageView = `object` as ImageView
+//            val tag = imageView.tag
+//
+//            var flag = false
+//            model.getList().value?.forEach {
+//                if(it.imageUrl == tag){
+//                    flag = true
+//                    return@forEach
+//                }
+//            }
+//            return if (flag) super.getItemPosition(`object`) else POSITION_NONE
+//        }
 
         override fun getCount(): Int {
             return model.getImageListSize()

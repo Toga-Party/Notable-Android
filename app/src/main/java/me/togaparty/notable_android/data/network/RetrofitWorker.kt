@@ -91,6 +91,7 @@ class RetrofitWorker(val context: Context) {
                 }
             }
         Log.v(TAG, "Retrofit: Returning to ImageProvider")
+        //Thread.sleep(10000)
         return image
     }
     private fun extractFile(zipIn: ZipInputStream, fileOutputStream: FileOutputStream) {

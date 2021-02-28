@@ -9,9 +9,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import me.togaparty.notable_android.data.files.FileWorker
 import me.togaparty.notable_android.data.network.RetrofitWorker
-import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import java.io.IOException
-import java.lang.Exception
 
 
 class ImageListProvider(app: Application) : AndroidViewModel(app) {
@@ -19,6 +17,8 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     private val fileWorker = FileWorker(getApplication())
     private val retrofitWorker = RetrofitWorker(getApplication())
     private val newList = arrayListOf<GalleryImage>()
+    private var processing = false
+
     private val imageList = MutableLiveData<List<GalleryImage>>().apply {
         value = ArrayList()
         viewModelScope.launch { newList.addAll(fileWorker.loadImages()) }
@@ -27,6 +27,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     suspend fun uploadImage(image: GalleryImage, position: Int)  {
         var returnedImage: GalleryImage? = null
+        processing = true
         val value = GlobalScope.async {
             returnedImage = retrofitWorker.uploadFile(image)
         }
@@ -42,8 +43,10 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                 imageList.value = newList
             }
         }?: throw IOException("Upload failed")
-
+        processing = false
     }
+
+    fun isProcessing () = processing
     fun saveImageToStorage(directory: String, filename: String, fileUri: Uri): GalleryImage? {
         return fileWorker.saveImage(directory, filename, fileUri)
     }

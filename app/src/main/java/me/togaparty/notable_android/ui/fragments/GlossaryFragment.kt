@@ -26,7 +26,7 @@ import java.nio.charset.Charset
 
 
 class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
-    private var mainRecyclerAdapter: MainRecyclerAdapter? = null
+    internal var mainRecyclerAdapter: MainRecyclerAdapter? = null
     private lateinit var navController: NavController
     private lateinit var editText: EditText
 

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
@@ -59,7 +60,6 @@ class GalleryFullscreenFragment : DialogFragment() {
         )
 
         navController = this.findNavController()
-        //model = ViewModelProvider(this).get(ImageListProvider::class.java)
         galleryPagerAdapter = GalleryPagerAdapter()
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = galleryPagerAdapter
@@ -81,25 +81,27 @@ class GalleryFullscreenFragment : DialogFragment() {
     }
     private fun editFloatingActionButton() {
         val floatingActionButton = view?.findViewById<SpeedDialView>(R.id.speedDial)
+
         if (currentImage.processed == true) {
             floatingActionButton?.removeActionItem(1)
             floatingActionButton?.addActionItem(
-                SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
-                    .setLabel(getString(R.string.inspect))
-                    .setTheme(R.style.Theme_Notable_OPENCV)
-                    .setLabelClickable(false)
-                    .create()
+                    SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
+                            .setLabel(getString(R.string.inspect))
+                            .setTheme(R.style.Theme_Notable_OPENCV)
+                            .setLabelClickable(false)
+                            .create()
             )
         } else {
             floatingActionButton?.removeActionItem(1)
             floatingActionButton?.addActionItem(
-                SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
-                    .setLabel(getString(R.string.process_music))
-                    .setTheme(R.style.Theme_Notable_OPENCV)
-                    .setLabelClickable(false)
-                    .create()
+                    SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
+                            .setLabel(getString(R.string.process_music))
+                            .setTheme(R.style.Theme_Notable_OPENCV)
+                            .setLabelClickable(false)
+                            .create()
             )
         }
+
     }
     private fun generateFloatingActionButton(view: View){
         val floatingActionButton = view.findViewById<SpeedDialView>(R.id.speedDial)
@@ -142,12 +144,16 @@ class GalleryFullscreenFragment : DialogFragment() {
                     R.id.fab_inspect -> {
                         toast("Inspect action")
                         dismiss()
-                        navController.navigate(
-                            GalleryFragmentDirections.actionGalleryFragmentToInspectFragment())
+                        val bundle = bundleOf("position" to selectedPosition)
+                        navController.navigate(R.id.action_galleryFragment_to_inspectFragment, bundle)
                     }
                     R.id.fab_process -> {
-                        toast("Process action")
-                        processImage()
+                        if (!model.isProcessing()) {
+                            toast("Process action")
+                            processImage()
+                        } else {
+                            toast("Something is processing. Please wait for it to finish")
+                        }
                     }
                 }
                 true
