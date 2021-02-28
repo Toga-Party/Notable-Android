@@ -11,7 +11,7 @@ import retrofit2.http.*
 interface RetrofitService {
 
     @Multipart
-    @POST(Constants.header)
+    @POST(Constants.HEADER)
     fun upload(
             @Part image: MultipartBody.Part,
             @Part("file_name") name: RequestBody

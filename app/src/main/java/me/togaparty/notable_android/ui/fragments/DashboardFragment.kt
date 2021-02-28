@@ -96,7 +96,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                     }
                 }
             R.id.settings_cardview -> navController.navigate(
-                    DashboardFragmentDirections.actionDashboardFragmentToSettingsActivity())
+                    DashboardFragmentDirections.actionDashboardFragmentToSettingsFragment())
             R.id.glossary_cardview -> navController.navigate(
                     DashboardFragmentDirections.actionDashboardFragmentToGlossaryFragment())
         }

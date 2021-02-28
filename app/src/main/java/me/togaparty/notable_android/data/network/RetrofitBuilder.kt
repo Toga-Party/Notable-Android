@@ -8,7 +8,7 @@ class RetrofitBuilder {
         private var retrofitInstance : Retrofit? = null
         init {
             retrofitInstance = Retrofit.Builder()
-                    .baseUrl(Constants.url)
+                    .baseUrl(Constants.URL)
                     //.addConverterFactory(OkhttpClientBuilder.gsonConverterFactory)
                     .client(OkhttpClientBuilder.okHttpClient)
                     .build()

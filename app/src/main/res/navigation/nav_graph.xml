@@ -33,9 +33,8 @@
             android:id="@+id/action_dashboardFragment_to_galleryFragment"
             app:destination="@id/galleryFragment" />
         <action
-            android:id="@+id/action_dashboardFragment_to_settingsActivity"
-            app:destination="@id/settingsActivity" />
-
+            android:id="@+id/action_dashboardFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/glossaryFragment"
@@ -111,9 +110,21 @@
         android:name="me.togaparty.notable_android.ui.fragments.WikiFragment"
         android:label="fragment_wiki"
         tools:layout="@layout/fragment_wiki" />
-    <activity
-        android:id="@+id/settingsActivity"
-        android:name="me.togaparty.notable_android.SettingsActivity"
-        android:label="SettingsActivity"
-        tools:layout="@layout/settings_activity"/>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_permissionsFragment"
+            app:destination="@id/permissionsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/permissionsFragment"
+        android:name="me.togaparty.notable_android.ui.fragments.PermissionsFragment"
+        android:label="PermissionsFragment" >
+        <action
+            android:id="@+id/action_permissionsFragment_pop"
+            app:popUpTo="@id/permissionsFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>
