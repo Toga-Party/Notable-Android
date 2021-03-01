@@ -52,7 +52,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     private var textFiles: Map<String,Uri>? = null
     private var imageFiles: ArrayList<Uri>? = null
     private var imageMap: Map<String,Uri>? = null
-    private var nameFiles: ArrayList<String>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -69,35 +69,29 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             container,
             false
         )
-
-        // Lookup the recyclerview in activity layout
-        val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
-
-        // Initialize predictions
-        val rows = InspectPrediction.createPredictionList(12)
-        // Create adapter passing in the sample data
-        val adapter = PredictionsAdapter(rows,this)
-        // Attach the adapter to the recyclerview to populate items
-        inspectRecycler.adapter = adapter
-        // Set layout manager to position the items
-        inspectRecycler.layoutManager = LinearLayoutManager(requireContext())
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
-
         currentPosition?.let{
             currentImage = model.getGalleryImage(it)
             wavFiles = currentImage.wavFiles
             textFiles = currentImage.textFiles
             imageFiles = ArrayList(currentImage.imageFiles.values)
             imageMap = currentImage.imageFiles
-            nameFiles = ArrayList(currentImage.imageFiles.keys)
             imageFiles?.let {
                 finalPosition = it.size
             }
         }
+        // Lookup the recyclerview in activity layout
+        val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
+        // Initialize predictions
+        val rows = InspectPrediction.createPredictionList(textFiles)
+        // Create adapter passing in the sample data
+        val adapter = PredictionsAdapter(rows,this)
+        // Attach the adapter to the recyclerview to populate items
+        inspectRecycler.adapter = adapter
+        // Set layout manager to position the items
+        inspectRecycler.layoutManager = LinearLayoutManager(requireContext())
 
-//        for (item in nameFiles!!){
-//            Log.d("Inspect", "Name: $item")
-//        }
+
 
         viewPager = view.findViewById(R.id.viewPagerBanner)
         galleryPagerAdapter = GalleryPagerAdapter(finalPosition)
