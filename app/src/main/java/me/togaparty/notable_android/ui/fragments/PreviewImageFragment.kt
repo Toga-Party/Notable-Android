@@ -13,10 +13,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -50,7 +52,7 @@ class PreviewImageFragment : Fragment() {
     private lateinit var outputCacheDirectory: File
     private lateinit var navController: NavController
 
-    private val model: ImageListProvider by activityViewModels()
+    private lateinit var model: ImageListProvider// by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +78,7 @@ class PreviewImageFragment : Fragment() {
         imageView = container.findViewById(R.id.imageView)
         container.findViewById<ImageButton>(R.id.save_button_1).setOnClickListener { saveImage() }
         loadSpeedDials(container) //goes BBRRR
-        //model = ViewModelProvider(this).get(ImageListProvider::class.java)
+        model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         lifecycleScope.launchWhenCreated {
             container.post{
                 setImageView()
@@ -130,6 +132,8 @@ class PreviewImageFragment : Fragment() {
     private fun saveImage() {
         Log.d("Preview", "Processing Image")
         showDialog("Save image", "Do you want to save this image in the gallery?") {
+            val loadingFragment = LoadingFragment.show(childFragmentManager)
+
             fileUri?.let {
                 CoroutineScope(Dispatchers.IO).launch {
                     var image: GalleryImage? = null
@@ -142,6 +146,7 @@ class PreviewImageFragment : Fragment() {
                             Log.d("Preview", "Adding to list")
                             model.addToList(it)
                         }
+                        loadingFragment.dismiss()
                         Log.d("Preview", "Navigating to Gallery")
                         navController.navigate(PreviewImageFragmentDirections.actionPreviewImageToGalleryFragment())
                         toast("Image Saved")

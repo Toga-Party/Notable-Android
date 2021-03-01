@@ -55,5 +55,7 @@
     <string name="wiki">Wiki</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

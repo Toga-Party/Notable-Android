@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -38,7 +39,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     private lateinit var viewPager: ViewPager
     private var selectedPosition: Int = 0
-    internal val model: ImageListProvider by activityViewModels()
+    internal lateinit var model: ImageListProvider //by activityViewModels()
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
     private var currentPosition : Int? = null
     internal lateinit var currentImage: GalleryImage
@@ -73,6 +74,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         inspectRecycler.adapter = adapter
         // Set layout manager to position the items
         inspectRecycler.layoutManager = LinearLayoutManager(requireContext())
+        model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         viewPager = view.findViewById(R.id.viewPagerBanner)
         galleryPagerAdapter = GalleryPagerAdapter()
         viewPager.adapter = galleryPagerAdapter

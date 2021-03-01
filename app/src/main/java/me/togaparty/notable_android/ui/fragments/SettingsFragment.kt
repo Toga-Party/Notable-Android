@@ -60,7 +60,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClic
                     }
                     requireActivity().startActivity(i)
                 }
-                "developer_header" -> Log.d(TAG, "Developer preference is called")
+                "developer_header" -> navController.navigate(SettingsFragmentDirections.actionSettingsFragmentToDevelopersFragment())
             }
         }
 

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -34,7 +35,7 @@ class GalleryFragment : Fragment(),
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
 
-    private val model: ImageListProvider by activityViewModels()
+    private lateinit  var model: ImageListProvider// by activityViewModels()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +52,7 @@ class GalleryFragment : Fragment(),
             navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToDashboardFragment())
         }
         // init adapter
-        //model = ViewModelProvider(this).get(ImageListProvider::class.java)
+        model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         galleryAdapter = GalleryImageAdapter(model.getList().value as MutableList<GalleryImage>)
         galleryAdapter.listener = this
 

@@ -12,6 +12,7 @@ import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -44,7 +45,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
 
-    internal val model: ImageListProvider by activityViewModels()
+    internal lateinit var model: ImageListProvider// by activityViewModels()
 
 
     @SuppressLint("LogConditional")
@@ -61,6 +62,7 @@ class GalleryFullscreenFragment : DialogFragment() {
 
         navController = this.findNavController()
         galleryPagerAdapter = GalleryPagerAdapter()
+        model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
