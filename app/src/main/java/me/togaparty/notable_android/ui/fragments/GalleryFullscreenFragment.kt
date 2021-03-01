@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -28,9 +28,9 @@ import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
+import me.togaparty.notable_android.ui.items.Status
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
-import java.io.IOException
 
 
 class GalleryFullscreenFragment : DialogFragment() {
@@ -44,7 +44,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
 
-    internal val model: ImageListProvider by activityViewModels()
+    internal lateinit var model: ImageListProvider// by activityViewModels()
 
 
     @SuppressLint("LogConditional")
@@ -61,6 +61,7 @@ class GalleryFullscreenFragment : DialogFragment() {
 
         navController = this.findNavController()
         galleryPagerAdapter = GalleryPagerAdapter()
+        model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
@@ -74,6 +75,15 @@ class GalleryFullscreenFragment : DialogFragment() {
             viewPager.adapter?.notifyDataSetChanged()
             if(model.getImageListSize() == 0) dismiss() else setCurrentItem(selectedPosition)
             editFloatingActionButton()
+            activity?.let {
+                when(model.getProcessingStatus()) {
+                    Status.FAILED -> toast("Upload failed")
+                    Status.SUCCESSFUL-> toast("Upload successful")
+                    else -> Unit
+                }.also {
+                    model.setProcessingStatus(Status.AVAILABLE)
+                }
+            }
         })
 
 
@@ -132,14 +142,20 @@ class GalleryFullscreenFragment : DialogFragment() {
                     R.id.fab_delete -> {
                         toast("Delete action")
                         Log.d(TAG, "Full screen: delete launched")
-                        GlobalScope.launch(Dispatchers.Main) {
-                            Log.d(TAG, "Full screen: deleting")
+                        if(model.getProcessingTag() != null  && model.getProcessingTag() == currentImage.imageUrl) {
+                            toast("Can't delete something that's being processed")
+                        } else {
+                            GlobalScope.launch(Dispatchers.Main) {
+                                Log.d(TAG, "Full screen: deleting")
 
-                            if(model.getImageListSize() != 0){
-                                model.deleteGalleryImage(selectedPosition, currentImage.imageUrl)
+                                if(model.getImageListSize() != 0){
+                                    model.deleteGalleryImage(selectedPosition, currentImage.imageUrl)
+                                }
                             }
+                            Log.d(TAG, "Full screen: deleted")
                         }
-                        Log.d(TAG, "Full screen: deleted")
+
+
                     }
                     R.id.fab_inspect -> {
                         toast("Inspect action")
@@ -148,7 +164,7 @@ class GalleryFullscreenFragment : DialogFragment() {
                         navController.navigate(R.id.action_galleryFragment_to_inspectFragment, bundle)
                     }
                     R.id.fab_process -> {
-                        if (!model.isProcessing()) {
+                        if (model.getProcessingStatus() != Status.PROCESSING) {
                             toast("Process action")
                             processImage()
                         } else {
@@ -165,11 +181,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     private fun processImage() {
         //var image: GalleryImage? = null
         GlobalScope.launch(Dispatchers.Default + NonCancellable) {
-            try {
             model.uploadImage(currentImage, selectedPosition)
-            } catch (ex: IOException) {
-                toast("Upload failed")
-            }
         }
         dismiss()
     }

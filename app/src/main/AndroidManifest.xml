@@ -34,10 +34,6 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <activity
-            android:name="me.togaparty.notable_android.SettingsActivity"
-            android:label="@string/title_activity_settings" />
         <activity
             android:name="me.togaparty.notable_android.MainActivity"
             android:windowSoftInputMode="adjustPan">

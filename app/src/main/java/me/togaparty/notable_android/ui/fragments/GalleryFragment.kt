@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,8 +23,10 @@ import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.ui.items.Status
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.permissionsGranted
+import me.togaparty.notable_android.utils.toast
 
 
 class GalleryFragment : Fragment(),
@@ -34,7 +37,7 @@ class GalleryFragment : Fragment(),
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
 
-    private val model: ImageListProvider by activityViewModels()
+    private lateinit  var model: ImageListProvider// by activityViewModels()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -51,12 +54,22 @@ class GalleryFragment : Fragment(),
             navController.navigate(GalleryFragmentDirections.actionGalleryFragmentToDashboardFragment())
         }
         // init adapter
-        //model = ViewModelProvider(this).get(ImageListProvider::class.java)
+        model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         galleryAdapter = GalleryImageAdapter(model.getList().value as MutableList<GalleryImage>)
         galleryAdapter.listener = this
 
         model.getList().observe(viewLifecycleOwner, {
             Log.d(TAG, "Gallery: Something changed")
+
+            activity?.let {
+                when(model.getProcessingStatus()) {
+                    Status.FAILED -> toast("Upload failed")
+                    Status.SUCCESSFUL-> toast("Upload successful")
+                    else -> Unit
+                }.also {
+                    model.setProcessingStatus(Status.AVAILABLE)
+                }
+            }
             galleryAdapter.notifyDataSetChanged()
         })
         // init recyclerview
