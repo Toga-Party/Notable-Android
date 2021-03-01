@@ -86,7 +86,6 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             //currentImage = model.getGalleryImage(it)
             //wavFiles = currentImage.wavFiles
             //textFiles = currentImage.textFiles
-
             //imageFiles = currentImage.imageFiles.flatMap { (_, values) -> arrayListOf(values)}
         //}
         return view

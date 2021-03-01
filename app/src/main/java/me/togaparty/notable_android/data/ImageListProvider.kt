@@ -2,14 +2,20 @@ package me.togaparty.notable_android.data
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.togaparty.notable_android.data.files.FileWorker
 import me.togaparty.notable_android.data.network.RetrofitWorker
-import java.io.IOException
+import me.togaparty.notable_android.ui.items.Status
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
+
 
 
 class ImageListProvider(app: Application) : AndroidViewModel(app) {
@@ -17,8 +23,12 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     private val fileWorker = FileWorker(getApplication())
     private val retrofitWorker = RetrofitWorker(getApplication())
     private val newList = arrayListOf<GalleryImage>()
-    private var processing = false
 
+    //private var processing = false
+    //private var result: Result? = null
+   // private var processingStatus =
+    private var processingTag: Uri? = null
+    private var processingStatus = Status.AVAILABLE
     private val imageList = MutableLiveData<List<GalleryImage>>().apply {
         value = ArrayList()
         viewModelScope.launch { newList.addAll(fileWorker.loadImages()) }
@@ -27,9 +37,23 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     suspend fun uploadImage(image: GalleryImage, position: Int)  {
         var returnedImage: GalleryImage? = null
-        processing = true
-        val value = GlobalScope.async {
-            returnedImage = retrofitWorker.uploadFile(image)
+        processingStatus = Status.PROCESSING
+        processingTag = image.imageUrl
+        var message = "Upload failed: "
+        val value = viewModelScope.async(context = Dispatchers.IO) {
+            when(val returnedValue = retrofitWorker.uploadFile(image)) {
+                is RetrofitWorker.UploadResult.Success -> {
+                    returnedImage = returnedValue.retrieved
+                    //result = Result.Success(success = "Upload successful")
+                    processingStatus = Status.SUCCESSFUL
+                }
+                is RetrofitWorker.UploadResult.Error -> {
+                    message += returnedValue.message
+                    Log.e(TAG, message, returnedValue.cause)
+                    processingStatus = Status.FAILED
+                    //result = Result.Success(success = "Upload failed: $message")
+                }
+            }
         }
         value.await()
         returnedImage?.let {
@@ -39,14 +63,17 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                     textFiles =  returned.textFiles.toMutableMap(),
                     wavFiles =  returned.wavFiles.toMutableMap(),
             )
-            withContext(Dispatchers.Main) {
-                imageList.value = newList
-            }
-        }?: throw IOException("Upload failed")
-        processing = false
+        }
+        withContext(Dispatchers.Main) {
+            imageList.value = newList
+        }
+        processingTag = null
     }
 
-    fun isProcessing () = processing
+
+    fun getProcessingStatus() = processingStatus
+    fun setProcessingStatus(status: Status) { processingStatus = status}
+    fun getProcessingTag() = processingTag
     fun saveImageToStorage(directory: String, filename: String, fileUri: Uri): GalleryImage? {
         return fileWorker.saveImage(directory, filename, fileUri)
     }

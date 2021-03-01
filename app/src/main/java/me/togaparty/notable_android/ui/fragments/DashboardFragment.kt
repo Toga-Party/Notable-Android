@@ -11,10 +11,12 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import me.togaparty.notable_android.R
+import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
@@ -22,6 +24,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
     private lateinit var checkPermissions: ActivityResultLauncher<Array<String>>
     private var navDirections: NavDirections? = null
+    internal lateinit var model: ImageListProvider
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -34,6 +37,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         setPermissions()
         navController = this.findNavController()
+        model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         view.findViewById<CardView>(R.id.camera_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.files_cardview).setOnClickListener(this)
         view.findViewById<CardView>(R.id.settings_cardview).setOnClickListener(this)
