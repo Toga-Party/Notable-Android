@@ -3,7 +3,6 @@ package me.togaparty.notable_android.ui.fragments
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,10 +30,10 @@ class LoadingFragment: DialogFragment() {
     companion object {
         private const val FRAGMENT_TAG = "busy"
 
-        fun newInstance() = LoadingFragment()
+        private fun newInstance() = LoadingFragment()
 
         fun show(supportFragmentManager: FragmentManager): LoadingFragment {
-            val dialog = LoadingFragment.newInstance()
+            val dialog = newInstance()
             // prevent dismiss by user click
             dialog.isCancelable = false
             dialog.show(supportFragmentManager, FRAGMENT_TAG)

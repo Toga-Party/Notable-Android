@@ -34,9 +34,6 @@ val FILE_REQUIRED_PERMISSIONS = mutableListOf(
 fun Fragment.toast(text: String?) {
     Toast.makeText(this.requireContext(), text, Toast.LENGTH_LONG).show()
 }
-fun Context.toast(text: String?) {
-    Toast.makeText(this, text, Toast.LENGTH_LONG).show()
-}
 fun Context.showDeniedDialog(title: String,
                              body: String) {
     AlertDialog.Builder(this).also{

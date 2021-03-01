@@ -8,10 +8,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,19 +17,17 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.fragment_inspect.*
-import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
-import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
-import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
+import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.data.InspectPrediction
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_android.data.InspectPrediction
-import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
+
 //TODO: When you are going to finish the InspectFragment implementation
 // Delete commented code that's marked with <*> and uncomment the code marked with <?>
 
@@ -144,21 +140,6 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             container.addView(view)
             return view
         }
-// Only needed when updating the adapter especially when deleting files.
-//        override fun getItemPosition(`object`: Any): Int {
-//            val imageView = `object` as ImageView
-//            val tag = imageView.tag
-//
-//            var flag = false
-//            model.getList().value?.forEach {
-//                if(it.imageUrl == tag){
-//                    flag = true
-//                    return@forEach
-//                }
-//            }
-//            return if (flag) super.getItemPosition(`object`) else POSITION_NONE
-//        }
-
         override fun getCount(): Int {
             return model.getImageListSize()
         }

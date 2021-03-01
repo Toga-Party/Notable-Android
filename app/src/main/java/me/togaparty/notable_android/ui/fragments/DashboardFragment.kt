@@ -24,7 +24,7 @@ class DashboardFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
     private lateinit var checkPermissions: ActivityResultLauncher<Array<String>>
     private var navDirections: NavDirections? = null
-    internal lateinit var model: ImageListProvider
+    private lateinit var model: ImageListProvider
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
