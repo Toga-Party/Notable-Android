@@ -203,8 +203,6 @@ class GalleryFullscreenFragment : DialogFragment() {
         } else{
             toast("Please connect to the internet")
         }
-
-        dismiss()
     }
     internal fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
