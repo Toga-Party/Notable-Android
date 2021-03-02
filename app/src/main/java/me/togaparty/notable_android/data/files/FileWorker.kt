@@ -167,9 +167,9 @@ class FileWorker(val context: Context){
                 matrix,
                 true)
     }
-    private fun getOtherFiles(directory: File, fileType: String) : HashMap<String, Uri> {
+    private fun getOtherFiles(directory: File, fileType: String) : Map<String, Uri> {
         val listOfFiles = File(directory, fileType).listFiles()
-        val map = HashMap<String, Uri>()
+        val map = linkedMapOf<String, Uri>()
         listOfFiles?.forEach { map[it.name] = Uri.fromFile(it) }
         return map
     }

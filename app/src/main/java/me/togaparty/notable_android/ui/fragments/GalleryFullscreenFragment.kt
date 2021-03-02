@@ -29,6 +29,7 @@ import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.ui.items.Status
+import me.togaparty.notable_android.utils.ConnectionDetector
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
 
@@ -180,9 +181,14 @@ class GalleryFullscreenFragment : DialogFragment() {
     @SuppressLint("RestrictedApi")
     private fun processImage() {
         //var image: GalleryImage? = null
-        GlobalScope.launch(Dispatchers.Default + NonCancellable) {
-            model.uploadImage(currentImage, selectedPosition)
+        if(ConnectionDetector(requireContext()).connected) {
+            GlobalScope.launch(Dispatchers.Default + NonCancellable) {
+                model.uploadImage(currentImage, selectedPosition)
+            }
+        } else{
+            toast("Please connect to the internet")
         }
+
         dismiss()
     }
     internal fun setCurrentItem(position: Int) {
