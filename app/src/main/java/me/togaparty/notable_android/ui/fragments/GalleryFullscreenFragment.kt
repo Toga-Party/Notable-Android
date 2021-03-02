@@ -29,9 +29,8 @@ import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.ui.items.Status
-import me.togaparty.notable_android.utils.ConnectionDetector
+import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
-import me.togaparty.notable_android.utils.toast
 
 
 class GalleryFullscreenFragment : DialogFragment() {
@@ -78,11 +77,26 @@ class GalleryFullscreenFragment : DialogFragment() {
             editFloatingActionButton()
             activity?.let {
                 when(model.getProcessingStatus()) {
-                    Status.FAILED -> toast("Upload failed")
-                    Status.SUCCESSFUL-> toast("Upload successful")
+                    Status.FAILED -> {
+                        showFailedDialog("Upload failed", "The upload you sent failed.")
+                        model.setProcessingStatus(Status.AVAILABLE)
+                    }
+                    Status.SUCCESSFUL-> {
+                        showSuccessDialog(
+                            "Processing finished",
+                            "We have received the response from the server want to inspect it?"
+                        ) {
+                            val bundle = bundleOf("position" to selectedPosition)
+                            dismiss()
+
+                            navController.navigate(
+                                R.id.action_galleryFragment_to_inspectFragment,
+                                bundle
+                            )
+                        }
+                        model.setProcessingStatus(Status.AVAILABLE)
+                    }
                     else -> Unit
-                }.also {
-                    model.setProcessingStatus(Status.AVAILABLE)
                 }
             }
         })
@@ -166,6 +180,7 @@ class GalleryFullscreenFragment : DialogFragment() {
                     }
                     R.id.fab_process -> {
                         if (model.getProcessingStatus() != Status.PROCESSING) {
+                            Log.d(TAG, "Status: ${model.getProcessingStatus().name}")
                             toast("Process action")
                             processImage()
                         } else {

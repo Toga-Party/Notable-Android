@@ -70,12 +70,31 @@ fun Fragment.showDialog(
     AlertDialog.Builder(requireContext()).also {
         it.setTitle(title)
         it.setMessage(body)
-        it.setPositiveButton("Yes") { _, _ ->
-            callback()
-        }
-        it.setNegativeButton("No") {_,_ ->
+        it.setPositiveButton("Yes") { _, _ ->callback()}
+        it.setNegativeButton("No") {_,_ ->}
+    }.create().show()
 
-        }
+}
+fun Fragment.showFailedDialog(
+    title: String,
+    body: String)
+{
+    AlertDialog.Builder(requireContext()).also{
+        it.setTitle(title)
+        it.setMessage(body)
+        it.setPositiveButton("Ok"){_,_->}
+    }.create().show()
+}
+fun Fragment.showSuccessDialog(
+    title: String,
+    body: String,
+    callback: () -> Unit
+) {
+    AlertDialog.Builder(requireContext()).also {
+        it.setTitle(title)
+        it.setMessage(body)
+        it.setPositiveButton("Yes") { _, _ ->callback()}
+        it.setNegativeButton("No") {_,_ ->}
     }.create().show()
 
 }

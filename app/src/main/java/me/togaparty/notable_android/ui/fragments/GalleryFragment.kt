@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -19,14 +18,15 @@ import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.item_gallery_image.view.*
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
-import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
-import me.togaparty.notable_android.helper.GlideApp
-import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.helper.GlideApp
+import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
 import me.togaparty.notable_android.ui.items.Status
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
+import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.utils.permissionsGranted
-import me.togaparty.notable_android.utils.toast
+import me.togaparty.notable_android.utils.showFailedDialog
+import me.togaparty.notable_android.utils.showSuccessDialog
 
 
 class GalleryFragment : Fragment(),
@@ -63,11 +63,18 @@ class GalleryFragment : Fragment(),
 
             activity?.let {
                 when(model.getProcessingStatus()) {
-                    Status.FAILED -> toast("Upload failed")
-                    Status.SUCCESSFUL-> toast("Upload successful")
+                    Status.FAILED -> {
+                        showFailedDialog("Upload failed", "The upload you sent failed.")
+                        model.setProcessingStatus(Status.AVAILABLE)
+                    }
+                    Status.SUCCESSFUL->{
+                        showSuccessDialog("Processing finished",
+                            "We have received the response from the server. " +
+                                    "Please check the image you processed earlier to inspect it."){}
+                        model.setProcessingStatus(Status.AVAILABLE)
+                    }
+
                     else -> Unit
-                }.also {
-                    model.setProcessingStatus(Status.AVAILABLE)
                 }
             }
             galleryAdapter.notifyDataSetChanged()

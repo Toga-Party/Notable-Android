@@ -26,7 +26,6 @@ class ConnectionDetector(context: Context) {
                         return@forEach
                     }
                 }
-
                 hasNetwork
             }
 
