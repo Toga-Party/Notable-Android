@@ -2,6 +2,7 @@ package me.togaparty.notable_android.data
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import java.io.BufferedReader
 import java.io.IOException

@@ -13,26 +13,26 @@ data class GalleryImage (
     //TODO: I should probably use generics for this. Maybe when the app is working I can do some refactoring.
     fun addTextFiles(map: Map<String, Uri>) {
         if (textFiles.isNullOrEmpty()) textFiles = linkedMapOf()
-        textFiles + map.toMutableMap()
+        textFiles += map.toMutableMap()
     }
     fun addTextFile(name: String, uri: Uri) {
         if (textFiles.isNullOrEmpty()) textFiles = linkedMapOf()
-        textFiles + Pair(name, uri)
+        textFiles += Pair(name, uri)
     }
     fun addWavFiles(map: Map<String, Uri>) {
         if (wavFiles.isNullOrEmpty()) wavFiles = linkedMapOf()
-        wavFiles + map.toMutableMap()
+        wavFiles += map.toMutableMap()
     }
     fun addWAVFile(name: String, uri: Uri) {
         if (wavFiles.isNullOrEmpty()) wavFiles = linkedMapOf()
-        wavFiles + Pair(name, uri)
+        wavFiles += Pair(name, uri)
     }
     fun addImageFiles(map: Map<String, Uri>) {
         if (imageFiles.isNullOrEmpty()) imageFiles = linkedMapOf()
-        imageFiles + map.toMutableMap()
+        imageFiles += map.toMutableMap()
     }
     fun addImageFile(name: String, uri: Uri) {
         if (imageFiles.isNullOrEmpty()) imageFiles = linkedMapOf()
-        imageFiles + Pair(name, uri)
+        imageFiles += Pair(name, uri)
     }
 }
