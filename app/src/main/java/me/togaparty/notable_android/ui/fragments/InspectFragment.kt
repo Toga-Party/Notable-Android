@@ -2,16 +2,17 @@ package me.togaparty.notable_android.ui.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,18 +24,17 @@ import kotlinx.android.synthetic.main.fragment_inspect.*
 import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
-import kotlinx.coroutines.selects.select
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
-import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
+import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.data.InspectPrediction
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_android.data.InspectPrediction
-import me.togaparty.notable_android.data.ImageListProvider
-import me.togaparty.notable_android.utils.Constants.Companion.TAG
+import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import me.togaparty.notable_android.utils.toast
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
@@ -47,26 +47,28 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     private var currentPosition : Int? = null
     internal lateinit var currentImage: GalleryImage
     internal lateinit var rows: ArrayList<InspectPrediction>
-    private var wavFiles: Map<String,Uri>? = null
-    private var textFiles: Map<String,Uri>? = null
+    internal lateinit var mediaPlayer: MediaPlayer
+    private var wavFiles: Map<String, Uri>? = null
+    private var textFiles: Map<String, Uri>? = null
     private var imageFiles: ArrayList<Uri>? = null
-    private var imageMap: Map<String,Uri>? = null
+    private var imageMap: Map<String, Uri>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             currentPosition = requireArguments().getInt("position")
         }
+
     }
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(
-            R.layout.fragment_inspect,
-            container,
-            false
+                R.layout.fragment_inspect,
+                container,
+                false
         )
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         currentPosition?.let{
@@ -79,13 +81,14 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 finalPosition = it.size
             }
         }
+        setButtonEvents(view, wavFiles?.get("full_song.wav"))
         // Lookup the recyclerview in activity layout
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
         Log.d("Inspect", "Create Text: $selectedPosition")
-        rows = InspectPrediction.createPredictionList(textFiles,  selectedPosition, requireContext())
+        rows = InspectPrediction.createPredictionList(textFiles, selectedPosition, requireContext())
         // Create adapter passing in the sample data
-        predictionsAdapter = PredictionsAdapter(rows,this)
+        predictionsAdapter = PredictionsAdapter(rows, this)
         // Attach the adapter to the recyclerview to populate items
         inspectRecycler.adapter = predictionsAdapter
         // Set layout manager to position the items
@@ -98,6 +101,39 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
 
         return view
+    }
+    private fun setButtonEvents(view: View, uri: Uri?) {
+        val btnPlayFull: Button = view.findViewById(R.id.play_sheet) as Button
+        btnPlayFull.setOnClickListener(View.OnClickListener {
+            try {
+                if (mediaPlayer.isPlaying) {
+                    mediaPlayer.stop()
+                    mediaPlayer.release()
+                    prepareMediaPlayer(uri)
+                }
+                mediaPlayer.prepare()
+                mediaPlayer.start()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
+    }
+    private fun prepareMediaPlayer(uri: Uri?){
+        mediaPlayer = MediaPlayer().apply {
+            setAudioAttributes(
+                    AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+            )
+            if (uri != null) {
+                mediaPlayer.setDataSource(requireContext(), uri)
+            }
+        }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
     }
     override fun onItemClick(position: Int, view: TextView) {
         //Button Click event exposes aligned TextView control
@@ -114,7 +150,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             override fun onPageSelected(position: Int) {
                 Log.d("Inspect", "Selected: $position Max: $finalPosition")
                 setCurrentItem(position)
-                InspectPrediction.replacePredictionList(textFiles,  selectedPosition, requireContext(),predictionsAdapter,rows)
+                InspectPrediction.replacePredictionList(textFiles, selectedPosition, requireContext(), predictionsAdapter, rows)
             }
             override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
             }
