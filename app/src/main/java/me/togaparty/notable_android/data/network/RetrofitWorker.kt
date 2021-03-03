@@ -26,7 +26,7 @@ class RetrofitWorker(val context: Context) {
             imageUrl = currentImage.imageUrl,
             name = currentImage.name,
         )
-        val serviceWorker = RetrofitBuilder.getRetrofit()
+        val retrofit: RetrofitService = RetrofitBuilder.retrofitInstance
         val filename = image.name.toRequestBody("text/plain".toMediaTypeOrNull())
         var imageToSend: MultipartBody.Part?
         context.contentResolver.openInputStream(image.imageUrl).use { input ->
@@ -43,7 +43,7 @@ class RetrofitWorker(val context: Context) {
         Log.d(TAG, "Retrofit: Uploading the image")
 
         val response = imageToSend?.let { sendImage ->
-            serviceWorker.create(RetrofitService::class.java)
+            retrofit
                 .upload(sendImage, filename)
                 .execute()
         }
@@ -73,6 +73,7 @@ class RetrofitWorker(val context: Context) {
 
                         val send = File(temp, entry.name)
 
+                        image.processed = true
                         when (send.extension) {
                             "wav" -> image.addWAVFile(send.nameWithoutExtension, Uri.fromFile(send))
                             "png" -> image.addImageFile(
@@ -84,7 +85,6 @@ class RetrofitWorker(val context: Context) {
                                 Uri.fromFile(send)
                             )
                         }
-                        image.processed = true
                         extractFile(zip, FileOutputStream(send))
                         entry = zip.nextEntry
                     }
