@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_inspect.*
 import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
+import kotlinx.coroutines.selects.select
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
@@ -35,19 +36,17 @@ import me.togaparty.notable_android.utils.toast
 import java.util.*
 import kotlin.collections.ArrayList
 
-//TODO: When you are going to finish the InspectFragment implementation
-// Delete commented code that's marked with <*> and uncomment the code marked with <?>
-
 class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     private lateinit var viewPager: ViewPager
     private var selectedPosition: Int = 0
     private var finalPosition: Int = 0
     internal lateinit var model: ImageListProvider //by activityViewModels()
+    private lateinit var predictionsAdapter: PredictionsAdapter
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
     private var currentPosition : Int? = null
     internal lateinit var currentImage: GalleryImage
-
+    internal lateinit var rows: ArrayList<InspectPrediction>
     private var wavFiles: Map<String,Uri>? = null
     private var textFiles: Map<String,Uri>? = null
     private var imageFiles: ArrayList<Uri>? = null
@@ -83,16 +82,14 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         // Lookup the recyclerview in activity layout
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
-        val rows = InspectPrediction.createPredictionList(textFiles)
+        Log.d("Inspect", "Create Text: $selectedPosition")
+        rows = InspectPrediction.createPredictionList(textFiles,  selectedPosition, requireContext())
         // Create adapter passing in the sample data
-        val adapter = PredictionsAdapter(rows,this)
+        predictionsAdapter = PredictionsAdapter(rows,this)
         // Attach the adapter to the recyclerview to populate items
-        inspectRecycler.adapter = adapter
+        inspectRecycler.adapter = predictionsAdapter
         // Set layout manager to position the items
         inspectRecycler.layoutManager = LinearLayoutManager(requireContext())
-
-
-
         viewPager = view.findViewById(R.id.viewPagerBanner)
         galleryPagerAdapter = GalleryPagerAdapter(finalPosition)
         galleryPagerAdapter.notifyDataSetChanged()
@@ -117,6 +114,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             override fun onPageSelected(position: Int) {
                 Log.d("Inspect", "Selected: $position Max: $finalPosition")
                 setCurrentItem(position)
+                InspectPrediction.replacePredictionList(textFiles,  selectedPosition, requireContext(),predictionsAdapter,rows)
             }
             override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
             }
