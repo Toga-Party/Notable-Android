@@ -8,10 +8,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,21 +17,15 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.fragment_inspect.*
-import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
-import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
-import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
+import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.data.InspectPrediction
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_android.data.InspectPrediction
-import me.togaparty.notable_android.data.ImageListProvider
-import me.togaparty.notable_android.utils.Constants.Companion.TAG
+import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import me.togaparty.notable_android.utils.toast
-import java.util.*
-import kotlin.collections.ArrayList
 
 //TODO: When you are going to finish the InspectFragment implementation
 // Delete commented code that's marked with <*> and uncomment the code marked with <?>
@@ -43,10 +35,10 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     private lateinit var viewPager: ViewPager
     private var selectedPosition: Int = 0
     private var finalPosition: Int = 0
-    internal lateinit var model: ImageListProvider //by activityViewModels()
+    private lateinit var model: ImageListProvider //by activityViewModels()
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
     private var currentPosition : Int? = null
-    internal lateinit var currentImage: GalleryImage
+    private lateinit var currentImage: GalleryImage
 
     private var wavFiles: Map<String,Uri>? = null
     private var textFiles: Map<String,Uri>? = null

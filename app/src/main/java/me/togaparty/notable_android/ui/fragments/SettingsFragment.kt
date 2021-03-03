@@ -3,7 +3,6 @@ package me.togaparty.notable_android.ui.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -12,7 +11,6 @@ import androidx.preference.PreferenceFragmentCompat
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.utils.ALL_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.utils.Constants.Companion.GITHUB
-import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.permissionsGranted
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClickListener {
@@ -27,9 +25,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClic
                 ?.onPreferenceClickListener = this
         preferenceScreen
                 .findPreference<Preference>("permissions_header")
-                ?.onPreferenceClickListener = this
-        preferenceScreen
-                .findPreference<Preference>("sync_header")
                 ?.onPreferenceClickListener = this
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,7 +47,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClic
 //        requireActivity().startActivity(i)
         if(preference != null) {
             when(preference.key) {
-                "sync_header" -> Log.d(TAG, "Sync preference is called")
                 "permissions_header" -> navController.navigate(SettingsFragmentDirections.actionSettingsFragmentToPermissionsFragment())
                 "support_preference" -> {
                     val i = Intent(Intent.ACTION_VIEW).apply {
