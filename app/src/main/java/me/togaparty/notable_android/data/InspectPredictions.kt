@@ -6,6 +6,7 @@ import android.util.Log
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import java.io.BufferedReader
 import java.io.IOException
+import java.io.InputStream
 import java.io.InputStreamReader
 
 class InspectPrediction(val symbol: String, val in_Glossary: Boolean) {
@@ -38,22 +39,27 @@ class InspectPrediction(val symbol: String, val in_Glossary: Boolean) {
         }
 
         private fun readTextFile(uri: Uri?, context: Context): String {
+
             var reader: BufferedReader? = null
             val builder = StringBuilder()
             try {
-                reader = BufferedReader(InputStreamReader(uri?.let { context.contentResolver.openInputStream(it) }))
+                val n = uri?.let { context.contentResolver.openInputStream(it) };
+                reader = BufferedReader(InputStreamReader(n))
+                //reader = BufferedReader(InputStreamReader(uri?.let { context.contentResolver.openInputStream(it) }))
                 var line: String? = ""
                 while (reader.readLine().also { line = it } != null) {
                     builder.appendLine(line)
                     builder.append(',')
                 }
             } catch (e: IOException) {
+                Log.d("Inspect", "Buffered Reader Error")
                 Log.d("Inspect", e.printStackTrace().toString())
             } finally {
                 if (reader != null) {
                     try {
                         reader.close()
                     } catch (e: IOException) {
+                        Log.d("Inspect", "Buffered Reader Close Error")
                         Log.d("Inspect", e.printStackTrace().toString())
                     }
                 }

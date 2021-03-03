@@ -20,10 +20,7 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.fragment_inspect.*
-import kotlinx.android.synthetic.main.fragment_inspect.view.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
-import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
@@ -69,6 +66,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 false
         )
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
+
         currentPosition?.let{
             currentImage = model.getGalleryImage(it)
             wavFiles = currentImage.wavFiles
@@ -83,7 +81,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         // Lookup the recyclerview in activity layout
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
-        Log.d("Inspect", "Create Text: $selectedPosition")
+        Log.d("Inspect", "Creating entry at position: $selectedPosition")
         rows = InspectPrediction.createPredictionList(textFiles, selectedPosition, requireContext())
         // Create adapter passing in the sample data
         predictionsAdapter = PredictionsAdapter(rows, this)
@@ -115,9 +113,11 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         if (uri != null) {
             mediaPlayer.setDataSource(requireContext(), uri)
         }
+        mediaPlayer.setOnCompletionListener { mediaPlayer.release() }
         mediaPlayer.prepareAsync()
+
         mediaPlayer.setOnPreparedListener(OnPreparedListener { mp ->
-            if(!mp.isPlaying) {
+            if (!mp.isPlaying) {
                 mp.start()
             }
         })
@@ -125,7 +125,12 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     }
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer?.release()
+        try {
+            mediaPlayer?.release()
+        } catch (e: IllegalStateException) {
+            // media player is not initialized
+        }
+
     }
     override fun onItemClick(position: Int, view: TextView) {
         //Button Click event exposes aligned TextView control
