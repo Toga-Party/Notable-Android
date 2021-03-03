@@ -27,7 +27,7 @@ class FileWorker(val context: Context){
 
     @SuppressLint("Recycle")
     fun loadImages():  ArrayList<GalleryImage> {
-        val imageList = ArrayList<GalleryImage>()
+        val imageList = arrayListOf<GalleryImage>()
 
         val outputDirectory = MainActivity.externalAppSpecificStorage(context)
         query()?.use {  cursor ->
@@ -169,7 +169,6 @@ class FileWorker(val context: Context){
     private fun getOtherFiles(directory: File, fileType: String) : Map<String, Uri> {
         val listOfFiles = File(directory, fileType).listFiles()
         val map = linkedMapOf<String, Uri>()
-        Log.d(TAG, "$fileType : list of files size: ${listOfFiles.size}")
         listOfFiles?.forEach { map[it.name] = Uri.fromFile(it) }
         return map
     }

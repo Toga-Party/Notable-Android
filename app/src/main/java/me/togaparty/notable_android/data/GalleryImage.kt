@@ -1,7 +1,10 @@
 package me.togaparty.notable_android.data
 
 import android.net.Uri
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class GalleryImage (
         val imageUrl: Uri,
         val name: String,
@@ -9,7 +12,7 @@ data class GalleryImage (
         var textFiles: Map<String,Uri> = linkedMapOf(),
         var wavFiles: Map<String,Uri> = linkedMapOf(),
         var imageFiles: Map<String,Uri> = linkedMapOf(),
-) {
+) : Parcelable {
     //TODO: I should probably use generics for this. Maybe when the app is working I can do some refactoring.
     fun addTextFiles(map: Map<String, Uri>) {
         if (textFiles.isNullOrEmpty()) textFiles = linkedMapOf()

@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -28,7 +29,7 @@ import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_android.ui.items.Status
+import me.togaparty.notable_android.utils.Status
 import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
@@ -78,13 +79,15 @@ class GalleryFullscreenFragment : DialogFragment() {
             activity?.let {
                 when(model.getProcessingStatus()) {
                     Status.FAILED -> {
-                        showFailedDialog("Upload failed", "The upload you sent failed.")
+                        showFailedDialog("Upload failed",
+                                "The upload you sent failed.")
                         model.setProcessingStatus(Status.AVAILABLE)
                     }
                     Status.SUCCESSFUL-> {
                         showSuccessDialog(
                             "Processing finished",
-                            "We have received the response from the server want to inspect it?"
+                            "We have received the response from the server want to " +
+                                    "inspect it?"
                         ) {
                             val bundle = bundleOf("position" to selectedPosition)
                             dismiss()
@@ -145,6 +148,7 @@ class GalleryFullscreenFragment : DialogFragment() {
                     .setTheme(R.style.Theme_Notable_OPENCV)
                     .setLabelClickable(false)
                     .create()
+
                 else -> SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
                     .setLabel(getString(R.string.process_music))
                     .setTheme(R.style.Theme_Notable_OPENCV)
@@ -153,35 +157,41 @@ class GalleryFullscreenFragment : DialogFragment() {
             })
 
             floatingActionButton.setOnActionSelectedListener { actionItem ->
+
                 when (actionItem.id) {
                     R.id.fab_delete -> {
-                        toast("Delete action")
-                        Log.d(TAG, "Full screen: delete launched")
-                        if(model.getProcessingTag() != null  && model.getProcessingTag() == currentImage.imageUrl) {
+                        if(model.getProcessingTag() != null  &&
+                                model.getProcessingTag() == currentImage.imageUrl) {
+
                             toast("Can't delete something that's being processed")
+                            Log.d(TAG, "Full screen: delete failed")
+
                         } else {
                             GlobalScope.launch(Dispatchers.Main) {
-                                Log.d(TAG, "Full screen: deleting")
 
+                                Log.d(TAG, "Full screen: deleting")
                                 if(model.getImageListSize() != 0){
-                                    model.deleteGalleryImage(selectedPosition, currentImage.imageUrl)
+
+                                    model.deleteGalleryImage(
+                                            selectedPosition,
+                                            currentImage.imageUrl
+                                    )
                                 }
+
                             }
                             Log.d(TAG, "Full screen: deleted")
                         }
-
-
                     }
                     R.id.fab_inspect -> {
-                        toast("Inspect action")
                         dismiss()
-                        val bundle = bundleOf("position" to selectedPosition)
-                        navController.navigate(R.id.action_galleryFragment_to_inspectFragment, bundle)
+                        navController.navigate(
+                                R.id.action_galleryFragment_to_inspectFragment,
+                                bundleOf("currentImage" to currentImage)
+                        )
                     }
                     R.id.fab_process -> {
                         if (model.getProcessingStatus() != Status.PROCESSING) {
                             Log.d(TAG, "Status: ${model.getProcessingStatus().name}")
-                            toast("Process action")
                             processImage()
                         } else {
                             toast("Something is processing. Please wait for it to finish")
@@ -197,6 +207,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     private fun processImage() {
         //var image: GalleryImage? = null
         if(ConnectionDetector(requireContext()).connected) {
+            toast("Processing image")
             GlobalScope.launch(Dispatchers.Default + NonCancellable) {
                 model.uploadImage(currentImage, selectedPosition)
             }
@@ -204,6 +215,8 @@ class GalleryFullscreenFragment : DialogFragment() {
             toast("Please connect to the internet")
         }
     }
+
+
     internal fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
         currentImage = model.getGalleryImage(position)
@@ -211,6 +224,8 @@ class GalleryFullscreenFragment : DialogFragment() {
         fileUri = currentImage.imageUrl
         editFloatingActionButton()
     }
+
+
     // viewpager page change listener
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
         object : ViewPager.OnPageChangeListener {

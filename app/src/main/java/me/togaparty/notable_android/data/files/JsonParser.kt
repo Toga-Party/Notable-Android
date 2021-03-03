@@ -12,36 +12,40 @@ private const val NAME = "name"
 private const val DEFINITION = "definition"
 class JsonParser(appContext: Context) {
 	private val context = appContext
-	private val json: JSONObject = JSONObject( try {
-		val inputStream = context.assets?.open("glossary.json")
-		val size = inputStream?.available()
-		val buffer = size?.let { ByteArray(it) }
-		val charset: Charset = Charsets.UTF_8
-		inputStream?.read(buffer)
-		inputStream?.close()
-		buffer?.let { String(it, charset) }?: ""
-	} catch (ex: IOException) {
-		ex.printStackTrace()
-		""
-	})
-	val mapOfTandD: MutableMap<String, String>?
-		get() {
+
+	private val json: JSONObject by lazy {
+		JSONObject(
+			try {
+				val inputStream = context.assets?.open("glossary.json")
+				val size = inputStream?.available()
+				val buffer = size?.let { ByteArray(it) }
+				val charset: Charset = Charsets.UTF_8
+				inputStream?.read(buffer)
+				inputStream?.close()
+				buffer?.let { String(it, charset) }?: ""
+			} catch (ex: IOException) {
+				ex.printStackTrace()
+				""
+			}
+		)
+	}
+	val mapOfTermsAndDef: MutableMap<String, String> by lazy {
 			val map = mutableMapOf<String, String>()
-			val listOfkeys =
+			val listOfKeys =
 				listOf("Lines", "Clefs","Notes", "Rests", "Articulations", "Time Signatures", "Key Signatures")
 
-			listOfkeys.forEach{
+			listOfKeys.forEach{
 				key ->
-				map.putAll(getTermsAndDefinition(key))
+				map += getTermsAndDefinition(key)
 			}
-			return map
+			map
 		}
-	fun getTermsAndDefinition(key: String) :MutableMap<String, String> {
+	private fun getTermsAndDefinition(key: String): MutableMap<String, String> {
 		val map = mutableMapOf<String, String>()
 		val userArray = json.getJSONArray(key)
 		for (i in 0 until userArray.length()) {
 			val termAndDefinition = userArray.getJSONObject(i)
-			map + Pair(
+			map += Pair(
 				termAndDefinition.getString(NAME),
 				termAndDefinition.getString(DEFINITION)
 			)

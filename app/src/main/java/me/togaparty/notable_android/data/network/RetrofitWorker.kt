@@ -26,8 +26,9 @@ class RetrofitWorker(val context: Context) {
             imageUrl = currentImage.imageUrl,
             name = currentImage.name,
         )
-        val retrofit: RetrofitService = RetrofitBuilder.retrofitInstance
+
         val filename = image.name.toRequestBody("text/plain".toMediaTypeOrNull())
+
         var imageToSend: MultipartBody.Part?
         context.contentResolver.openInputStream(image.imageUrl).use { input ->
             val imageType = context.contentResolver.getType(image.imageUrl)
@@ -41,25 +42,30 @@ class RetrofitWorker(val context: Context) {
         }
 
         Log.d(TAG, "Retrofit: Uploading the image")
-
+        val retrofit: RetrofitService = RetrofitBuilder.retrofitInstance
         val response = imageToSend?.let { sendImage ->
+            Log.v(TAG, "Retrofit: Waiting for response")
             retrofit
                 .upload(sendImage, filename)
                 .execute()
         }
+
         if (response != null) {
             if (response.isSuccessful) {
                 Log.v(TAG, "Retrofit: Success response received")
                 ZipInputStream(response.body()?.byteStream()).use { zip ->
                     var entry = zip.nextEntry
+
                     while (entry != null) {
-                        val outputDirectory = MainActivity.externalAppSpecificStorage(context)
+                        val outputDirectory =
+                                MainActivity.externalAppSpecificStorage(context)
 
                         val temp = when (File(entry.name).extension) {
                             "png", "jpg" ->
                                 File(
                                     outputDirectory,
-                                    File(image.name).nameWithoutExtension + separator + "images"
+                                    File(image.name).nameWithoutExtension
+                                            + separator + "images"
                                 )
                                     .apply { mkdirs() }
                             else ->
@@ -75,17 +81,22 @@ class RetrofitWorker(val context: Context) {
 
                         image.processed = true
                         when (send.extension) {
-                            "wav" -> image.addWAVFile(send.nameWithoutExtension, Uri.fromFile(send))
+                            "wav" -> image.addWAVFile(
+                                    send.nameWithoutExtension,
+                                    Uri.fromFile(send))
+
                             "png" -> image.addImageFile(
-                                send.nameWithoutExtension,
-                                Uri.fromFile(send)
-                            )
+                                    send.nameWithoutExtension,
+                                    Uri.fromFile(send))
+
                             "txt" -> image.addTextFile(
-                                send.nameWithoutExtension,
-                                Uri.fromFile(send)
-                            )
+                                    send.nameWithoutExtension,
+                                    Uri.fromFile(send))
                         }
+
+                        Log.d(TAG, "Retrofit: Extracting zip")
                         extractFile(zip, FileOutputStream(send))
+
                         entry = zip.nextEntry
                     }
                 }

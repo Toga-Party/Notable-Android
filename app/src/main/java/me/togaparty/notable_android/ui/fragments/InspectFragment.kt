@@ -3,7 +3,6 @@ package me.togaparty.notable_android.ui.fragments
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaPlayer
-import android.media.MediaPlayer.OnPreparedListener
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,30 +28,52 @@ import me.togaparty.notable_android.data.InspectPrediction
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
 
 
 class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     private lateinit var viewPager: ViewPager
-    private var selectedPosition: Int = 0
-    private var finalPosition: Int = 0
-    internal lateinit var model: ImageListProvider //by activityViewModels()
-    private lateinit var predictionsAdapter: PredictionsAdapter
+
+    internal var selectedPosition: Int = 0
+    internal var finalPosition: Int = 0
+
+    private lateinit var model: ImageListProvider
+
+    internal lateinit var predictionsAdapter: PredictionsAdapter
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
-    private var currentPosition : Int? = null
-    internal lateinit var currentImage: GalleryImage
+
     internal lateinit var rows: ArrayList<InspectPrediction>
-    internal lateinit var mediaPlayer: MediaPlayer
+
+    private lateinit var mediaPlayer: MediaPlayer
+
+    private lateinit var currentImage: GalleryImage
+
     private var wavFiles: Map<String, Uri>? = null
-    private var textFiles: Map<String, Uri>? = null
+    internal var textFiles: Map<String, Uri>? = null
     private var imageFiles: ArrayList<Uri>? = null
-    private var imageMap: Map<String, Uri>? = null
+    internal var imageMap: Map<String, Uri>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         arguments?.let {
-            currentPosition = requireArguments().getInt("position")
+            bundle ->
+            Log.d(TAG, "Inspect: Retrieving Bundle")
+            currentImage = bundle.getParcelable<GalleryImage>("currentImage") as GalleryImage
+            wavFiles = currentImage.wavFiles
+
+            textFiles = currentImage.textFiles
+
+            imageFiles = ArrayList(currentImage.imageFiles.values)
+
+            imageMap = currentImage.imageFiles
+
+            imageFiles?.let {
+                finalPosition = it.size
+            }
+
         }
 
     }
@@ -67,16 +89,6 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         )
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
 
-        currentPosition?.let{
-            currentImage = model.getGalleryImage(it)
-            wavFiles = currentImage.wavFiles
-            textFiles = currentImage.textFiles
-            imageFiles = ArrayList(currentImage.imageFiles.values)
-            imageMap = currentImage.imageFiles
-            imageFiles?.let {
-                finalPosition = it.size
-            }
-        }
         setButtonEvents(view, wavFiles?.get("full_song.wav"))
         // Lookup the recyclerview in activity layout
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
@@ -99,34 +111,37 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     }
     private fun setButtonEvents(view: View, uri: Uri?) {
         val btnPlayFull: Button = view.findViewById(R.id.play_sheet) as Button
-        btnPlayFull.setOnClickListener(View.OnClickListener {
+        btnPlayFull.setOnClickListener {
             try {
                 prepareMediaPlayer(uri)
             } catch (e: Exception) {
-                Log.d("Inspect", e.printStackTrace().toString())
+                Log.d("Inspect", "${e.printStackTrace()}")
             }
-        })
+        }
     }
     private fun prepareMediaPlayer(uri: Uri?){
+
         mediaPlayer = MediaPlayer()
-        mediaPlayer.setOnPreparedListener(OnPreparedListener { mp -> mp.start() })
+        mediaPlayer.setOnPreparedListener { mp -> mp.start() }
         if (uri != null) {
             mediaPlayer.setDataSource(requireContext(), uri)
         }
         mediaPlayer.setOnCompletionListener { mediaPlayer.release() }
         mediaPlayer.prepareAsync()
 
-        mediaPlayer.setOnPreparedListener(OnPreparedListener { mp ->
+        mediaPlayer.setOnPreparedListener { mp ->
             if (!mp.isPlaying) {
                 mp.start()
             }
-        })
+        }
 
     }
     override fun onDestroy() {
         super.onDestroy()
         try {
-            mediaPlayer?.release()
+            if(::mediaPlayer.isInitialized) {
+                mediaPlayer.release()
+            }
         } catch (e: IllegalStateException) {
             // media player is not initialized
         }
@@ -159,6 +174,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         private var count : Int = itemCount
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val layoutInflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
             Log.d("Inspect", "Pager Adapter: $position")
             val view = layoutInflater.inflate(R.layout.fragment_inspect_image, container, false)
 
