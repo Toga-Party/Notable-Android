@@ -2,8 +2,8 @@ package me.togaparty.notable_android.ui.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.MediaPlayer.OnPreparedListener
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -32,8 +32,6 @@ import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import me.togaparty.notable_android.utils.toast
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
@@ -99,37 +97,31 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
-
         return view
     }
     private fun setButtonEvents(view: View, uri: Uri?) {
         val btnPlayFull: Button = view.findViewById(R.id.play_sheet) as Button
         btnPlayFull.setOnClickListener(View.OnClickListener {
             try {
-                if (mediaPlayer.isPlaying) {
-                    mediaPlayer.stop()
-                    mediaPlayer.release()
-                    prepareMediaPlayer(uri)
-                }
-                mediaPlayer.prepare()
-                mediaPlayer.start()
+                prepareMediaPlayer(uri)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.d("Inspect", e.printStackTrace().toString())
             }
         })
     }
     private fun prepareMediaPlayer(uri: Uri?){
-        mediaPlayer = MediaPlayer().apply {
-            setAudioAttributes(
-                    AudioAttributes.Builder()
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .build()
-            )
-            if (uri != null) {
-                mediaPlayer.setDataSource(requireContext(), uri)
-            }
+        mediaPlayer = MediaPlayer()
+        mediaPlayer.setOnPreparedListener(OnPreparedListener { mp -> mp.start() })
+        if (uri != null) {
+            mediaPlayer.setDataSource(requireContext(), uri)
         }
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener(OnPreparedListener { mp ->
+            if(!mp.isPlaying) {
+                mp.start()
+            }
+        })
+
     }
     override fun onDestroy() {
         super.onDestroy()
@@ -137,7 +129,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     }
     override fun onItemClick(position: Int, view: TextView) {
         //Button Click event exposes aligned TextView control
-        toast(view.text.toString() +" $position clicked")
+        toast(view.text.toString() + " $position clicked")
     }
     internal fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)

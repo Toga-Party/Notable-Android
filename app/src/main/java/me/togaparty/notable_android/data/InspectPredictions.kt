@@ -53,13 +53,13 @@ class InspectPrediction(val symbol: String, val in_Glossary: Boolean) {
                     builder.append(',')
                 }
             } catch (e: IOException) {
-                e.printStackTrace()
+                Log.d("Inspect", e.printStackTrace().toString())
             } finally {
                 if (reader != null) {
                     try {
                         reader.close()
                     } catch (e: IOException) {
-                        e.printStackTrace()
+                        Log.d("Inspect", e.printStackTrace().toString())
                     }
                 }
             }
