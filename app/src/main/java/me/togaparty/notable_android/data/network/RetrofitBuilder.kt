@@ -5,15 +5,12 @@ import retrofit2.Retrofit
 
 class RetrofitBuilder {
     companion object {
-        private var retrofitInstance : Retrofit? = null
-        init {
-            retrofitInstance = Retrofit.Builder()
-                    .baseUrl(Constants.URL)
-                    //.addConverterFactory(OkhttpClientBuilder.gsonConverterFactory)
-                    .client(OkhttpClientBuilder.okHttpClient)
-                    .build()
+        val retrofitInstance: RetrofitService by lazy {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(Constants.URL)
+                .client(OkhttpClientBuilder.okHttpClient)
+                .build()
+            retrofit.create(RetrofitService::class.java)
         }
-
-        fun getRetrofit(): Retrofit = retrofitInstance!!
     }
 }

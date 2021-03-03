@@ -44,14 +44,12 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
             when(val returnedValue = retrofitWorker.uploadFile(image)) {
                 is RetrofitWorker.UploadResult.Success -> {
                     returnedImage = returnedValue.retrieved
-                    //result = Result.Success(success = "Upload successful")
                     processingStatus = Status.SUCCESSFUL
                 }
                 is RetrofitWorker.UploadResult.Error -> {
                     message += returnedValue.message
                     Log.e(TAG, message, returnedValue.cause)
                     processingStatus = Status.FAILED
-                    //result = Result.Success(success = "Upload failed: $message")
                 }
             }
         }

@@ -45,7 +45,6 @@ class FileWorker(val context: Context){
 
                 val checkDir = File(outputDirectory, File(name).nameWithoutExtension)
                 if (checkDir.exists()) {
-                    Log.d(TAG, "FileWo44                                                                                                                                                               rker: This is processed")
                     tempImage.processed = true
                     tempImage.addWavFiles(getOtherFiles(checkDir, "wav"))
                     tempImage.addTextFiles(getOtherFiles(checkDir, "txt"))
@@ -170,6 +169,7 @@ class FileWorker(val context: Context){
     private fun getOtherFiles(directory: File, fileType: String) : Map<String, Uri> {
         val listOfFiles = File(directory, fileType).listFiles()
         val map = linkedMapOf<String, Uri>()
+        Log.d(TAG, "$fileType : list of files size: ${listOfFiles.size}")
         listOfFiles?.forEach { map[it.name] = Uri.fromFile(it) }
         return map
     }

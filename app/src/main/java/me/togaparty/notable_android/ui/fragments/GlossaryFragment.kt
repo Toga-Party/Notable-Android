@@ -15,20 +15,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_glossary.*
 import me.togaparty.notable_android.R
+import me.togaparty.notable_android.data.files.JsonParser
 import me.togaparty.notable_android.ui.adapter.CategoryItemAdapter
 import me.togaparty.notable_android.ui.adapter.MainRecyclerAdapter
 import me.togaparty.notable_android.ui.items.AllCategory
 import me.togaparty.notable_android.ui.items.CategoryItem
 import org.json.JSONException
-import org.json.JSONObject
-import java.io.IOException
-import java.nio.charset.Charset
 
 
 class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
     internal var mainRecyclerAdapter: MainRecyclerAdapter? = null
     private lateinit var navController: NavController
     private lateinit var editText: EditText
+    private lateinit var jsonParser: JsonParser
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,6 +36,7 @@ class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
 
         navController = this.findNavController()
 
+        jsonParser = JsonParser.getInstance(requireContext())
         val categoryItemList: MutableList<CategoryItem> = ArrayList()
         val categoryItemList2: MutableList<CategoryItem> = ArrayList()
         val categoryItemList3: MutableList<CategoryItem> = ArrayList()
@@ -46,91 +46,13 @@ class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
         val categoryItemList7: MutableList<CategoryItem> = ArrayList()
 
         try {
-            val obj = JSONObject(loadJSONFromAsset())
-
-            val userArray = obj.getJSONArray("Lines")
-            for (i in 0 until userArray.length()) {
-                val termdefinition = userArray.getJSONObject(i)
-                categoryItemList.add(
-                        CategoryItem(
-                                1, termdefinition.getString("name"), termdefinition.getString(
-                                "definition"
-                        )
-                        )
-                )
-            }
-
-            val userArray2 = obj.getJSONArray("Clefs")
-            for (i in 0 until userArray2.length()) {
-                val termdefinition = userArray2.getJSONObject(i)
-                categoryItemList2.add(
-                        CategoryItem(
-                                2, termdefinition.getString("name"), termdefinition.getString(
-                                "definition"
-                        )
-                        )
-                )
-            }
-
-            val userArray3 = obj.getJSONArray("Notes")
-            for (i in 0 until userArray3.length()) {
-                val termdefinition = userArray3.getJSONObject(i)
-                categoryItemList3.add(
-                        CategoryItem(
-                                3, termdefinition.getString("name"), termdefinition.getString(
-                                "definition"
-                        )
-                        )
-                )
-            }
-
-            val userArray4 = obj.getJSONArray("Rests")
-            for (i in 0 until userArray4.length()) {
-                val termdefinition = userArray4.getJSONObject(i)
-                categoryItemList4.add(
-                        CategoryItem(
-                                4, termdefinition.getString("name"), termdefinition.getString(
-                                "definition"
-                        )
-                        )
-                )
-            }
-
-            val userArray5 = obj.getJSONArray("Articulations")
-            for (i in 0 until userArray5.length()) {
-                val termdefinition = userArray5.getJSONObject(i)
-                categoryItemList5.add(
-                        CategoryItem(
-                                5, termdefinition.getString("name"), termdefinition.getString(
-                                "definition"
-                        )
-                        )
-                )
-            }
-
-            val userArray6 = obj.getJSONArray("Time Signatures")
-            for (i in 0 until userArray6.length()) {
-                val termdefinition = userArray6.getJSONObject(i)
-                categoryItemList6.add(
-                        CategoryItem(
-                                6, termdefinition.getString("name"), termdefinition.getString(
-                                "definition"
-                        )
-                        )
-                )
-            }
-
-            val userArray7 = obj.getJSONArray("Key Signatures")
-            for (i in 0 until userArray7.length()) {
-                val termdefinition = userArray7.getJSONObject(i)
-                categoryItemList7.add(
-                        CategoryItem(
-                                7, termdefinition.getString("name"), termdefinition.getString(
-                                "definition"
-                        )
-                        )
-                )
-            }
+            categoryItemList.addAll(jsonParser.getList("Lines", 1))
+            categoryItemList2.addAll(jsonParser.getList("Clefs", 2))
+            categoryItemList3.addAll(jsonParser.getList("Notes", 3))
+            categoryItemList4.addAll(jsonParser.getList("Rests", 4))
+            categoryItemList5.addAll(jsonParser.getList("Articulations", 5))
+            categoryItemList6.addAll(jsonParser.getList("Time Signatures", 6))
+            categoryItemList7.addAll(jsonParser.getList("Key Signatures", 7))
         }
         catch (e: JSONException) {
             e.printStackTrace()
@@ -172,24 +94,6 @@ class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
         main_recycler!!.layoutManager = layoutManager
         mainRecyclerAdapter = this.context?.let { MainRecyclerAdapter(it, allCategory, this) }
         main_recycler!!.adapter = mainRecyclerAdapter
-    }
-
-    private fun loadJSONFromAsset(): String {
-        val json: String?
-        try {
-            val inputStream = context?.assets?.open("glossary.json")
-            val size = inputStream?.available()
-            val buffer = size?.let { ByteArray(it) }
-            val charset: Charset = Charsets.UTF_8
-            inputStream?.read(buffer)
-            inputStream?.close()
-            json = buffer?.let { String(it, charset) }
-        }
-        catch (ex: IOException) {
-            ex.printStackTrace()
-            return ""
-        }
-        return json!!
     }
 
 
