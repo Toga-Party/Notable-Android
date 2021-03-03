@@ -17,22 +17,22 @@ data class GalleryImage (
     }
     fun addTextFile(name: String, uri: Uri) {
         if (textFiles.isNullOrEmpty()) textFiles = linkedMapOf()
-        textFiles + Pair(name, uri)
+        textFiles += Pair(name, uri)
     }
     fun addWavFiles(map: Map<String, Uri>) {
         if (wavFiles.isNullOrEmpty()) wavFiles = linkedMapOf()
-        wavFiles + map.toMutableMap()
+        wavFiles += map.toMutableMap()
     }
     fun addWAVFile(name: String, uri: Uri) {
         if (wavFiles.isNullOrEmpty()) wavFiles = linkedMapOf()
-        wavFiles + Pair(name, uri)
+        wavFiles += Pair(name, uri)
     }
     fun addImageFiles(map: Map<String, Uri>) {
         if (imageFiles.isNullOrEmpty()) imageFiles = linkedMapOf()
-        imageFiles + map.toMutableMap()
+        imageFiles += map.toMutableMap()
     }
     fun addImageFile(name: String, uri: Uri) {
         if (imageFiles.isNullOrEmpty()) imageFiles = linkedMapOf()
-        imageFiles + Pair(name, uri)
+        imageFiles += Pair(name, uri)
     }
 }
