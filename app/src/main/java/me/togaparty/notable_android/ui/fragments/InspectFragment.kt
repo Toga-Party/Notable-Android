@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,7 +52,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     private lateinit var mediaSegmentPlayer: MediaPlayer
 
     private lateinit var currentImage: GalleryImage
-
+    private var isPlaying: Boolean = false
     private var wavFiles: Map<String, Uri>? = null
     internal var textFiles: Map<String, Uri>? = null
     private var imageFiles: ArrayList<Uri>? = null
@@ -125,19 +126,28 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 button.setOnClickListener {
                     try {
                         prepareMediaPlayer(uri, mediaSheetPlayer)
-                        mediaSheetPlayer.prepareAsync()
+                        if (isPlaying) {
+                            toast("Playback is busy")
+                        } else {
+                            mediaSheetPlayer.prepareAsync()
+                            isPlaying = true
+                        }
                     } catch (e: Exception) {
                         Log.d("Inspect", "${e.printStackTrace()}")
                     }
                 }
             }
             R.id.play_segment -> {
-
                 button.setOnClickListener() {
                     try {
                         uri = wavFiles?.get("staff$selectedPosition")!!
                         prepareMediaPlayer(uri, mediaSegmentPlayer)
-                        mediaSegmentPlayer.prepareAsync()
+                        if (isPlaying) {
+                            toast("Playback is busy")
+                        } else {
+                            mediaSegmentPlayer.prepareAsync()
+                            isPlaying = true
+                        }
                     } catch (e: Exception) {
                         Log.d("Inspect", "${e.printStackTrace()}")
                     }
@@ -150,6 +160,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         if(mediaPlayer.isPlaying) {
             mediaPlayer.pause();
             mediaPlayer.seekTo(0)
+            isPlaying = false
         }else{
             mediaPlayer.reset()
             if (uri != null) {
@@ -161,7 +172,10 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                             .setUsage(AudioAttributes.USAGE_MEDIA)
                             .build()
             )
-            mediaPlayer.setOnCompletionListener { mediaPlayer.reset() }
+            mediaPlayer.setOnCompletionListener {
+                mediaPlayer.reset()
+                isPlaying = false
+            }
             mediaPlayer.setOnPreparedListener { mp ->
                 if (!mp.isPlaying) {
                     mp.start()
