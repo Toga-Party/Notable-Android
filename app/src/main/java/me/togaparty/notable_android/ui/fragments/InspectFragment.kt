@@ -6,11 +6,14 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -21,6 +24,7 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import kotlinx.android.synthetic.main.fragment_inspect.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import kotlinx.coroutines.selects.select
 import me.togaparty.notable_android.R
@@ -50,6 +54,9 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     private lateinit var mediaSheetPlayer: MediaPlayer
     private lateinit var mediaSegmentPlayer: MediaPlayer
+    private lateinit var seekBar: SeekBar
+    private lateinit var progressHandler: Handler
+    private lateinit var runnable: Runnable
 
     private lateinit var currentImage: GalleryImage
     private var isPlaying: Boolean = false
@@ -77,11 +84,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 finalPosition = it.size
             }
         }
-        val keys = ArrayList(wavFiles?.keys)
-        val values = ArrayList(wavFiles?.values)
-        keys.forEach{Log.d("Inspect", "KEY $it")}
-        values.forEach{Log.d("Inspect", "VALUE $it")}
-
+        progressHandler = Handler()
     }
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -97,8 +100,28 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         // Initial setup of mediaplayers to position 0
         val btnPlaySegment: Button = view.findViewById(R.id.play_segment) as Button
         val btnPlaySheet: Button = view.findViewById(R.id.play_sheet) as Button
+        val seekBarHandler = Handler()
+        seekBar = view.findViewById(R.id.seekBar) as SeekBar
+        seekBar.max = 0
         setButtonEvents(view, btnPlaySheet, selectedPosition)
         setButtonEvents(view, btnPlaySegment, selectedPosition)
+        seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser){
+                    if(mediaSegmentPlayer?.isPlaying){
+                        mediaSegmentPlayer?.seekTo(progress)
+                    }else if (mediaSheetPlayer?.isPlaying){
+                        mediaSheetPlayer?.seekTo(progress)
+                    }
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                TODO("Not yet implemented")
+            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                TODO("Not yet implemented")
+            }
+        })
         // Lookup the recyclerview in activity layout
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
@@ -117,6 +140,27 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
         return view
+    }
+    private fun setSeekBar(mediaPlayer: MediaPlayer){
+        val fileDuration = mediaPlayer.duration
+        seekBar.progress = 0
+        seekBar.max = fileDuration / 1000
+        runnable = object : Runnable {
+            override fun run() {
+                try {
+                    seekBar.progress = mediaPlayer.currentPosition / 1000
+                    Log.d("Inspect", "DURATION:" + mediaPlayer.duration.toString())
+                    Log.d("Inspect", "CURRENT:" + mediaPlayer.currentPosition.toString())
+                    Log.d("Inspect", "PROGRESS:" + seekBar.progress.toString())
+                    Log.d("Inspect", "MAX:" + seekBar.max.toString())
+                    seekBar.refreshDrawableState();
+                    progressHandler.postDelayed(this,1000)
+                }catch (e: Exception){
+                    seekBar.progress = 0
+                }
+            }
+        }
+        progressHandler.postDelayed(runnable, 1000)
     }
     private fun setButtonEvents(view: View, button: Button, position: Int) {
         lateinit var uri: Uri
@@ -160,6 +204,9 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         if(mediaPlayer.isPlaying) {
             mediaPlayer.pause();
             mediaPlayer.seekTo(0)
+            progressHandler.removeCallbacks(runnable)
+            seekBar.progress = 0
+            seekBar.max = 0
             isPlaying = false
         }else{
             mediaPlayer.reset()
@@ -174,11 +221,16 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             )
             mediaPlayer.setOnCompletionListener {
                 mediaPlayer.reset()
+                progressHandler.removeCallbacks(runnable)
+                seekBar.progress = 0
+                seekBar.max = 0
+
                 isPlaying = false
             }
             mediaPlayer.setOnPreparedListener { mp ->
                 if (!mp.isPlaying) {
                     mp.start()
+                    setSeekBar(mediaPlayer)
                 }
             }
         }

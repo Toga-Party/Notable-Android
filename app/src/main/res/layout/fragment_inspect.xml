@@ -65,7 +65,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:progressTint="#fa654b"
+                android:progress="0"
+                android:progressDrawable="@drawable/seekbarruler"
+                android:thumb="@drawable/seekbarslider"
+                android:maxHeight="3dp"
+                android:minHeight="3dp"
+                app:layout_constraintBottom_toBottomOf="@+id/recycler_predictions"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/linearLayout3"
