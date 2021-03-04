@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import me.togaparty.notable_android.R
-import me.togaparty.notable_android.data.InspectPrediction
+import me.togaparty.notable_android.data.files.InspectPrediction
 
 
 class PredictionsAdapter(private val predictions: List<InspectPrediction>, private val listener : OnItemClickListener) : RecyclerView.Adapter<PredictionsAdapter.ViewHolder>() {

@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -29,7 +28,6 @@ import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
-import me.togaparty.notable_android.utils.Status
 import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 

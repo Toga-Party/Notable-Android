@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
-import me.togaparty.notable_android.data.InspectPrediction
+import me.togaparty.notable_android.data.files.InspectPrediction
 import me.togaparty.notable_android.data.files.JsonParser
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
@@ -141,7 +141,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
         Log.d("Inspect", "Creating entry at position: $selectedPosition")
-        rows = InspectPrediction.createPredictionList(textFiles, selectedPosition, requireContext())
+        rows = InspectPrediction.createPredictionList(textFiles, selectedPosition)
         // Create adapter passing in the sample data
         predictionsAdapter = PredictionsAdapter(rows, this)
         // Attach the adapter to the recyclerview to populate items
@@ -200,7 +200,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 }
             }
             R.id.play_segment -> {
-                button.setOnClickListener() {
+                button.setOnClickListener {
                     try {
                         uri = wavFiles?.get("staff$selectedPosition")!!
                         prepareMediaPlayer(uri, mediaSegmentPlayer)
@@ -275,7 +275,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 //        }
         //TODO: Proof of concept
         toast(view.text.toString() + " $position clicked")
-        val definition: String? = jsonParser.mapOfTermsAndDef.get("Staff")
+        val definition: String? = jsonParser.mapOfTermsAndDef["Staff"]
         val bundle = bundleOf("term" to view.text.toString(), "definition" to definition)
         navController.navigate(R.id.action_inspectFragment_to_glossaryDefinitionFragment,bundle)
     }
@@ -292,7 +292,12 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 setCurrentItem(position)
                 val uri = wavFiles?.get("staff$position")!!
                 prepareMediaPlayer(uri, mediaSegmentPlayer)
-                InspectPrediction.replacePredictionList(textFiles, selectedPosition, requireContext(), predictionsAdapter, rows)
+                InspectPrediction.replacePredictionList(
+                    textFiles,
+                    selectedPosition,
+                    predictionsAdapter,
+                    rows
+                )
             }
             override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
             }
