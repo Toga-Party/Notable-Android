@@ -125,16 +125,19 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 button.setOnClickListener {
                     try {
                         prepareMediaPlayer(uri, mediaSheetPlayer)
+                        mediaSheetPlayer.prepareAsync()
                     } catch (e: Exception) {
                         Log.d("Inspect", "${e.printStackTrace()}")
                     }
                 }
             }
             R.id.play_segment -> {
-                uri = wavFiles?.get("staff$position")!!
-                button.setOnClickListener {
+
+                button.setOnClickListener() {
                     try {
+                        uri = wavFiles?.get("staff$selectedPosition")!!
                         prepareMediaPlayer(uri, mediaSegmentPlayer)
+                        mediaSegmentPlayer.prepareAsync()
                     } catch (e: Exception) {
                         Log.d("Inspect", "${e.printStackTrace()}")
                     }
@@ -144,7 +147,6 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     }
     private fun prepareMediaPlayer(uri: Uri?, mediaPlayer: MediaPlayer){
-        //mediaPlayer.setOnPreparedListener { mp -> mp.start() }
         if(mediaPlayer.isPlaying) {
             mediaPlayer.pause();
             mediaPlayer.seekTo(0)
@@ -159,13 +161,12 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                             .setUsage(AudioAttributes.USAGE_MEDIA)
                             .build()
             )
-            mediaPlayer.setOnCompletionListener { mediaPlayer.release() }
+            mediaPlayer.setOnCompletionListener { mediaPlayer.reset() }
             mediaPlayer.setOnPreparedListener { mp ->
                 if (!mp.isPlaying) {
                     mp.start()
                 }
             }
-            mediaPlayer.prepareAsync()
         }
     }
     override fun onDestroy() {
@@ -197,6 +198,8 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             override fun onPageSelected(position: Int) {
                 Log.d("Inspect", "Selected: $position Max: $finalPosition")
                 setCurrentItem(position)
+                val uri = wavFiles?.get("staff$position")!!
+                prepareMediaPlayer(uri, mediaSegmentPlayer)
                 InspectPrediction.replacePredictionList(textFiles, selectedPosition, requireContext(), predictionsAdapter, rows)
             }
             override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
