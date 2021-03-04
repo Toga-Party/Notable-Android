@@ -44,6 +44,13 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     }
 
 
+    fun refreshList() {
+        newList.clear()
+        viewModelScope.launch {
+            newList += fileWorker.loadImages()
+        }
+        imageList.value = newList
+    }
 
     suspend fun uploadImage(image: GalleryImage, position: Int)  {
 

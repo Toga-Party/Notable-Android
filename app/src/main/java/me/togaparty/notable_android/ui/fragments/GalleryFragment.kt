@@ -13,35 +13,35 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.item_gallery_image.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
-import me.togaparty.notable_android.utils.Status
+import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
-import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
-import me.togaparty.notable_android.utils.permissionsGranted
-import me.togaparty.notable_android.utils.showFailedDialog
-import me.togaparty.notable_android.utils.showSuccessDialog
 
 
 class GalleryFragment : Fragment(),
-        GalleryImageClickListener {
+        GalleryImageClickListener, SwipeRefreshLayout.OnRefreshListener {
     // Gallery Column Count
     private val spanCount = 2
 
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
-
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit  var model: ImageListProvider// by activityViewModels()
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_gallery, container, false)
@@ -55,28 +55,41 @@ class GalleryFragment : Fragment(),
         }
         // init adapter
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
+
+
         galleryAdapter = GalleryImageAdapter(model.getList().value as MutableList<GalleryImage>)
         galleryAdapter.listener = this
+        swipeRefreshLayout = view.findViewById(R.id.swipeContainer)
 
         model.getList().observe(viewLifecycleOwner, {
             Log.d(TAG, "Gallery: Something changed")
 
             activity?.let {
-                when(model.getProcessingStatus()) {
+                when (model.getProcessingStatus()) {
                     Status.FAILED -> {
                         showFailedDialog("Upload failed", "The upload you sent failed.")
                         model.setProcessingStatus(Status.AVAILABLE)
                     }
-                    Status.SUCCESSFUL->{
-                        showSuccessDialog("Processing finished",
+                    Status.SUCCESSFUL -> {
+                        showSuccessDialog(
+                            "Processing finished",
                             "We have received the response from the server. " +
-                                    "Please check the image you processed earlier to inspect it."){}
+                                    "Please check the image you processed earlier to inspect it."
+                        ) {}
                         model.setProcessingStatus(Status.AVAILABLE)
                     }
 
                     else -> Unit
                 }
             }
+            swipeRefreshLayout.setOnRefreshListener(this)
+            swipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light
+            )
+
             galleryAdapter.notifyDataSetChanged()
         })
         // init recyclerview
@@ -84,7 +97,16 @@ class GalleryFragment : Fragment(),
         recyclerView.adapter = galleryAdapter
     }
 
+    override fun onRefresh() {
 
+        Log.d(TAG, "Gallery: Refreshing list")
+        GlobalScope.launch(Dispatchers.Main) {
+            model.refreshList()
+            galleryAdapter.notifyDataSetChanged()
+        }
+        swipeRefreshLayout.isRefreshing = false
+
+    }
     override fun onClick(position: Int) {
         val bundle = Bundle()
             bundle.putInt("position", position)
@@ -103,17 +125,20 @@ class GalleryFragment : Fragment(),
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             context = parent.context
             val view = LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_gallery_image, parent,
-                    false)
+                R.layout.item_gallery_image, parent,
+                false
+            )
             return ViewHolder(view)
         }
 
         override fun getItemCount(): Int {
             return itemList.size
         }
+
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.bind()
         }
+
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             fun bind() {
                 val image = itemList[adapterPosition]
@@ -142,7 +167,4 @@ class GalleryFragment : Fragment(),
 
         }
     }
-
-    companion object
-
 }

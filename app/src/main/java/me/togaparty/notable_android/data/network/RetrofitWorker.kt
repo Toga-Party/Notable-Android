@@ -80,8 +80,6 @@ class RetrofitWorker(val context: Context) {
                         val send = File(temp, entry.name)
                         Log.d(TAG, "Retrofit: Extracting zip")
                         extractFile(zip, FileOutputStream(send))
-
-                        image.processed = true
                         when (send.extension) {
                             "wav" -> image.addWavFiles(
                                 mapOf(Pair(
@@ -115,7 +113,7 @@ class RetrofitWorker(val context: Context) {
                 throw IOException("Response is empty. Upload failed.")
             }
         }
-        UploadResult.Success(retrieved = image)
+        UploadResult.Success(retrieved = image.apply { processed = true })
     } catch (exe: IOException) {
         UploadResult.Error("Failed to process the response", IOException())
     } catch (exe: ConnectException) {

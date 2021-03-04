@@ -169,14 +169,16 @@ class FileWorker(val context: Context){
     private fun getOtherFiles(directory: File, fileType: String) : Map<String, Uri> {
         val listOfFiles = File(directory, fileType).listFiles()
         val map = linkedMapOf<String, Uri>()
-        listOfFiles?.forEach { map[it.nameWithoutExtension] = Uri.fromFile(it) }
+        listOfFiles?.forEach {
+            Log.d(TAG, "File read type: $fileType, name: ${it.nameWithoutExtension}")
+            map[it.nameWithoutExtension] = Uri.fromFile(it)
+        }
         return map
     }
     private fun contentValues(fileName: String) : ContentValues =
             ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                 put(MediaStore.Images.Media.MIME_TYPE, "image/*")
-
             }
     private fun saveImageOutput(fileUri: Uri, outputStream: OutputStream?) {
 
