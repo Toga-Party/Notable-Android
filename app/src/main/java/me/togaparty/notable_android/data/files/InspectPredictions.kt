@@ -11,7 +11,7 @@ class InspectPrediction(val symbol: String, val in_Glossary: Boolean) {
     companion object {
         fun replacePredictionList(textFiles: Map<String, Uri>?, position: Int, context: Context, predictionsAdapter: PredictionsAdapter, predictionsList: ArrayList<InspectPrediction>) {
 
-            val textFileUri = textFiles?.get("predictions$position.txt")
+            val textFileUri = textFiles?.get("predictions$position")
             val textFile = readTextFile(textFileUri, context)
             predictionsList.clear()
             val list = textFile.split(',')
@@ -36,7 +36,7 @@ class InspectPrediction(val symbol: String, val in_Glossary: Boolean) {
                 Log.d(TAG, "Textfiles is null")
             }
             val predictionsList = ArrayList<InspectPrediction>()
-            val textFileUri = textFiles?.get("predictions$position.txt")
+            val textFileUri = textFiles?.get("predictions$position")
             val textFile = readTextFile(textFileUri, context)
             val list = textFile.split(',')
             for (text in list) {

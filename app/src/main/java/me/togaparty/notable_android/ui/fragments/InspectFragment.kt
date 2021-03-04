@@ -2,6 +2,7 @@ package me.togaparty.notable_android.ui.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -12,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +21,7 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
+import kotlinx.coroutines.selects.select
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
@@ -46,7 +47,8 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     internal lateinit var rows: ArrayList<InspectPrediction>
 
-    private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var mediaSheetPlayer: MediaPlayer
+    private lateinit var mediaSegmentPlayer: MediaPlayer
 
     private lateinit var currentImage: GalleryImage
 
@@ -57,9 +59,9 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            bundle ->
+        mediaSegmentPlayer = MediaPlayer()
+        mediaSheetPlayer = MediaPlayer()
+        arguments?.let { bundle ->
             Log.d(TAG, "Inspect: Retrieving Bundle")
             currentImage = bundle.getParcelable<GalleryImage>("currentImage") as GalleryImage
             wavFiles = currentImage.wavFiles
@@ -73,8 +75,11 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             imageFiles?.let {
                 finalPosition = it.size
             }
-
         }
+        val keys = ArrayList(wavFiles?.keys)
+        val values = ArrayList(wavFiles?.values)
+        keys.forEach{Log.d("Inspect", "KEY $it")}
+        values.forEach{Log.d("Inspect", "VALUE $it")}
 
     }
     override fun onCreateView(
@@ -88,8 +93,11 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 false
         )
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
-
-        setButtonEvents(view, wavFiles?.get("full_song.wav"))
+        // Initial setup of mediaplayers to position 0
+        val btnPlaySegment: Button = view.findViewById(R.id.play_segment) as Button
+        val btnPlaySheet: Button = view.findViewById(R.id.play_sheet) as Button
+        setButtonEvents(view, btnPlaySheet, selectedPosition)
+        setButtonEvents(view, btnPlaySegment, selectedPosition)
         // Lookup the recyclerview in activity layout
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
@@ -109,38 +117,65 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
         return view
     }
-    private fun setButtonEvents(view: View, uri: Uri?) {
-        val btnPlayFull: Button = view.findViewById(R.id.play_sheet) as Button
-        btnPlayFull.setOnClickListener {
-            try {
-                prepareMediaPlayer(uri)
-            } catch (e: Exception) {
-                Log.d("Inspect", "${e.printStackTrace()}")
+    private fun setButtonEvents(view: View, button: Button, position: Int) {
+        lateinit var uri: Uri
+        when (button.id) {
+            R.id.play_sheet -> {
+                uri = wavFiles?.get("full_song")!!
+                button.setOnClickListener {
+                    try {
+                        prepareMediaPlayer(uri, mediaSheetPlayer)
+                    } catch (e: Exception) {
+                        Log.d("Inspect", "${e.printStackTrace()}")
+                    }
+                }
+            }
+            R.id.play_segment -> {
+                uri = wavFiles?.get("staff$position")!!
+                button.setOnClickListener {
+                    try {
+                        prepareMediaPlayer(uri, mediaSegmentPlayer)
+                    } catch (e: Exception) {
+                        Log.d("Inspect", "${e.printStackTrace()}")
+                    }
+                }
             }
         }
+
     }
-    private fun prepareMediaPlayer(uri: Uri?){
-
-        mediaPlayer = MediaPlayer()
-        mediaPlayer.setOnPreparedListener { mp -> mp.start() }
-        if (uri != null) {
-            mediaPlayer.setDataSource(requireContext(), uri)
-        }
-        mediaPlayer.setOnCompletionListener { mediaPlayer.release() }
-        mediaPlayer.prepareAsync()
-
-        mediaPlayer.setOnPreparedListener { mp ->
-            if (!mp.isPlaying) {
-                mp.start()
+    private fun prepareMediaPlayer(uri: Uri?, mediaPlayer: MediaPlayer){
+        //mediaPlayer.setOnPreparedListener { mp -> mp.start() }
+        if(mediaPlayer.isPlaying) {
+            mediaPlayer.pause();
+            mediaPlayer.seekTo(0)
+        }else{
+            mediaPlayer.reset()
+            if (uri != null) {
+                mediaPlayer.setDataSource(requireContext(), uri)
             }
+            mediaPlayer.setAudioAttributes(
+                    AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+            )
+            mediaPlayer.setOnCompletionListener { mediaPlayer.release() }
+            mediaPlayer.setOnPreparedListener { mp ->
+                if (!mp.isPlaying) {
+                    mp.start()
+                }
+            }
+            mediaPlayer.prepareAsync()
         }
-
     }
     override fun onDestroy() {
         super.onDestroy()
         try {
-            if(::mediaPlayer.isInitialized) {
-                mediaPlayer.release()
+            if(::mediaSheetPlayer.isInitialized) {
+                mediaSheetPlayer.release()
+            }
+            if(::mediaSegmentPlayer.isInitialized) {
+                mediaSegmentPlayer.release()
             }
         } catch (e: IllegalStateException) {
             // media player is not initialized
@@ -178,7 +213,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             Log.d("Inspect", "Pager Adapter: $position")
             val view = layoutInflater.inflate(R.layout.fragment_inspect_image, container, false)
 
-            val fileurl = imageMap?.get("slice$position.png")
+            val fileurl = imageMap?.get("slice$position")
             view.inspectImage.tag = fileurl
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
             circularProgressDrawable.strokeWidth = 5f
