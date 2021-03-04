@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -49,7 +50,7 @@ class PreviewImageFragment : Fragment() {
     private lateinit var outputCacheDirectory: File
     private lateinit var navController: NavController
 
-    private lateinit var model: ImageListProvider// by activityViewModels()
+    private lateinit var model: ImageListProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

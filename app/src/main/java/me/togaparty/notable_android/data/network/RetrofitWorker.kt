@@ -61,7 +61,7 @@ class RetrofitWorker(val context: Context) {
                                 MainActivity.externalAppSpecificStorage(context)
 
                         val temp = when (File(entry.name).extension) {
-                            "png", "jpg" ->
+                            "png", "jpg", "jpeg" ->
                                 File(
                                     outputDirectory,
                                     File(image.name).nameWithoutExtension
@@ -78,25 +78,36 @@ class RetrofitWorker(val context: Context) {
                         }
 
                         val send = File(temp, entry.name)
-
-                        image.processed = true
-                        when (send.extension) {
-                            "wav" -> image.addWAVFile(
-                                    send.nameWithoutExtension,
-                                    Uri.fromFile(send))
-
-                            "png" -> image.addImageFile(
-                                    send.nameWithoutExtension,
-                                    Uri.fromFile(send))
-
-                            "txt" -> image.addTextFile(
-                                    send.nameWithoutExtension,
-                                    Uri.fromFile(send))
-                        }
-
                         Log.d(TAG, "Retrofit: Extracting zip")
                         extractFile(zip, FileOutputStream(send))
 
+                        image.processed = true
+                        when (send.extension) {
+                            "wav" -> image.addWavFiles(
+                                mapOf(Pair(
+                                    send.nameWithoutExtension,
+                                    Uri.fromFile(send)
+                                ))
+                            )
+
+                            "png", "jpg", "jpeg" -> image.addImageFiles(
+                                mapOf(
+                                    Pair(
+                                        send.nameWithoutExtension,
+                                        Uri.fromFile(send)
+                                    )
+                                )
+                            )
+
+                            "txt" -> image.addTextFiles(
+                                mapOf(
+                                    Pair(
+                                        send.nameWithoutExtension,
+                                        Uri.fromFile(send)
+                                    )
+                                )
+                            )
+                        }
                         entry = zip.nextEntry
                     }
                 }
