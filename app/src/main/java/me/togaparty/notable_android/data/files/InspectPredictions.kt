@@ -5,7 +5,10 @@ import android.net.Uri
 import android.util.Log
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
-import java.io.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.IOException
+import java.io.InputStreamReader
 
 class InspectPrediction(val symbol: String, val in_Glossary: Boolean) {
     companion object {

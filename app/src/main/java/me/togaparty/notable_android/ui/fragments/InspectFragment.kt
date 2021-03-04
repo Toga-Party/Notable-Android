@@ -14,8 +14,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -27,6 +30,7 @@ import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.data.InspectPrediction
+import me.togaparty.notable_android.data.files.JsonParser
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
@@ -48,6 +52,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     internal lateinit var rows: ArrayList<InspectPrediction>
 
+    private lateinit var jsonParser: JsonParser
     private lateinit var mediaSheetPlayer: MediaPlayer
     private lateinit var mediaSegmentPlayer: MediaPlayer
     private lateinit var seekBar: SeekBar
@@ -60,6 +65,8 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     internal var textFiles: Map<String, Uri>? = null
     private var imageFiles: ArrayList<Uri>? = null
     internal var imageMap: Map<String, Uri>? = null
+
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +87,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 finalPosition = it.size
             }
         }
+        jsonParser = JsonParser.getInstance(requireContext())
         progressHandler = Handler()
     }
     override fun onCreateView(
@@ -93,22 +101,27 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 false
         )
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
+
         // Initial setup of mediaplayers to position 0
         val btnPlaySegment: Button = view.findViewById(R.id.play_segment) as Button
         val btnPlaySheet: Button = view.findViewById(R.id.play_sheet) as Button
+
         val seekBarHandler = Handler()
+
         seekBar = view.findViewById(R.id.seekBar) as SeekBar
         seekBar.max = 0
+
         setButtonEvents(view, btnPlaySheet, selectedPosition)
         setButtonEvents(view, btnPlaySegment, selectedPosition)
+
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             var originalProgress: Int = 0
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    if (mediaSegmentPlayer?.isPlaying) {
-                        mediaSegmentPlayer?.seekTo(progress)
-                    } else if (mediaSheetPlayer?.isPlaying) {
-                        mediaSheetPlayer?.seekTo(progress)
+                    if (mediaSegmentPlayer.isPlaying) {
+                        mediaSegmentPlayer.seekTo(progress)
+                    } else if (mediaSheetPlayer.isPlaying) {
+                        mediaSheetPlayer.seekTo(progress)
                     }
                 }
             }
@@ -141,6 +154,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
+        navController = this.findNavController()
         return view
     }
     private fun setSeekBar(mediaPlayer: MediaPlayer){
@@ -155,7 +169,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                     Log.d("Inspect", "CURRENT:" + mediaPlayer.currentPosition.toString())
                     Log.d("Inspect", "PROGRESS:" + seekBar.progress.toString())
                     Log.d("Inspect", "MAX:" + seekBar.max.toString())
-                    seekBar.refreshDrawableState();
+                    seekBar.refreshDrawableState()
                     progressHandler.postDelayed(this, 1000)
                 }catch (e: Exception){
                     seekBar.progress = 0
@@ -168,6 +182,8 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         lateinit var uri: Uri
         when (button.id) {
             R.id.play_sheet -> {
+                if (wavFiles == null) Log.e(TAG, "THIS IS NULL")
+                Log.d(TAG, "WAVFILE size ${wavFiles?.isEmpty()}")
                 uri = wavFiles?.get("full_song")!!
                 button.setOnClickListener {
                     try {
@@ -204,7 +220,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     }
     private fun prepareMediaPlayer(uri: Uri?, mediaPlayer: MediaPlayer){
         if(mediaPlayer.isPlaying) {
-            mediaPlayer.pause();
+            mediaPlayer.pause()
             mediaPlayer.seekTo(0)
             progressHandler.removeCallbacks(runnable)
             seekBar.progress = 0
@@ -253,7 +269,15 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     }
     override fun onItemClick(position: Int, view: TextView) {
         //Button Click event exposes aligned TextView control
+//        jsonParser.mapOfTermsAndDef.forEach{
+//            (key, value) ->
+//            Log.i(TAG, "Key: $key, Value: $value")
+//        }
+        //TODO: Proof of concept
         toast(view.text.toString() + " $position clicked")
+        val definition: String? = jsonParser.mapOfTermsAndDef.get("Staff")
+        val bundle = bundleOf("term" to view.text.toString(), "definition" to definition)
+        navController.navigate(R.id.action_inspectFragment_to_glossaryDefinitionFragment,bundle)
     }
     internal fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
@@ -286,6 +310,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
             val fileurl = imageMap?.get("slice$position")
             view.inspectImage.tag = fileurl
+
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f

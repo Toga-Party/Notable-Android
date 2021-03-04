@@ -46,6 +46,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     fun refreshList() {
         newList.clear()
+        imageList.value = newList
         viewModelScope.launch {
             newList += fileWorker.loadImages()
         }

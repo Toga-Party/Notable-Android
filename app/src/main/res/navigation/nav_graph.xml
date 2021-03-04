@@ -100,16 +100,9 @@
         android:label="fragment_inspect"
         tools:layout="@layout/fragment_inspect">
         <action
-            android:id="@+id/action_inspectFragment_to_wikiFragment"
-            app:destination="@id/wikiFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
+            android:id="@+id/action_inspectFragment_to_glossaryDefinitionFragment"
+            app:destination="@id/glossaryDefinitionFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/wikiFragment"
-        android:name="me.togaparty.notable_android.ui.fragments.WikiFragment"
-        android:label="fragment_wiki"
-        tools:layout="@layout/fragment_wiki" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="me.togaparty.notable_android.ui.fragments.SettingsFragment"
