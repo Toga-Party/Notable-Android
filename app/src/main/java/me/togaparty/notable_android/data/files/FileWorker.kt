@@ -169,7 +169,7 @@ class FileWorker(val context: Context){
     private fun getOtherFiles(directory: File, fileType: String) : Map<String, Uri> {
         val listOfFiles = File(directory, fileType).listFiles()
         val map = linkedMapOf<String, Uri>()
-        listOfFiles?.forEach { map[it.name] = Uri.fromFile(it) }
+        listOfFiles?.forEach { map[it.nameWithoutExtension] = Uri.fromFile(it) }
         return map
     }
     private fun contentValues(fileName: String) : ContentValues =

@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.togaparty.notable_android.data.files.FileWorker
 import me.togaparty.notable_android.data.network.RetrofitWorker
-import me.togaparty.notable_android.utils.Status
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
+import me.togaparty.notable_android.utils.Status
 
 
 
@@ -67,6 +67,10 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                 }
             }
         }
+
+        Log.d(TAG, "Returned image wavfiles count: ${returnedImage?.wavFiles?.size}")
+        Log.d(TAG, "Returned image textfiles count: ${returnedImage?.textFiles?.size}")
+        Log.d(TAG, "Returned image imagefiles count: ${returnedImage?.imageFiles?.size}")
         value.await()
         returnedImage?.let {
             returned ->
