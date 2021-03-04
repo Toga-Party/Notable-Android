@@ -7,7 +7,6 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,9 +22,7 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.fragment_inspect.*
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
-import kotlinx.coroutines.selects.select
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
@@ -105,21 +101,27 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         seekBar.max = 0
         setButtonEvents(view, btnPlaySheet, selectedPosition)
         setButtonEvents(view, btnPlaySegment, selectedPosition)
-        seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            var originalProgress: Int = 0
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser){
-                    if(mediaSegmentPlayer?.isPlaying){
+                if (fromUser) {
+                    if (mediaSegmentPlayer?.isPlaying) {
                         mediaSegmentPlayer?.seekTo(progress)
-                    }else if (mediaSheetPlayer?.isPlaying){
+                    } else if (mediaSheetPlayer?.isPlaying) {
                         mediaSheetPlayer?.seekTo(progress)
                     }
                 }
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                TODO("Not yet implemented")
+                if (seekBar != null) {
+                    originalProgress = seekBar.progress
+                }
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                TODO("Not yet implemented")
+                if (seekBar != null) {
+                    originalProgress = seekBar.progress
+                }
             }
         })
         // Lookup the recyclerview in activity layout
@@ -154,7 +156,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                     Log.d("Inspect", "PROGRESS:" + seekBar.progress.toString())
                     Log.d("Inspect", "MAX:" + seekBar.max.toString())
                     seekBar.refreshDrawableState();
-                    progressHandler.postDelayed(this,1000)
+                    progressHandler.postDelayed(this, 1000)
                 }catch (e: Exception){
                     seekBar.progress = 0
                 }
