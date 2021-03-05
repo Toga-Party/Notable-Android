@@ -50,6 +50,7 @@ class WikiFragment : Fragment() {
         definition = list[1] as String
         body = list[2] as String
         foot = list[3] as String
+        foot += "\n $term : $note - $duration"
         return inflater.inflate(R.layout.fragment_wiki, container, false)
     }
 
