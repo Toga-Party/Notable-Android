@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -275,9 +274,22 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 //        }
         //TODO: Proof of concept
         toast(view.text.toString() + " $position clicked")
-        val definition: String? = jsonParser.mapOfTermsAndDef["Staff"]
-        val bundle = bundleOf("term" to view.text.toString(), "definition" to definition)
-        navController.navigate(R.id.action_inspectFragment_to_glossaryDefinitionFragment,bundle)
+//        val definition: String? = jsonParser.mapOfTermsAndDef["Staff"]
+//        val bundle = bundleOf("term" to view.text.toString(), "definition" to definition)
+//        navController.navigate(R.id.action_inspectFragment_to_glossaryDefinitionFragment,bundle)
+
+
+        val regexPattern =
+            Regex("(?=.*?-.*?_?.*?)(note|gracenote|rest|multirest|clef|keySignature|timeSignature)[_\\-]?(?:([A-G][b#]?[1-6])|rest)?(\\S*)?")
+
+        val matches = regexPattern.find(view.text.toString())
+        matches?.let {
+            val (term, note, duration) = it.destructured
+            Log.d(TAG, "term catched: $term")
+            Log.d(TAG, "note catched: $note")
+            val replacedDuration = duration.replace(Regex("_\\.*-?"), " ").trim()
+            Log.d(TAG, "duration catched: $replacedDuration")
+        }?: Log.d(TAG, "This term is not matched by regex: ${view.text}")
     }
     internal fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)
