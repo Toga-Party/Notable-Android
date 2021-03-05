@@ -52,6 +52,8 @@
     <string name="save_button">save_button</string>
     <string name="term">Term</string>
     <string name="definition">Definition</string>
+    <string name="notes">Note attributes</string>
+    <string name="duration">Duration</string>
     <string name="wiki">Wiki</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
