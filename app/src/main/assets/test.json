@@ -1,0 +1,12 @@
+{
+  "note": {
+    "name": "note",
+    "definition": "put something here",
+    "type": [
+      "A4",{
+        "name": "A4",
+        "definition": "definition of A4"
+      }
+    ]
+  }
+}

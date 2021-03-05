@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -285,11 +286,16 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         val matches = regexPattern.find(view.text.toString())
         matches?.let {
             val (term, note, duration) = it.destructured
-            Log.d(TAG, "term catched: $term")
-            Log.d(TAG, "note catched: $note")
+            Log.d(TAG, "term caught: $term")
+            Log.d(TAG, "note caught: $note")
             val replacedDuration = duration.replace(Regex("_\\.*-?"), " ").trim()
-            Log.d(TAG, "duration catched: $replacedDuration")
+            Log.d(TAG, "duration caught: $replacedDuration")
+
+            val bundle = bundleOf("term" to term, "note" to note, "duration" to replacedDuration)
+            navController.navigate(R.id.action_inspectFragment_to_wikiFragment, bundle)
         }?: Log.d(TAG, "This term is not matched by regex: ${view.text}")
+        val bundle = bundleOf("term" to view.text, "note" to "", "duration" to "")
+        navController.navigate(R.id.action_inspectFragment_to_wikiFragment)
     }
     internal fun setCurrentItem(position: Int) {
         viewPager.setCurrentItem(position, false)

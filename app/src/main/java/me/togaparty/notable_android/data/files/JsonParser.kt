@@ -29,28 +29,29 @@ class JsonParser(appContext: Context) {
 			}
 		)
 	}
-	val mapOfTermsAndDef: MutableMap<String, String> by lazy {
-			val map = mutableMapOf<String, String>()
-			val listOfKeys =
-				listOf("Lines", "Clefs","Notes", "Rests", "Articulations", "Time Signatures", "Key Signatures")
-
-			listOfKeys.forEach{
-				key ->
-				map += getTermsAndDefinition(key)
+	private val wikijson: JSONObject by lazy {
+		JSONObject(
+			try {
+				val inputStream = context.assets?.open("test.json")
+				val size = inputStream?.available()
+				val buffer = size?.let { ByteArray(it) }
+				val charset: Charset = Charsets.UTF_8
+				inputStream?.read(buffer)
+				inputStream?.close()
+				buffer?.let { String(it, charset) }?: ""
+			} catch (ex: IOException) {
+				ex.printStackTrace()
+				""
 			}
-			map
-		}
-	private fun getTermsAndDefinition(key: String): MutableMap<String, String> {
-		val map = mutableMapOf<String, String>()
-		val userArray = json.getJSONArray(key)
-		for (i in 0 until userArray.length()) {
-			val termAndDefinition = userArray.getJSONObject(i)
-			map += Pair(
-				termAndDefinition.getString(NAME),
-				termAndDefinition.getString(DEFINITION)
-			)
-		}
-		return  map
+		)
+	}
+
+	fun getNoteAndDefinition(key: String) : Pair<String, String> {
+		val jsonObject = wikijson.getJSONObject(key)
+		return Pair (
+			jsonObject.getString(NAME),
+			jsonObject.getString(DEFINITION)
+		)
 	}
 
 
