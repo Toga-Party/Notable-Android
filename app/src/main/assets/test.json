@@ -1,0 +1,37 @@
+{
+  "note": {
+    "name": "Note",
+    "definition": "put something here",
+    "type": [
+      "A4",{
+        "name": "A4",
+        "definition": "definition of A4"
+      }
+    ]
+  },
+  "barline": {
+    "name": "Barline",
+    "definition": "put something here",
+    "type": []
+  },
+  "clef": {
+    "name": "Clef",
+    "definition": "put something here",
+    "type": []
+  },
+  "tie": {
+    "name": "Tie",
+    "definition": "put something here",
+    "type": []
+  },
+  "timeSignature": {
+    "name": "Time Signature",
+    "definition": "put something here",
+    "type": []
+  },
+  "keySignature": {
+    "name": "Key Signature",
+    "definition": "put something here",
+    "type": []
+  }
+}
