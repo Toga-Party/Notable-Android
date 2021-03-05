@@ -1,7 +1,245 @@
 {
+  "gracenote": {
+    "name": "Gracenote: ",
+    "definition": "placeholder",
+    "type": {
+      "A2": {
+        "name": "A2",
+        "definition": "definition of A2"
+      },
+      "A#3": {
+        "name": "A#3",
+        "definition": "definition of A#3"
+      },
+      "A3": {
+        "name": "A3",
+        "definition": "definition of A3"
+      },
+      "A#4": {
+        "name": "A#4",
+        "definition": "definition of A#4"
+      },
+      "A4": {
+        "name": "A4",
+        "definition": "definition of A4"
+      },
+      "A#5": {
+        "name": "A#5",
+        "definition": "definition of A#5"
+      },
+      "A5": {
+        "name": "A5",
+        "definition": "definition of A5"
+      },
+      "Ab3": {
+        "name": "Ab3",
+        "definition": "definition of Ab3"
+      },
+      "Ab4": {
+        "name": "Ab4",
+        "definition": "definition of Ab4"
+      },
+      "Ab5": {
+        "name": "Ab5",
+        "definition": "definition of Ab5"
+      },
+      "B2": {
+        "name": "B2",
+        "definition": "definition of B2"
+      },
+      "B3": {
+        "name": "B3",
+        "definition": "definition of B3"
+      },
+      "B#3": {
+        "name": "B#3",
+        "definition": "definition of B#3"
+      },
+      "B#4": {
+        "name": "B#4",
+        "definition": "definition of B#4"
+      },
+      "B4": {
+        "name": "B4",
+        "definition": "definition of B4"
+      },
+      "B5": {
+        "name": "B5",
+        "definition": "definition of B5"
+      },
+      "Bb3": {
+        "name": "Bb3",
+        "definition": "definition of Bb3"
+      },
+      "Bb4": {
+        "name": "Bb4",
+        "definition": "definition of Bb4"
+      },
+      "Bb5": {
+        "name": "Bb5",
+        "definition": "definition of Bb5"
+      },
+      "C#3": {
+        "name": "C#3",
+        "definition": "definition of C#3"
+      },
+      "C3": {
+        "name": "C3",
+        "definition": "definition of C3"
+      },
+      "C#4": {
+        "name": "C#4",
+        "definition": "definition of C#4"
+      },
+      "C4": {
+        "name": "C4",
+        "definition": "definition of C4"
+      },
+      "C#5": {
+        "name": "C#5",
+        "definition": "definition of C#5"
+      },
+      "C5": {
+        "name": "C5",
+        "definition": "definition of C5"
+      },
+      "Cb5": {
+        "name": "Cb5",
+        "definition": "definition of Cb5"
+      },
+      "D3": {
+        "name": "D3",
+        "definition": "definition of D3"
+      },
+      "D#3": {
+        "name": "D#3",
+        "definition": "definition of D#3"
+      },
+      "D#4": {
+        "name": "D#4",
+        "definition": "definition of D#4"
+      },
+      "D4": {
+        "name": "D4",
+        "definition": "definition of D4"
+      },
+      "D#5": {
+        "name": "D#5",
+        "definition": "definition of D#5"
+      },
+      "D5": {
+        "name": "D5",
+        "definition": "definition of D5"
+      },
+      "Db4": {
+        "name": "Db4",
+        "definition": "definition of Db4"
+      },
+      "Db5": {
+        "name": "Db5",
+        "definition": "definition of Db5"
+      },
+      "E3": {
+        "name": "E3",
+        "definition": "definition of E3"
+      },
+      "E#4": {
+        "name": "E#4",
+        "definition": "definition of E#4"
+      },
+      "E4": {
+        "name": "E4",
+        "definition": "definition of E4"
+      },
+      "E#5": {
+        "name": "E#5",
+        "definition": "definition of E#5"
+      },
+      "E5": {
+        "name": "E5",
+        "definition": "definition of E5"
+      },
+      "Eb3": {
+        "name": "Eb3",
+        "definition": "definition of Eb3"
+      },
+      "Eb4": {
+        "name": "Eb4",
+        "definition": "definition of Eb4"
+      },
+      "Eb5": {
+        "name": "Eb5",
+        "definition": "definition of Eb5"
+      },
+      "F2": {
+        "name": "F2",
+        "definition": "definition of F2"
+      },
+      "F#2": {
+        "name": "F#2",
+        "definition": "definition of F#2"
+      },
+      "F#3": {
+        "name": "F#3",
+        "definition": "definition of F#3"
+      },
+      "F3": {
+        "name": "F3",
+        "definition": "definition of F3"
+      },
+      "F#4": {
+        "name": "F#4",
+        "definition": "definition of F#4"
+      },
+      "F4": {
+        "name": "F4",
+        "definition": "definition of F4"
+      },
+      "F#5": {
+        "name": "F#5",
+        "definition": "definition of F#5"
+      },
+      "F5": {
+        "name": "F5",
+        "definition": "definition of F5"
+      },
+      "G#3": {
+        "name": "G#3",
+        "definition": "definition of G#3"
+      },
+      "G3": {
+        "name": "G3",
+        "definition": "definition of G3"
+      },
+      "G#4": {
+        "name": "G#4",
+        "definition": "definition of G#4"
+      },
+      "G4": {
+        "name": "G4",
+        "definition": "definition of G4"
+      },
+      "G#5": {
+        "name": "G#5",
+        "definition": "definition of G#5"
+      },
+      "G5": {
+        "name": "G5",
+        "definition": "definition of G5"
+      },
+      "Gb4": {
+        "name": "Gb4",
+        "definition": "definition of Gb4"
+      },
+      "Gb5": {
+        "name": "Gb5",
+        "definition": "definition of Gb5"
+      }
+    }
+  },
   "note": {
-    "name": "Note",
-    "definition": "put something here",
+    "name": "Note: ",
+    "definition": "placeholder",
     "type": {
       "A1": {
         "name": "A1",
@@ -30,13 +268,360 @@
       "A#4": {
         "name": "A#4",
         "definition": "definition of A#4"
+      },
+      "A5": {
+        "name": "A5",
+        "definition": "definition of A5"
+      },
+      "A#5": {
+        "name": "A#5",
+        "definition": "definition of A#5"
+      },
+      "Ab2": {
+        "name": "Ab2",
+        "definition": "definition of Ab2"
+      },
+      "Ab3": {
+        "name": "Ab3",
+        "definition": "definition of Ab3"
+      },
+      "Ab4": {
+        "name": "Ab4",
+        "definition": "definition of Ab4"
+      },
+      "Ab5": {
+        "name": "Ab5",
+        "definition": "definition of Ab5"
+      },
+      "B1": {
+        "name": "B1",
+        "definition": "definition of B1"
+      },
+      "B2": {
+        "name": "B2",
+        "definition": "definition of B2"
+      },
+      "B#2": {
+        "name": "B#2",
+        "definition": "definition of B#2"
+      },
+      "B#3": {
+        "name": "B#3",
+        "definition": "definition of B#3"
+      },
+      "B3": {
+        "name": "B3",
+        "definition": "definition of B3"
+      },
+      "B#4": {
+        "name": "B#4",
+        "definition": "definition of B#4"
+      },
+      "B4": {
+        "name": "B4",
+        "definition": "definition of B4"
+      },
+      "B5": {
+        "name": "B5",
+        "definition": "definition of B5"
+      },
+      "B#5": {
+        "name": "B#5",
+        "definition": "definition of B#5"
+      },
+      "Bb1": {
+        "name": "Bb1",
+        "definition": "definition of Bb1"
+      },
+      "Bb2": {
+        "name": "Bb2",
+        "definition": "definition of Bb2"
+      },
+      "Bb3": {
+        "name": "Bb3",
+        "definition": "definition of Bb3"
+      },
+      "Bb4": {
+        "name": "Bb4",
+        "definition": "definition of Bb4"
+      },
+      "Bb5": {
+        "name": "Bb5",
+        "definition": "definition of Bb5"
+      },
+      "C2": {
+        "name": "C2",
+        "definition": "definition of C2"
+      },
+      "C#2": {
+        "name": "C#2",
+        "definition": "definition of C#2"
+      },
+      "C#3": {
+        "name": "C#3",
+        "definition": "definition of C#3"
+      },
+      "C3": {
+        "name": "C3",
+        "definition": "definition of C3"
+      },
+      "C4": {
+        "name": "C4",
+        "definition": "definition of C4"
+      },
+      "C#4": {
+        "name": "C#4",
+        "definition": "definition of C#4"
+      },
+      "C#5": {
+        "name": "C#5",
+        "definition": "definition of C#5"
+      },
+      "C5": {
+        "name": "C5",
+        "definition": "definition of C5"
+      },
+      "C#6": {
+        "name": "C#6",
+        "definition": "definition of C#6"
+      },
+      "C6": {
+        "name": "C6",
+        "definition": "definition of C6"
+      },
+      "Cb3": {
+        "name": "Cb3",
+        "definition": "definition of Cb3"
+      },
+      "Cb4": {
+        "name": "Cb4",
+        "definition": "definition of Cb4"
+      },
+      "Cb5": {
+        "name": "Cb5",
+        "definition": "definition of Cb5"
+      },
+      "Cb6": {
+        "name": "Cb6",
+        "definition": "definition of Cb6"
+      },
+      "D2": {
+        "name": "D2",
+        "definition": "definition of D2"
+      },
+      "D#2": {
+        "name": "D#2",
+        "definition": "definition of D#2"
+      },
+      "D3": {
+        "name": "D3",
+        "definition": "definition of D3"
+      },
+      "D#3": {
+        "name": "D#3",
+        "definition": "definition of D#3"
+      },
+      "D4": {
+        "name": "D4",
+        "definition": "definition of D4"
+      },
+      "D#4": {
+        "name": "D#4",
+        "definition": "definition of D#4"
+      },
+      "D#5": {
+        "name": "D#5",
+        "definition": "definition of D#5"
+      },
+      "D5": {
+        "name": "D5",
+        "definition": "definition of D5"
+      },
+      "D#6": {
+        "name": "D#6",
+        "definition": "definition of D#6"
+      },
+      "D6": {
+        "name": "D6",
+        "definition": "definition of D6"
+      },
+      "Db3": {
+        "name": "Db3",
+        "definition": "definition of Db3"
+      },
+      "Db4": {
+        "name": "Db4",
+        "definition": "definition of Db4"
+      },
+      "Db5": {
+        "name": "Db5",
+        "definition": "definition of Db5"
+      },
+      "Db6": {
+        "name": "Db6",
+        "definition": "definition of Db6"
+      },
+      "E2": {
+        "name": "E2",
+        "definition": "definition of E2"
+      },
+      "E#2": {
+        "name": "E#2",
+        "definition": "definition of E#2"
+      },
+      "E3": {
+        "name": "E3",
+        "definition": "definition of E3"
+      },
+      "E#3": {
+        "name": "E#3",
+        "definition": "definition of E#3"
+      },
+      "E4": {
+        "name": "E4",
+        "definition": "definition of E4"
+      },
+      "E#4": {
+        "name": "E#4",
+        "definition": "definition of E#4"
+      },
+      "E5": {
+        "name": "E5",
+        "definition": "definition of E5"
+      },
+      "E#5": {
+        "name": "E#5",
+        "definition": "definition of E#5"
+      },
+      "E6": {
+        "name": "E6",
+        "definition": "definition of E6"
+      },
+      "E#6": {
+        "name": "E#6",
+        "definition": "definition of E#6"
+      },
+      "Eb2": {
+        "name": "Eb2",
+        "definition": "definition of Eb2"
+      },
+      "Eb3": {
+        "name": "Eb3",
+        "definition": "definition of Eb3"
+      },
+      "Eb4": {
+        "name": "Eb4",
+        "definition": "definition of Eb4"
+      },
+      "Eb5": {
+        "name": "Eb5",
+        "definition": "definition of Eb5"
+      },
+      "Eb6": {
+        "name": "Eb6",
+        "definition": "definition of Eb6"
+      },
+      "F2": {
+        "name": "F2",
+        "definition": "definition of F2"
+      },
+      "F#2": {
+        "name": "F#2",
+        "definition": "definition of F#2"
+      },
+      "F#3": {
+        "name": "F#3",
+        "definition": "definition of F#3"
+      },
+      "F3": {
+        "name": "F3",
+        "definition": "definition of F3"
+      },
+      "F#4": {
+        "name": "F#4",
+        "definition": "definition of F#4"
+      },
+      "F4": {
+        "name": "F4",
+        "definition": "definition of F4"
+      },
+      "F#5": {
+        "name": "F#5",
+        "definition": "definition of F#5"
+      },
+      "F5": {
+        "name": "F5",
+        "definition": "definition of F5"
+      },
+      "F#6": {
+        "name": "F#6",
+        "definition": "definition of F#6"
+      },
+      "F6": {
+        "name": "F6",
+        "definition": "definition of F6"
+      },
+      "Fb3": {
+        "name": "Fb3",
+        "definition": "definition of Fb3"
+      },
+      "Fb4": {
+        "name": "Fb4",
+        "definition": "definition of Fb4"
+      },
+      "Fb5": {
+        "name": "Fb5",
+        "definition": "definition of Fb5"
+      },
+      "G2": {
+        "name": "G2",
+        "definition": "definition of G2"
+      },
+      "G#2": {
+        "name": "G#2",
+        "definition": "definition of G#2"
+      },
+      "G3": {
+        "name": "G3",
+        "definition": "definition of G3"
+      },
+      "G#3": {
+        "name": "G#3",
+        "definition": "definition of G#3"
+      },
+      "G#4": {
+        "name": "G#4",
+        "definition": "definition of G#4"
+      },
+      "G4": {
+        "name": "G4",
+        "definition": "definition of G4"
+      },
+      "G5": {
+        "name": "G5",
+        "definition": "definition of G5"
+      },
+      "G#5": {
+        "name": "G#5",
+        "definition": "definition of G#5"
+      },
+      "Gb2": {
+        "name": "Gb2",
+        "definition": "definition of Gb2"
+      },
+      "Gb3": {
+        "name": "Gb3",
+        "definition": "definition of Gb3"
+      },
+      "Gb4": {
+        "name": "Gb4",
+        "definition": "definition of Gb4"
+      },
+      "Gb5": {
+        "name": "Gb5",
+        "definition": "definition of Gb5"
       }
     }
-  },
-  "gracenote": {
-    "name": "Gracenote",
-    "definition": "put something here",
-    "type": {}
   },
   "rest": {
     "name": "Rest",
