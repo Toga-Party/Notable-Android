@@ -42,8 +42,8 @@ class WikiFragment : Fragment() {
 
         val list = term?.let {
             when(it) {
-                "keySignature", "timeSignature", "rest", "multirest" -> jsonParser.getNoteNameDuration(it, duration?:"")
-                "barline", "tie" -> jsonParser.getNameAndDefinition(it)
+                "keySignature", "timeSignature", "rest" -> jsonParser.getNoteNameDuration(it, duration?:"")
+                "barline", "tie", "multirest" -> jsonParser.getNameAndDefinition(it)
                 else -> jsonParser.getNoteNameDuration(it, note?:"")
             }
         }?: listOf("","","","")

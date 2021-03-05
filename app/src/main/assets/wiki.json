@@ -1,57 +1,57 @@
 {
   "barline": {
-    "name": "Barline: ",
-    "definition": "placeholder"
+    "name": "Bar line: ",
+    "definition": "Divides the staff into short sections called measures or bars; extra ledger lines may be added to show a not that is too high or too low to be on staff"
   },
   "clef": {
-    "name": "clef: ",
-    "definition": "placeholder",
+    "name": "Clef: ",
+    "definition": "It tells you which note (A, B, C, D, E, F or G) is found on each line or space.",
     "type": {
       "C1": {
-        "name": "C1",
-        "definition": "definition of C1"
+        "name": "C1 Clef or the Soprano Clef",
+        "definition": "The symbol settling on the bottom of the five-line stave"
       },
       "C2": {
-        "name": "C2",
-        "definition": "definition of C2"
+        "name": "C2 Clef or Mezzo Soprano Clef",
+        "definition": "The symbol is right above the level of the Soprano Clef sitting on the second to the bottom line of the five-line stave"
       },
       "C3": {
-        "name": "C3",
-        "definition": "definition of C3"
+        "name": "C3 Clef or Alto Clef",
+        "definition": "This marks the middle C as the center of the five-line stave. Used formerly for the alto voice but today it is most commonly found in viola."
       },
       "C4": {
-        "name": "C4",
-        "definition": "definition of C4"
+        "name": "C4 Clef or the Middle 'C'",
+        "definition": "The symbol used for the C-Clef is like a stylized letter B with center part indicating the placement of middle C.  This is also called the Middle C which or more the middle of the range of pitch we use."
       },
       "C5": {
-        "name": "C5",
-        "definition": "definition of C5"
+        "name": "C5 Clef",
+        "definition": "The symbol is considered an alternative for baritone clef, which is placed on the top line of the staff."
       },
       "F3": {
-        "name": "F3",
-        "definition": "definition of F3"
+        "name": "F3 Clef or Baritone Clef",
+        "definition": "The symbol is set below the middle F on the 3rd line of a five line stave."
       },
       "F4": {
-        "name": "F4",
-        "definition": "definition of F4"
+        "name": "F4 Clef or Bass Clef",
+        "definition": "This is also called as the bass clef because it wraps around the highest F note on the bass staff."
       },
       "F5": {
-        "name": "F5",
-        "definition": "definition of F5"
+        "name": "F5 Clef or Sub bass Clef",
+        "definition": "The symbol is placed at the fifth line"
       },
       "G1": {
-        "name": "G1",
-        "definition": "definition of G1"
+        "name": "G1 Clef or French Clef",
+        "definition": "This is known as the French Violin Clef. It sets the position of G above the middle C"
       },
       "G2": {
-        "name": "G2",
-        "definition": "definition of G2"
+        "name": "G2 Clef or Treble Clef",
+        "definition": "The treble clef is also called the G clef. The symbol of a treble clef is a stylized letter G."
       }
     }
   },
   "gracenote": {
-    "name": "gracenote: ",
-    "definition": "placeholder",
+    "name": "Grace note: ",
+    "definition": "Musical note added as an embellishment, printed in small type, not counted in rhythm",
     "type": {
       "A2": {
         "name": "A2",
@@ -288,468 +288,74 @@
     }
   },
   "keySignature": {
-    "name": "keySignature: ",
-    "definition": "placeholder",
+    "name": "Key Signature: ",
+    "definition": "A list of all the sharps and ats in the key that the music is in. Appears at the beginning of the music, and is found in every staff.",
     "type": {
       "AbM": {
         "name": "AbM",
-        "definition": "definition of AbM"
+        "definition": "A flat major"
       },
       "AM": {
         "name": "AM",
-        "definition": "definition of AM"
+        "definition": "A major"
       },
       "BbM": {
         "name": "BbM",
-        "definition": "definition of BbM"
+        "definition": "B flat major"
       },
       "BM": {
         "name": "BM",
-        "definition": "definition of BM"
+        "definition": "B major"
       },
       "CM": {
         "name": "CM",
-        "definition": "definition of CM"
+        "definition": "C major"
       },
       "C#M": {
         "name": "C#M",
-        "definition": "definition of C#M"
+        "definition": "C sharp major"
       },
       "DbM": {
         "name": "DbM",
-        "definition": "definition of DbM"
+        "definition": "D flat major"
       },
       "DM": {
         "name": "DM",
-        "definition": "definition of DM"
+        "definition": "D major"
       },
       "EbM": {
         "name": "EbM",
-        "definition": "definition of EbM"
+        "definition": "E flat major"
       },
       "EM": {
         "name": "EM",
-        "definition": "definition of EM"
+        "definition": "E major"
       },
       "FM": {
         "name": "FM",
-        "definition": "definition of FM"
+        "definition": "F major"
       },
       "F#M": {
         "name": "F#M",
-        "definition": "definition of F#M"
+        "definition": "F sharp major"
       },
       "GbM": {
         "name": "GbM",
-        "definition": "definition of GbM"
+        "definition": "G flat major"
       },
       "GM": {
         "name": "GM",
-        "definition": "definition of GM"
+        "definition": "G major"
       }
     }
   },
   "multirest": {
-    "name": "multirest: ",
-    "definition": "placeholder",
-    "type": {
-      "1": {
-        "name": "1",
-        "definition": "definition of 1"
-      },
-      "2": {
-        "name": "2",
-        "definition": "definition of 2"
-      },
-      "3": {
-        "name": "3",
-        "definition": "definition of 3"
-      },
-      "4": {
-        "name": "4",
-        "definition": "definition of 4"
-      },
-      "5": {
-        "name": "5",
-        "definition": "definition of 5"
-      },
-      "6": {
-        "name": "6",
-        "definition": "definition of 6"
-      },
-      "7": {
-        "name": "7",
-        "definition": "definition of 7"
-      },
-      "8": {
-        "name": "8",
-        "definition": "definition of 8"
-      },
-      "9": {
-        "name": "9",
-        "definition": "definition of 9"
-      },
-      "10": {
-        "name": "10",
-        "definition": "definition of 10"
-      },
-      "11": {
-        "name": "11",
-        "definition": "definition of 11"
-      },
-      "12": {
-        "name": "12",
-        "definition": "definition of 12"
-      },
-      "13": {
-        "name": "13",
-        "definition": "definition of 13"
-      },
-      "14": {
-        "name": "14",
-        "definition": "definition of 14"
-      },
-      "15": {
-        "name": "15",
-        "definition": "definition of 15"
-      },
-      "16": {
-        "name": "16",
-        "definition": "definition of 16"
-      },
-      "17": {
-        "name": "17",
-        "definition": "definition of 17"
-      },
-      "18": {
-        "name": "18",
-        "definition": "definition of 18"
-      },
-      "19": {
-        "name": "19",
-        "definition": "definition of 19"
-      },
-      "20": {
-        "name": "20",
-        "definition": "definition of 20"
-      },
-      "21": {
-        "name": "21",
-        "definition": "definition of 21"
-      },
-      "22": {
-        "name": "22",
-        "definition": "definition of 22"
-      },
-      "23": {
-        "name": "23",
-        "definition": "definition of 23"
-      },
-      "24": {
-        "name": "24",
-        "definition": "definition of 24"
-      },
-      "25": {
-        "name": "25",
-        "definition": "definition of 25"
-      },
-      "26": {
-        "name": "26",
-        "definition": "definition of 26"
-      },
-      "27": {
-        "name": "27",
-        "definition": "definition of 27"
-      },
-      "28": {
-        "name": "28",
-        "definition": "definition of 28"
-      },
-      "29": {
-        "name": "29",
-        "definition": "definition of 29"
-      },
-      "30": {
-        "name": "30",
-        "definition": "definition of 30"
-      },
-      "31": {
-        "name": "31",
-        "definition": "definition of 31"
-      },
-      "32": {
-        "name": "32",
-        "definition": "definition of 32"
-      },
-      "33": {
-        "name": "33",
-        "definition": "definition of 33"
-      },
-      "34": {
-        "name": "34",
-        "definition": "definition of 34"
-      },
-      "35": {
-        "name": "35",
-        "definition": "definition of 35"
-      },
-      "36": {
-        "name": "36",
-        "definition": "definition of 36"
-      },
-      "37": {
-        "name": "37",
-        "definition": "definition of 37"
-      },
-      "38": {
-        "name": "38",
-        "definition": "definition of 38"
-      },
-      "39": {
-        "name": "39",
-        "definition": "definition of 39"
-      },
-      "40": {
-        "name": "40",
-        "definition": "definition of 40"
-      },
-      "41": {
-        "name": "41",
-        "definition": "definition of 41"
-      },
-      "42": {
-        "name": "42",
-        "definition": "definition of 42"
-      },
-      "43": {
-        "name": "43",
-        "definition": "definition of 43"
-      },
-      "44": {
-        "name": "44",
-        "definition": "definition of 44"
-      },
-      "45": {
-        "name": "45",
-        "definition": "definition of 45"
-      },
-      "46": {
-        "name": "46",
-        "definition": "definition of 46"
-      },
-      "47": {
-        "name": "47",
-        "definition": "definition of 47"
-      },
-      "48": {
-        "name": "48",
-        "definition": "definition of 48"
-      },
-      "49": {
-        "name": "49",
-        "definition": "definition of 49"
-      },
-      "50": {
-        "name": "50",
-        "definition": "definition of 50"
-      },
-      "51": {
-        "name": "51",
-        "definition": "definition of 51"
-      },
-      "52": {
-        "name": "52",
-        "definition": "definition of 52"
-      },
-      "53": {
-        "name": "53",
-        "definition": "definition of 53"
-      },
-      "54": {
-        "name": "54",
-        "definition": "definition of 54"
-      },
-      "55": {
-        "name": "55",
-        "definition": "definition of 55"
-      },
-      "56": {
-        "name": "56",
-        "definition": "definition of 56"
-      },
-      "57": {
-        "name": "57",
-        "definition": "definition of 57"
-      },
-      "58": {
-        "name": "58",
-        "definition": "definition of 58"
-      },
-      "59": {
-        "name": "59",
-        "definition": "definition of 59"
-      },
-      "60": {
-        "name": "60",
-        "definition": "definition of 60"
-      },
-      "63": {
-        "name": "63",
-        "definition": "definition of 63"
-      },
-      "64": {
-        "name": "64",
-        "definition": "definition of 64"
-      },
-      "65": {
-        "name": "65",
-        "definition": "definition of 65"
-      },
-      "66": {
-        "name": "66",
-        "definition": "definition of 66"
-      },
-      "67": {
-        "name": "67",
-        "definition": "definition of 67"
-      },
-      "68": {
-        "name": "68",
-        "definition": "definition of 68"
-      },
-      "69": {
-        "name": "69",
-        "definition": "definition of 69"
-      },
-      "70": {
-        "name": "70",
-        "definition": "definition of 70"
-      },
-      "71": {
-        "name": "71",
-        "definition": "definition of 71"
-      },
-      "72": {
-        "name": "72",
-        "definition": "definition of 72"
-      },
-      "73": {
-        "name": "73",
-        "definition": "definition of 73"
-      },
-      "76": {
-        "name": "76",
-        "definition": "definition of 76"
-      },
-      "77": {
-        "name": "77",
-        "definition": "definition of 77"
-      },
-      "79": {
-        "name": "79",
-        "definition": "definition of 79"
-      },
-      "80": {
-        "name": "80",
-        "definition": "definition of 80"
-      },
-      "81": {
-        "name": "81",
-        "definition": "definition of 81"
-      },
-      "88": {
-        "name": "88",
-        "definition": "definition of 88"
-      },
-      "89": {
-        "name": "89",
-        "definition": "definition of 89"
-      },
-      "91": {
-        "name": "91",
-        "definition": "definition of 91"
-      },
-      "94": {
-        "name": "94",
-        "definition": "definition of 94"
-      },
-      "96": {
-        "name": "96",
-        "definition": "definition of 96"
-      },
-      "98": {
-        "name": "98",
-        "definition": "definition of 98"
-      },
-      "99": {
-        "name": "99",
-        "definition": "definition of 99"
-      },
-      "100": {
-        "name": "100",
-        "definition": "definition of 100"
-      },
-      "105": {
-        "name": "105",
-        "definition": "definition of 105"
-      },
-      "107": {
-        "name": "107",
-        "definition": "definition of 107"
-      },
-      "112": {
-        "name": "112",
-        "definition": "definition of 112"
-      },
-      "115": {
-        "name": "115",
-        "definition": "definition of 115"
-      },
-      "119": {
-        "name": "119",
-        "definition": "definition of 119"
-      },
-      "123": {
-        "name": "123",
-        "definition": "definition of 123"
-      },
-      "124": {
-        "name": "124",
-        "definition": "definition of 124"
-      },
-      "126": {
-        "name": "126",
-        "definition": "definition of 126"
-      },
-      "128": {
-        "name": "128",
-        "definition": "definition of 128"
-      },
-      "143": {
-        "name": "143",
-        "definition": "definition of 143"
-      },
-      "164": {
-        "name": "164",
-        "definition": "definition of 164"
-      },
-      "193": {
-        "name": "193",
-        "definition": "definition of 193"
-      },
-      "225": {
-        "name": "225",
-        "definition": "definition of 225"
-      },
-      "1111": {
-        "name": "1111",
-        "definition": "definition of 1111"
-      }
-    }
+    "name": "Multirest: ",
+    "definition": "Rests that last multiple measures"
   },
   "note": {
     "name": "note: ",
-    "definition": "placeholder",
+    "definition": "Silence in music.",
     "type": {
       "A1": {
         "name": "A1",
@@ -1154,7 +760,7 @@
         "definition": "definition of eighth_fermata"
       },
       "eighth._fermata": {
-        "name": "eighth._fermata",
+        "name": "eighth_fermata",
         "definition": "definition of eighth._fermata"
       },
       "half": {
@@ -1237,27 +843,27 @@
   },
   "tie": {
     "name": "Tie: ",
-    "definition": "placeholder"
+    "definition": "Used between two notes of the same pitch; there is no articulation between them, they sound like a single note."
   },
   "timeSignature": {
-    "name": "timeSignature: ",
-    "definition": "placeholder",
+    "name": "Time Signature: ",
+    "definition": "A symbol that tells you the meter of the piece and how (with what type of note it is written; tells two things; how many beats there are in each measure and what type of note gets a beat",
     "type": {
       "11/4": {
         "name": "11/4",
-        "definition": "definition of 11/4"
+        "definition": "11 instances of quarter(4) notes in each bar"
       },
       "1/2": {
         "name": "1/2",
-        "definition": "definition of 1/2"
+        "definition": "12 instances of quarter(4) notes in each bar"
       },
       "12/16": {
         "name": "12/16",
-        "definition": "definition of 12/16"
+        "definition": ""
       },
       "12/4": {
         "name": "12/4",
-        "definition": "definition of 12/4"
+        "definition": "12 instances of quarter(4) notes in each bar"
       },
       "12/8": {
         "name": "12/8",
@@ -1269,23 +875,23 @@
       },
       "2/1": {
         "name": "2/1",
-        "definition": "definition of 2/1"
+        "definition": "2 instances of whole(1) notes in each bar"
       },
       "2/2": {
         "name": "2/2",
-        "definition": "definition of 2/2"
+        "definition": "2 instances of half(2) notes in each bar"
       },
       "2/3": {
         "name": "2/3",
-        "definition": "definition of 2/3"
+        "definition": "one bar consists of two-thirds of a triplet of quarter note"
       },
       "2/4": {
         "name": "2/4",
-        "definition": "definition of 2/4"
+        "definition": "2 instances of quarter(4) notes in each bar"
       },
       "24/16": {
         "name": "24/16",
-        "definition": "definition of 24/16"
+        "definition": "24 instances of semiquaver(16) notes in each bar"
       },
       "2/48": {
         "name": "2/48",
@@ -1293,23 +899,23 @@
       },
       "2/8": {
         "name": "2/8",
-        "definition": "definition of 2/8"
+        "definition": "2 instances of quaver(8) notes in each bar"
       },
       "3/1": {
         "name": "3/1",
-        "definition": "definition of 3/1"
+        "definition": "3 instances of whole(1) notes in each bar"
       },
       "3/2": {
         "name": "3/2",
-        "definition": "definition of 3/2"
+        "definition": "3 instances of half(2) notes in each bar"
       },
       "3/4": {
         "name": "3/4",
-        "definition": "definition of 3/4"
+        "definition": "3 instances of quarter(4) notes in each bar"
       },
       "3/6": {
         "name": "3/6",
-        "definition": "definition of 3/6"
+        "definition": "2 instances of half(2) notes in each bar"
       },
       "3/8": {
         "name": "3/8",
@@ -1389,7 +995,7 @@
       },
       "9/8": {
         "name": "9/8",
-        "definition": "definition of 9/8"
+        "definition": ""
       },
       "C": {
         "name": "C",

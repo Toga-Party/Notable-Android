@@ -1,6 +1,7 @@
 package me.togaparty.notable_android.data.files
 
 import android.content.Context
+import android.util.JsonReader
 import me.togaparty.notable_android.ui.items.CategoryItem
 import me.togaparty.notable_android.utils.SingletonHolder
 import org.json.JSONObject
@@ -32,7 +33,7 @@ class JsonParser(appContext: Context) {
 	private val wikijson: JSONObject by lazy {
 		JSONObject(
 			try {
-				val inputStream = context.assets?.open("test.json")
+				val inputStream = context.assets?.open("wiki.json")
 				val size = inputStream?.available()
 				val buffer = size?.let { ByteArray(it) }
 				val charset: Charset = Charsets.UTF_8
