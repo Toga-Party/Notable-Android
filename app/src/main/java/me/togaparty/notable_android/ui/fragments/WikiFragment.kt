@@ -2,6 +2,7 @@ package me.togaparty.notable_android.ui.fragments
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.files.JsonParser
+import me.togaparty.notable_android.utils.Constants
 
 
 class WikiFragment : Fragment() {
@@ -48,9 +50,11 @@ class WikiFragment : Fragment() {
 
         title = list[0] as String
         definition = list[1] as String
-        body = list[2] as String
+        //body = list[2] as String
         foot = list[3] as String
-        foot += "\n $term : $note - $duration"
+        body = " $note - $duration "
+        foot += "\n $duration"
+        Log.d(Constants.TAG, "$term $note $duration")
         return inflater.inflate(R.layout.fragment_wiki, container, false)
     }
 
