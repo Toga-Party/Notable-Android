@@ -2,6 +2,7 @@ package me.togaparty.notable_android.ui.fragments
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.files.JsonParser
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
 
 class WikiFragment : Fragment() {
@@ -40,6 +42,9 @@ class WikiFragment : Fragment() {
 
         title = list[0] as String
         definition = list[1] as String
+        list.forEach{
+            Log.d(TAG, it.toString())
+        }
         return inflater.inflate(R.layout.fragment_glossary_definition, container, false)
     }
 

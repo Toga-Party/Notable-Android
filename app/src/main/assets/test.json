@@ -2,51 +2,75 @@
   "note": {
     "name": "Note",
     "definition": "put something here",
-    "type": [
-      "A4",{
+    "type": {
+      "A1": {
+        "name": "A1",
+        "definition": "definition of A1"
+      },
+      "A2": {
+        "name": "A2",
+        "definition": "definition of A2"
+      },
+      "A#2": {
+        "name": "A#2",
+        "definition": "definition of A#2"
+      },
+      "A3": {
+        "name": "A3",
+        "definition": "definition of A3"
+      },
+      "A#3": {
+        "name": "A#3",
+        "definition": "definition of A#3"
+      },
+      "A4": {
         "name": "A4",
         "definition": "definition of A4"
+      },
+      "A#4": {
+        "name": "A#4",
+        "definition": "definition of A#4"
       }
-    ]
+    }
   },
   "gracenote": {
     "name": "Gracenote",
     "definition": "put something here",
-    "type": []
+    "type": {}
   },
   "rest": {
     "name": "Rest",
     "definition": "put something here",
-    "type": []
+    "type": {}
   },
   "multirest": {
     "name": "MultiRest",
     "definition": "put something here",
-    "type": []
+    "type": {}
   },
   "barline": {
     "name": "Barline",
     "definition": "put something here",
-    "type": []
+    "type": {}
   },
   "clef": {
     "name": "Clef",
     "definition": "put something here",
-    "type": []
+    "type": {}
   },
   "tie": {
     "name": "Tie",
     "definition": "put something here",
-    "type": []
+    "type": {}
   },
   "timeSignature": {
     "name": "Time Signature",
     "definition": "put something here",
-    "type": []
+    "type": {}
   },
   "keySignature": {
     "name": "Key Signature",
     "definition": "put something here",
-    "type": []
+    "type": {}
   }
 }

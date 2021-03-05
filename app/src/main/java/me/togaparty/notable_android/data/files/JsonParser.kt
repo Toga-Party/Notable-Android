@@ -52,14 +52,16 @@ class JsonParser(appContext: Context) {
 			add(jsonObject.getString(NAME))
 			add(jsonObject.getString(DEFINITION))
 		}
-		jsonObject.getJSONArray("type").run {
+		jsonObject.getJSONObject("type").run {
+			//Log.d(TAG, "return size of this object: ${length()}")
 			if(length() == 0) {
 				mutableList.addAll(listOf("",""))
-			} else {
-				getJSONObject(0).getJSONObject(type).apply{
+			}else {
+				getJSONObject(type).run {
 					mutableList.add(getString(NAME))
 					mutableList.add(getString(DEFINITION))
 				}
+
 			}
 		}
 		return mutableList
