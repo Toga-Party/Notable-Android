@@ -285,17 +285,17 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
         val matches = regexPattern.find(view.text.toString())
         matches?.let {
-            val (term, note, duration) = it.destructured
-            Log.d(TAG, "term caught: $term")
-            Log.d(TAG, "note caught: $note")
-            val replacedDuration = duration.replace(Regex("_\\.*-?"), " ").trim()
+            val (first, second, third) = it.destructured
+            Log.d(TAG, "term caught: $first")
+            Log.d(TAG, "note caught: $second")
+            val replacedDuration = third.replace(Regex("_\\.*-?"), " ").trim()
             Log.d(TAG, "duration caught: $replacedDuration")
 
-            val bundle = bundleOf("term" to term, "note" to note, "duration" to replacedDuration)
+            val bundle = bundleOf("first" to first, "second" to second, "third" to replacedDuration)
             navController.navigate(R.id.action_inspectFragment_to_wikiFragment, bundle)
         }?: run {
             Log.d(TAG, "This term is not matched by regex: ${view.text}")
-            val bundle = bundleOf("term" to view.text.toString(), "note" to "", "duration" to "")
+            val bundle = bundleOf("first" to view.text.toString(), "second" to "", "third" to "")
             navController.navigate(R.id.action_inspectFragment_to_wikiFragment, bundle)
         }
     }

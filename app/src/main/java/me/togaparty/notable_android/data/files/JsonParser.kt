@@ -46,7 +46,7 @@ class JsonParser(appContext: Context) {
 		)
 	}
 
-	fun getNoteAndDefinition(key: String, type: String) : List<Any> {
+	fun getNoteNameDuration(key: String, type: String) : List<Any> {
 		val jsonObject = wikijson.getJSONObject(key)
 		val mutableList = mutableListOf<String>().apply {
 			add(jsonObject.getString(NAME))
@@ -66,7 +66,16 @@ class JsonParser(appContext: Context) {
 		}
 		return mutableList
 	}
-
+	fun getNameAndDefinition(key: String) : List<Any> {
+		val jsonObject = wikijson.getJSONObject(key)
+		val mutableList = mutableListOf<String>().apply {
+			add(jsonObject.getString(NAME))
+			add(jsonObject.getString(DEFINITION))
+			add("")
+			add("")
+		}
+		return mutableList
+	}
 
 	fun getList(key: String, itemID: Int) : MutableList<CategoryItem> {
 		val list = mutableListOf<CategoryItem>()
