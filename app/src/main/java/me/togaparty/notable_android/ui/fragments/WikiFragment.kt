@@ -45,15 +45,23 @@ class WikiFragment : Fragment() {
         list.forEach{
             Log.d(TAG, it.toString())
         }
-        return inflater.inflate(R.layout.fragment_glossary_definition, container, false)
+        return inflater.inflate(R.layout.fragment_wiki, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val definitionTextView: TextView = view.findViewById(R.id.definition_textview)
+
         view.findViewById<TextView>(R.id.term_textview).text = title
+        val definitionTextView: TextView = view.findViewById(R.id.definition_textview)
         definitionTextView.text = definition
         definitionTextView.movementMethod = ScrollingMovementMethod()
+
+        val notesTextView: TextView = view.findViewById(R.id.notes_textview)
+        notesTextView.text = note
+        notesTextView.movementMethod = ScrollingMovementMethod()
+        val durationTextView: TextView = view.findViewById(R.id.duration_textview)
+        durationTextView.text = duration
+        durationTextView.movementMethod = ScrollingMovementMethod()
     }
 
     companion object

@@ -33,20 +33,6 @@
 
     <!-- Preference Titles -->
     <string name="permissions_header">Permissions</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="summary_camera_permission_preference" />
-    <string name="summary_file_storage_permission_preference" />
 
     <string name="camera_button">camera_button</string>
     <string name="save_button">save_button</string>
@@ -55,9 +41,4 @@
     <string name="notes">Note attributes</string>
     <string name="duration">Duration</string>
     <string name="wiki">Wiki</string>
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
 </resources>

@@ -8,7 +8,7 @@
     tools:context="me.togaparty.notable_android.ui.fragments.GlossaryDefinitionFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/wikiLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="36dp"
