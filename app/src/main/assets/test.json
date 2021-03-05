@@ -9,6 +9,21 @@
       }
     ]
   },
+  "gracenote": {
+    "name": "Gracenote",
+    "definition": "put something here",
+    "type": []
+  },
+  "rest": {
+    "name": "Rest",
+    "definition": "put something here",
+    "type": []
+  },
+  "multirest": {
+    "name": "MultiRest",
+    "definition": "put something here",
+    "type": []
+  },
   "barline": {
     "name": "Barline",
     "definition": "put something here",

@@ -34,12 +34,12 @@ class WikiFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val pair = term?.let {
-            jsonParser.getNoteAndDefinition(it)
-        }?: Pair("","")
+        val list = term?.let {
+            jsonParser.getNoteAndDefinition(it, note?:"")
+        }?: listOf("","","","")
 
-        title = pair.first
-        definition = pair.second
+        title = list[0] as String
+        definition = list[1] as String
         return inflater.inflate(R.layout.fragment_glossary_definition, container, false)
     }
 

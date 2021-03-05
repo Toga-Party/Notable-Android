@@ -46,12 +46,23 @@ class JsonParser(appContext: Context) {
 		)
 	}
 
-	fun getNoteAndDefinition(key: String) : Pair<String, String> {
+	fun getNoteAndDefinition(key: String, type: String) : List<Any> {
 		val jsonObject = wikijson.getJSONObject(key)
-		return Pair (
-			jsonObject.getString(NAME),
-			jsonObject.getString(DEFINITION)
-		)
+		val mutableList = mutableListOf<String>().apply {
+			add(jsonObject.getString(NAME))
+			add(jsonObject.getString(DEFINITION))
+		}
+		jsonObject.getJSONArray("type").run {
+			if(length() == 0) {
+				mutableList.addAll(listOf("",""))
+			} else {
+				getJSONObject(0).getJSONObject(type).apply{
+					mutableList.add(getString(NAME))
+					mutableList.add(getString(DEFINITION))
+				}
+			}
+		}
+		return mutableList
 	}
 
 
