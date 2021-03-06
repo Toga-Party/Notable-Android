@@ -740,20 +740,20 @@
     }
   },
   "rest": {
-    "name": "rest: ",
-    "definition": "placeholder",
+    "name": "Rest: ",
+    "definition": "Symbol that indicates intervals of absence of sound in music.",
     "type": {
       "eighth": {
-        "name": "eighth",
-        "definition": "definition of eighth"
+        "name": "Eighth Quaver rest",
+        "definition": "A musical rest corresponding in time value to an eighth note"
       },
       "eighth.": {
-        "name": "eighth.",
-        "definition": "definition of eighth."
+        "name": "Dotted Eighth or Quaver rest",
+        "definition": "A musical rest corresponding in time value to an eighth note and a sixteenth note"
       },
       "eighth..": {
-        "name": "eighth..",
-        "definition": "definition of eighth.."
+        "name": "Double-Dotted Eighth Quaver rest",
+        "definition": "A musical rest corresponding in time value to an eighth note and three-fourths of an eight rest"
       },
       "eighth_fermata": {
         "name": "eighth_fermata",
@@ -764,12 +764,12 @@
         "definition": "definition of eighth._fermata"
       },
       "half": {
-        "name": "half",
-        "definition": "definition of half"
+        "name": "Half Rest",
+        "definition": "A musical rest lasting the length of a half note."
       },
       "half.": {
-        "name": "half.",
-        "definition": "definition of half."
+        "name": "Dotted Half Rest",
+        "definition": "A musical rest lasting the length of a half note and a quarter note."
       },
       "half_fermata": {
         "name": "half_fermata",
@@ -780,20 +780,20 @@
         "definition": "definition of half._fermata"
       },
       "quadruple_whole": {
-        "name": "quadruple_whole",
-        "definition": "definition of quadruple_whole"
+        "name": "Quadruple Whole or Longa Rest",
+        "definition": "Also known as four measure rest, used for long silent passages not divided in bars"
       },
       "quarter": {
-        "name": "quarter",
-        "definition": "definition of quarter"
+        "name": "Quarter Rest or Crotchet rest",
+        "definition": "A musical rest lasting the length of a quarter note."
       },
       "quarter.": {
-        "name": "quarter.",
-        "definition": "definition of quarter."
+        "name": "Dotted Quarter or Crotchet rest.",
+        "definition": "A musical rest lasting the length of a quarter note and an eighth note."
       },
       "quarter..": {
-        "name": "quarter..",
-        "definition": "definition of quarter.."
+        "name": "Double-Dotted Quarter Rest or Crotchet rest",
+        "definition": "A musical rest lasting the length of a quarter note and three-fourths of a quarter note"
       },
       "quarter_fermata": {
         "name": "quarter_fermata",
@@ -808,36 +808,36 @@
         "definition": "definition of quarter.._fermata"
       },
       "sixteenth": {
-        "name": "sixteenth",
-        "definition": "definition of sixteenth"
+        "name": "Sixteenth or Semiquaver rest",
+        "definition": "A musical rest lasting the length of a sixteenth note."
       },
       "sixteenth.": {
-        "name": "sixteenth.",
-        "definition": "definition of sixteenth."
+        "name": "Dotted Sixteenth or Semiquaver rest",
+        "definition": "A musical rest lasting the length of a sixteenth note and a thirty-second note"
       },
       "sixteenth_fermata": {
-        "name": "sixteenth_fermata",
-        "definition": "definition of sixteenth_fermata"
+        "name": "Sixteenth Fermata",
+        "definition": "A fermata located over a whole rest tells you to pause, allowing silence for longer than 4 counts. (or depends on the Time Signature) "
       },
       "sixty_fourth": {
-        "name": "sixty_fourth",
-        "definition": "definition of sixty_fourth"
+        "name": "Sixty-Fourth or Hemidemisemiquaver rest",
+        "definition": "A musical rest lasting the length of a sixty-fourth note or half of thiry-second note"
       },
       "thirty_second": {
-        "name": "thirty_second",
-        "definition": "definition of thirty_second"
+        "name": "Thirty-Second or Demisemiquaver rest",
+        "definition": "A musical rest lasting the length of a thirty-second note."
       },
       "whole": {
-        "name": "whole",
-        "definition": "definition of whole"
+        "name": "Whole or Semibreve rest",
+        "definition": "A musical rest lasting the length of a whole note."
       },
       "whole.": {
-        "name": "whole.",
-        "definition": "definition of whole."
+        "name": "Dotted Whole or Semibreve rest",
+        "definition": "A musical rest lasting the length of a whole note and a half note."
       },
       "whole_fermata": {
-        "name": "whole_fermata",
-        "definition": "definition of whole_fermata"
+        "name": "Whole Fermata",
+        "definition": "A fermata located over a whole rest tells you to pause, allowing silence for longer than 4 counts. (or depends on the Time Signature) "
       }
     }
   },
