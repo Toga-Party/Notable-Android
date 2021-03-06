@@ -5,10 +5,10 @@
     android:id="@+id/glossary"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.DashboardFragment">
+    tools:context="me.togaparty.notable_android.ui.fragments.DashboardFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/wikiLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/bg_menu"
@@ -37,7 +37,7 @@
             android:lineSpacingExtra="10sp"
             android:text="@string/notable"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="35dp"
+            android:textSize="35sp"
             app:layout_constraintBottom_toTopOf="@+id/imageView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.5"

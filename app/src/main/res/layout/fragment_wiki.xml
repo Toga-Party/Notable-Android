@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/yellow"
+    tools:context="me.togaparty.notable_android.ui.fragments.WikiFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/wikiLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/bg_settings"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.9"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.95">
+
+        <TextView
+            android:id="@+id/term_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="152dp"
+            android:fontFamily="@font/amiko_bold"
+            android:text="@string/term"
+            android:textColor="@android:color/primary_text_light"
+            android:textColorHighlight="?android:attr/textColorHighlight"
+            android:textColorHint="?android:attr/textColorHint"
+            android:textColorLink="?android:attr/textColorLink"
+            android:textSize="30sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.049"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/yellow"
+            app:layout_constraintBottom_toTopOf="@+id/definition_textview"
+            app:layout_constraintTop_toBottomOf="@+id/term_textview"
+            tools:layout_editor_absoluteX="4dp" />
+
+        <TextView
+            android:id="@+id/definition_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="22dp"
+            android:fontFamily="@font/amiko"
+            android:maxLines="12"
+            android:padding="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
+            android:scrollbars="vertical"
+            android:shadowColor="@color/cardview_shadow_start_color"
+            android:text="@string/definition"
+            android:textColor="@android:color/primary_text_light"
+            android:textColorHighlight="?android:attr/textColorHighlight"
+            android:textColorHint="?android:attr/textColorHint"
+            android:textColorLink="?android:attr/textColorLink"
+            android:textSize="20sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.115"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/term_textview"
+            app:layout_constraintWidth_default="wrap"
+            app:layout_constraintWidth_max="wrap"
+            app:layout_constraintWidth_min="wrap" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/yellow"
+            android:paddingTop="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/notes_textview"
+            app:layout_constraintTop_toBottomOf="@+id/definition_textview"
+            tools:layout_editor_absoluteX="4dp" />
+
+        <TextView
+            android:id="@+id/notes_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/amiko"
+            android:maxLines="12"
+            android:padding="5dp"
+            android:scrollbars="vertical"
+            android:shadowColor="@color/cardview_shadow_start_color"
+            android:text="@string/notes"
+            android:textColor="@color/black"
+            android:textColorHighlight="?android:attr/textColorHighlight"
+            android:textColorHint="?android:attr/textColorHint"
+            android:textColorLink="?android:attr/textColorLink"
+            android:textSize="30sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.049"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/definition_textview" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/yellow"
+            app:layout_constraintBottom_toTopOf="@+id/duration_textview"
+            app:layout_constraintTop_toBottomOf="@+id/notes_textview"
+            app:layout_constraintVertical_bias="0.104"
+            tools:layout_editor_absoluteX="-40dp" />
+
+        <TextView
+            android:id="@+id/duration_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/amiko"
+            android:maxLines="12"
+            android:padding="5dp"
+            android:scrollbars="vertical"
+            android:shadowColor="@color/cardview_shadow_start_color"
+            android:text="@string/duration"
+            android:textColor="@color/colorPrimaryDark"
+            android:textColorHighlight="?android:attr/textColorHighlight"
+            android:textColorHint="?android:attr/textColorHint"
+            android:textColorLink="?android:attr/textColorLink"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.144"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/notes_textview" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

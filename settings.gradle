@@ -1,3 +1,2 @@
-include ':opencv-lib'
 include ':app'
-rootProject.name = "Notable_OPENCV"
+rootProject.name = "Notable_Android"
