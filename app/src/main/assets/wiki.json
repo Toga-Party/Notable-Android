@@ -1,7 +1,7 @@
 {
   "barline": {
     "name": "Bar line: ",
-    "definition": "Divides the staff into short sections called measures or bars; extra ledger lines may be added to show a not that is too high or too low to be on staff"
+    "definition": "Divides the staff into short sections called measures or bars; extra ledger lines may be added to show a note that is too high or too low to be on staff"
   },
   "clef": {
     "name": "Clef: ",
@@ -354,8 +354,8 @@
     "definition": "Rests that last multiple measures"
   },
   "note": {
-    "name": "note: ",
-    "definition": "Silence in music.",
+    "name": "Note: ",
+    "definition": "This describes the pitch and the duration of a musical sound.",
     "type": {
       "A1": {
         "name": "A1",
