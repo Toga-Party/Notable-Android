@@ -1,7 +1,7 @@
 {
   "barline": {
     "name": "Bar line: ",
-    "definition": "Divides the staff into short sections called measures or bars; extra ledger lines may be added to show a note that is too high or too low to be on staff"
+    "definition": "Divides the staff into short sections called measures or bars;\nextra ledger lines may be added to show a note that is too high or too low on the staff"
   },
   "clef": {
     "name": "Clef: ",
@@ -17,11 +17,11 @@
       },
       "C3": {
         "name": "C3 Clef or Alto Clef",
-        "definition": "This marks the middle C as the center of the five-line stave. Used formerly for the alto voice but today it is most commonly found in viola."
+        "definition": "This marks the middle C as the center of the five-line stave.\n  Used formerly for the alto voice but today it is most commonly found in viola."
       },
       "C4": {
         "name": "C4 Clef or the Middle 'C'",
-        "definition": "The symbol used for the C-Clef is like a stylized letter B with center part indicating the placement of middle C.  This is also called the Middle C which or more the middle of the range of pitch we use."
+        "definition": "The symbol used for the C-Clef is like a stylized letter B with center part indicating the placement of middle C.\n  This is also called the Middle C or the middle of the range of pitch we use."
       },
       "C5": {
         "name": "C5 Clef",
@@ -41,11 +41,11 @@
       },
       "G1": {
         "name": "G1 Clef or French Clef",
-        "definition": "This is known as the French Violin Clef. It sets the position of G above the middle C"
+        "definition": "This is known as the French Violin Clef.\n  It sets the position of G above the middle C"
       },
       "G2": {
         "name": "G2 Clef or Treble Clef",
-        "definition": "The treble clef is also called the G clef. The symbol of a treble clef is a stylized letter G."
+        "definition": "The treble clef is also called the G clef.\n  The symbol of a treble clef is a stylized letter G."
       }
     }
   },
@@ -741,7 +741,7 @@
   },
   "rest": {
     "name": "Rest: ",
-    "definition": "Symbol that indicates intervals of absence of sound in music.",
+    "definition": "Symbol that indicates intervals of absence in sound for music.",
     "type": {
       "eighth": {
         "name": "Eighth Quaver rest",
@@ -757,7 +757,7 @@
       },
       "eighth_fermata": {
         "name": "eighth_fermata",
-        "definition": "definition of eighth_fermata"
+        "definition": "A musical rest corresponding in time value to an eighth note and three-fourths of an eight rest, accented by fermata"
       },
       "eighth._fermata": {
         "name": "eighth_fermata",
@@ -843,7 +843,7 @@
   },
   "tie": {
     "name": "Tie: ",
-    "definition": "Used between two notes of the same pitch; there is no articulation between them, they sound like a single note."
+    "definition": "Used between two notes of the same pitch;\nthere is no articulation between them, they sound like a single note."
   },
   "timeSignature": {
     "name": "Time Signature: ",
@@ -859,7 +859,7 @@
       },
       "12/16": {
         "name": "12/16",
-        "definition": ""
+        "definition": "12 instances of sixteenth(16) notes in each bar"
       },
       "12/4": {
         "name": "12/4",
@@ -867,11 +867,11 @@
       },
       "12/8": {
         "name": "12/8",
-        "definition": "definition of 12/8"
+        "definition": "12 instances of quaver(8) notes in each bar"
       },
       "1/4": {
         "name": "1/4",
-        "definition": "definition of 1/4"
+        "definition": "1 instance of quarter(4) notes in each bar"
       },
       "2/1": {
         "name": "2/1",
@@ -895,7 +895,7 @@
       },
       "2/48": {
         "name": "2/48",
-        "definition": "definition of 2/48"
+        "definition": "one bar consists of two instances of six quaver notes"
       },
       "2/8": {
         "name": "2/8",
@@ -919,91 +919,91 @@
       },
       "3/8": {
         "name": "3/8",
-        "definition": "definition of 3/8"
+        "definition": "3 instances of quaver(8) notes in each bar"
       },
       "4/1": {
         "name": "4/1",
-        "definition": "definition of 4/1"
+        "definition": "4 instances of whole(1) notes in each bar"
       },
       "4/2": {
         "name": "4/2",
-        "definition": "definition of 4/2"
+        "definition": "4 instances of half(2) notes in each bar"
       },
       "4/4": {
         "name": "4/4",
-        "definition": "definition of 4/4"
+        "definition": "4 instances of quarter(4) notes in each bar"
       },
       "4/8": {
         "name": "4/8",
-        "definition": "definition of 4/8"
+        "definition": "4 instances of quaver(8) notes in each bar"
       },
       "5/4": {
         "name": "5/4",
-        "definition": "definition of 5/4"
+        "definition": "5 instances of quarter(4) notes in each bar"
       },
       "5/8": {
         "name": "5/8",
-        "definition": "definition of 5/8"
+        "definition": "5 instances of quaver(8) notes in each bar"
       },
       "6/16": {
         "name": "6/16",
-        "definition": "definition of 6/16"
+        "definition": "2 instances of two quaver(8) notes in each bar"
       },
       "6/2": {
         "name": "6/2",
-        "definition": "definition of 6/2"
+        "definition": "6 instances of half(2) notes in each bar"
       },
       "6/4": {
         "name": "6/4",
-        "definition": "definition of 6/4"
+        "definition": "6 instances of quarter(4) notes in each bar"
       },
       "6/8": {
         "name": "6/8",
-        "definition": "definition of 6/8"
+        "definition": "6 instances of quaver(8) notes in each bar"
       },
       "7/4": {
         "name": "7/4",
-        "definition": "definition of 7/4"
+        "definition": "7 instances of quarter(4) notes in each bar"
       },
       "8/12": {
         "name": "8/12",
-        "definition": "definition of 8/12"
+        "definition": "8 instances of two quarter(4) notes in each bar"
       },
       "8/16": {
         "name": "8/16",
-        "definition": "definition of 8/16"
+        "definition": "8 instances of semiquaver(16) notes in each bar"
       },
       "8/2": {
         "name": "8/2",
-        "definition": "definition of 8/2"
+        "definition": "8 instances of half(2) notes in each bar"
       },
       "8/4": {
         "name": "8/4",
-        "definition": "definition of 8/4"
+        "definition": "8 instances of quarter(4) notes in each bar"
       },
       "8/8": {
         "name": "8/8",
-        "definition": "definition of 8/8"
+        "definition": "8 instances of quaver(8) notes in each bar"
       },
       "9/16": {
         "name": "9/16",
-        "definition": "definition of 9/16"
+        "definition": "9 instances of semiquaver(16) notes in each bar"
       },
       "9/4": {
         "name": "9/4",
-        "definition": "definition of 9/4"
+        "definition": "9 instances of quarter(4) notes in each bar"
       },
       "9/8": {
         "name": "9/8",
-        "definition": ""
+        "definition": "9 instances of quaver(8) notes in each bar"
       },
       "C": {
         "name": "C",
-        "definition": "definition of C"
+        "definition": "Also known as common time – is a musical meter which is the equivalent of 4/4 time "
       },
       "C/": {
         "name": "C/",
-        "definition": "definition of C/"
+        "definition": "Also known as cut time or cut common time – is a musical meter which is the equivalent of 2/2 time "
       }
     }
   }

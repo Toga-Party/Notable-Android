@@ -96,5 +96,4 @@ fun Fragment.showSuccessDialog(
         it.setPositiveButton("Yes") { _, _ ->callback()}
         it.setNegativeButton("No") {_,_ ->}
     }.create().show()
-
 }
