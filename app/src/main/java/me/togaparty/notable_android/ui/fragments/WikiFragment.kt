@@ -12,11 +12,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_wiki.*
+import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.files.JsonParser
 import me.togaparty.notable_android.utils.Constants
-import org.w3c.dom.Text
 
 
 class WikiFragment : Fragment() {
@@ -26,10 +25,9 @@ class WikiFragment : Fragment() {
 
     private var title: String? = null
     private var definition: String? = null
+    private var body: String? = null
 
     private lateinit var coloredFoot: SpannableStringBuilder
-    private var body: String? = null
-    private var foot: String? = null
     private val jsonParser by lazy { JsonParser.getInstance(requireContext()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,16 +43,24 @@ class WikiFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
+
         val list = term?.let {
+
             when (it) {
-                "keySignature", "timeSignature", "rest" -> jsonParser.getNoteNameDuration(it, duration
-                        ?: "")
-                "barline", "tie", "multirest" -> jsonParser.getNameAndDefinition(it)
-                else -> jsonParser.getNoteNameDuration(it, note ?: "")
+                "keySignature", "timeSignature", "rest" ->
+                    jsonParser.getNoteNameDuration(it, duration?: "")
+                "barline", "tie", "multirest" ->
+                    jsonParser.getNameAndDefinition(it)
+                else ->
+                    jsonParser.getNoteNameDuration(it, note ?: "")
             }
         } ?: listOf("", "", "", "")
+
         setFormattedText(list)
-        Log.d(Constants.TAG, "$term $note $duration")
+
+        if(BuildConfig.DEBUG) {
+            Log.d(Constants.TAG, "$term $note $duration")
+        }
         return inflater.inflate(R.layout.fragment_wiki, container, false)
     }
     private fun setFormattedText(list: List<Any>){
@@ -62,14 +68,15 @@ class WikiFragment : Fragment() {
         title = list[0] as String
         definition = list[1] as String
         body = if (note.isNullOrBlank() && duration.isNullOrBlank()) {
-            ""
-        } else if (duration.isNullOrBlank()) {
-            "Attribute: $note"
-        } else if (note.isNullOrBlank()) {
-            "Attribute: $duration "
-        } else {
-            "$note : $duration"
-        }
+                    ""
+                } else if (duration.isNullOrBlank()) {
+                    "Attribute: $note"
+                } else if (note.isNullOrBlank()) {
+                    "Attribute: $duration "
+                } else {
+                    "$note : $duration"
+                }
+
         if (!body.isNullOrBlank()) {
             val part1 = "Additional Information:\n"
             var part2 = "• " + list[3] as String + "\n"
@@ -110,7 +117,8 @@ class WikiFragment : Fragment() {
     }
 
     companion object {
-        val durationRef = mapOf(
+        val durationRef: Map<String, Double> by lazy {
+            mapOf(
                 "double" to 4.0,
                 "double." to 6.0,
                 "double.." to 7.0,
@@ -137,6 +145,8 @@ class WikiFragment : Fragment() {
                 "sixty_fourth.." to .035,
                 "hundred_twenty_eighth" to .01,
                 "hundred_twenty_eighth." to .015,
-                "hundred_twenty_eighth.." to .017)
+                "hundred_twenty_eighth.." to .017
+            )
+        }
     }
 }

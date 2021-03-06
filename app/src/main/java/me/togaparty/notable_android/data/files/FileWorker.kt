@@ -1,6 +1,5 @@
 package me.togaparty.notable_android.data.files
 
-import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -14,6 +13,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
+import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
@@ -25,7 +25,7 @@ import java.io.OutputStream
 
 class FileWorker(val context: Context){
 
-    @SuppressLint("Recycle")
+
     fun loadImages():  ArrayList<GalleryImage> {
         val imageList = arrayListOf<GalleryImage>()
 
@@ -81,7 +81,6 @@ class FileWorker(val context: Context){
                 put(MediaStore.Images.Media.IS_PENDING, true)
             }
             // RELATIVE_PATH and IS_PENDING are introduced in API 29.
-
             val imageUri: Uri? =
                 context.contentResolver.insert(
                     MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
@@ -170,7 +169,9 @@ class FileWorker(val context: Context){
         val listOfFiles = File(directory, fileType).listFiles()
         val map = linkedMapOf<String, Uri>()
         listOfFiles?.forEach {
-            Log.d(TAG, "File read type: $fileType, name: ${it.nameWithoutExtension}")
+            if(BuildConfig.DEBUG) {
+                Log.d(TAG, "File read type: $fileType, name: ${it.nameWithoutExtension}")
+            }
             map[it.nameWithoutExtension] = Uri.fromFile(it)
         }
         return map

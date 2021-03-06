@@ -14,13 +14,13 @@ import me.togaparty.notable_android.ui.items.AllCategory
 import me.togaparty.notable_android.ui.items.CategoryItem
 import java.util.*
 
-class MainRecyclerAdapter(private val context: Context,
-                          private var allCategory: List<AllCategory>,
-                          private val listener: OnItemClickListener
-) :
-    RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>(), Filterable {
-    var allCategoryUnmutable: List<AllCategory> = allCategory.map { it.copy() }
+class MainRecyclerAdapter(
+    private val context: Context,
+    private var allCategory: List<AllCategory>,
+    private val listener: OnItemClickListener
+): RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>(), Filterable {
 
+    var allCategoryImmutable: List<AllCategory> = allCategory.map { it.copy() }
 
     private var itemRecyclerAdapter: CategoryItemAdapter? = null
 
@@ -56,6 +56,7 @@ class MainRecyclerAdapter(private val context: Context,
 
     override fun getFilter(): Filter {
         return object : Filter() {
+
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(charSequence: CharSequence?, filterResults: FilterResults) {
                 allCategory = filterResults.values as List<AllCategory>
@@ -66,7 +67,7 @@ class MainRecyclerAdapter(private val context: Context,
                 val queryString = charSequence?.toString()?.toLowerCase(Locale.ROOT)
                 val filterResults = FilterResults()
 
-                val allCategoryFull: List<AllCategory> = allCategoryUnmutable.map { it.copy() }
+                val allCategoryFull: List<AllCategory> = allCategoryImmutable.map { it.copy() }
 
                 if (queryString==null || queryString.isEmpty()){
                     filterResults.values = allCategoryFull

@@ -29,8 +29,11 @@ import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
 
-class GalleryFragment : Fragment(),
-        GalleryImageClickListener, SwipeRefreshLayout.OnRefreshListener {
+class GalleryFragment:
+    Fragment(),
+    GalleryImageClickListener,
+    SwipeRefreshLayout.OnRefreshListener
+{
     // Gallery Column Count
     private val spanCount = 2
 
@@ -55,7 +58,6 @@ class GalleryFragment : Fragment(),
         }
         // init adapter
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
-
 
         galleryAdapter = GalleryImageAdapter(model.getList().value as MutableList<GalleryImage>)
         galleryAdapter.listener = this

@@ -8,7 +8,7 @@ class RetrofitBuilder {
         val retrofitInstance: RetrofitService by lazy {
             val retrofit = Retrofit.Builder()
                 .baseUrl(Constants.URL)
-                .client(OkhttpClientBuilder.okHttpClient)
+                .client(OkHttpClientBuilder.okHttpClient)
                 .build()
             retrofit.create(RetrofitService::class.java)
         }

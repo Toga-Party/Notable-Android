@@ -1,44 +1,58 @@
 <resources>
-    <string name="app_name">Notable!</string>
-    <string name="button_send">Take Photo</string>
+    <!--Notable-->
+    <string name="notable">Notable!</string>
+
+    <!--Camera-->
     <string name="preview_image">Preview Image</string>
+    <string name="camera_button">camera_button</string>
+    <string name="save_button">save_button</string>
+
+    <!--Dashboard-->
     <string name="gallery">Gallery</string>
     <string name="scan">Scan</string>
-    <string name="notable">Notable!</string>
-    <string name="music_note">Music Note</string>
     <string name="camera_icon">Camera Icon</string>
     <string name="files_icon">Files Icon</string>
     <string name="settings">Settings</string>
     <string name="settings_icon">Settings Icon</string>
+    <string name="music_note">Music Note</string>
     <string name="glossary">Glossary</string>
     <string name="book_icon">Book Icon</string>
+
+    <!--Preview Image-->
     <string name="retake">Retake</string>
     <string name="crop">Crop</string>
-    <string name="process">Process</string>
-    <string name="textview">TextView</string>
-    <string name="image_gallery">Image Gallery</string>
-    <string name="search_words">Search Words…</string>
-    <string name="imageview3">ImageView3</string>
-    <string name="wikitest">Welcome to Wiki</string>
-    <!-- Gallery FAB -->
+
+
+    <!--Gallery Fullscreen-->
+    <string name="show_image_in_gallery">Show Image in Gallery</string>
     <string name="delete"> Delete Image</string>
     <string name="inspect">Inspect Music</string>
     <string name="process_music">Process Music</string>
-    <!-- Inspect Buttons -->
+    <string name="fullscreen_image_of_gallery_item">Fullscreen Image of Gallery Item</string>
+
+    <!--Gallery-->
+    <string name="image_gallery">Image Gallery</string>
+    <string name="gallery_item_image">Gallery Item Image</string>
+
+    <!--Glossary-->
+    <string name="search_words">Search Words…</string>
+
+    <!--Inspect-->
     <string name="play_segment">Play Shown</string>
     <string name="play_sheet">Play Sheet</string>
     <string name="review">Review</string>
+    <string name="image_banner">Image Banner</string>
+    <string name="musicsheets">musicsheets</string>
 
-    <string name="title_activity_settings">Notable Settings</string>
+    <!--Wiki-->
+    <string name="notes">Note attributes</string>
+    <string name="duration">Duration</string>
+    <string name="definition">Definition</string>
+    <string name="term">Term</string>
 
     <!-- Preference Titles -->
     <string name="permissions_header">Permissions</string>
 
-    <string name="camera_button">camera_button</string>
-    <string name="save_button">save_button</string>
-    <string name="term">Term</string>
-    <string name="definition">Definition</string>
-    <string name="notes">Note attributes</string>
-    <string name="duration">Duration</string>
-    <string name="wiki">Wiki</string>
+    <!--Misc-->
+    <string name="textview">TextView</string>
 </resources>

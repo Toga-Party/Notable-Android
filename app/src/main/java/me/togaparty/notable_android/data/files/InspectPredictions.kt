@@ -42,6 +42,6 @@ class InspectPrediction(val symbol: String, val in_Glossary: Boolean) {
         }
 
         private fun readTextFile(uri: Uri): List<String> =
-            File(uri.path).useLines { it.toSortedSet().toList() }
+            File(uri.path!!).useLines { it.toSortedSet().toList() }
     }
 }

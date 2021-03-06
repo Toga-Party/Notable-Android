@@ -1,12 +1,12 @@
 package me.togaparty.notable_android.ui.fragments
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +26,7 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
+import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
@@ -53,15 +54,15 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
     internal lateinit var rows: ArrayList<InspectPrediction>
 
     private lateinit var jsonParser: JsonParser
-    private lateinit var mediaSheetPlayer: MediaPlayer
-    private lateinit var mediaSegmentPlayer: MediaPlayer
-    private lateinit var seekBar: SeekBar
-    private lateinit var progressHandler: Handler
+    internal lateinit var mediaSheetPlayer: MediaPlayer
+    internal lateinit var mediaSegmentPlayer: MediaPlayer
+    internal lateinit var seekBar: SeekBar
+    internal lateinit var progressHandler: Handler
     private lateinit var runnable: Runnable
 
     private lateinit var currentImage: GalleryImage
     private var isPlaying: Boolean = false
-    private var wavFiles: Map<String, Uri>? = null
+    internal var wavFiles: Map<String, Uri>? = null
     internal var textFiles: Map<String, Uri>? = null
     private var imageFiles: ArrayList<Uri>? = null
     internal var imageMap: Map<String, Uri>? = null
@@ -88,7 +89,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             }
         }
         jsonParser = JsonParser.getInstance(requireContext())
-        progressHandler = Handler()
+        progressHandler = Handler(Looper.getMainLooper())
     }
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -102,17 +103,15 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         )
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
 
-        // Initial setup of mediaplayers to position 0
+        // Initial setup of media players to position 0
         val btnPlaySegment: Button = view.findViewById(R.id.play_segment) as Button
         val btnPlaySheet: Button = view.findViewById(R.id.play_sheet) as Button
-
-        val seekBarHandler = Handler()
 
         seekBar = view.findViewById(R.id.seekBar) as SeekBar
         seekBar.max = 0
 
-        setButtonEvents(view, btnPlaySheet, selectedPosition)
-        setButtonEvents(view, btnPlaySegment, selectedPosition)
+        setButtonEvents(btnPlaySheet)
+        setButtonEvents(btnPlaySegment)
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             var originalProgress: Int = 0
@@ -140,7 +139,9 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         // Lookup the recyclerview in activity layout
         val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
         // Initialize predictions
-        Log.d("Inspect", "Creating entry at position: $selectedPosition")
+        if(BuildConfig.DEBUG) {
+            Log.d("Inspect", "Creating entry at position: $selectedPosition")
+        }
         rows = InspectPrediction.createPredictionList(textFiles, selectedPosition)
         // Create adapter passing in the sample data
         predictionsAdapter = PredictionsAdapter(rows, this)
@@ -165,10 +166,12 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             override fun run() {
                 try {
                     seekBar.progress = mediaPlayer.currentPosition / 1000
-                    Log.d("Inspect", "DURATION:" + mediaPlayer.duration.toString())
-                    Log.d("Inspect", "CURRENT:" + mediaPlayer.currentPosition.toString())
-                    Log.d("Inspect", "PROGRESS:" + seekBar.progress.toString())
-                    Log.d("Inspect", "MAX:" + seekBar.max.toString())
+                    if(BuildConfig.DEBUG) {
+                        Log.d("Inspect", "DURATION:" + mediaPlayer.duration.toString())
+                        Log.d("Inspect", "CURRENT:" + mediaPlayer.currentPosition.toString())
+                        Log.d("Inspect", "PROGRESS:" + seekBar.progress.toString())
+                        Log.d("Inspect", "MAX:" + seekBar.max.toString())
+                    }
                     seekBar.refreshDrawableState()
                     progressHandler.postDelayed(this, 1000)
                 }catch (e: Exception){
@@ -178,12 +181,14 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         }
         progressHandler.postDelayed(runnable, 1000)
     }
-    private fun setButtonEvents(view: View, button: Button, position: Int) {
+    private fun setButtonEvents(button: Button) {
         lateinit var uri: Uri
         when (button.id) {
             R.id.play_sheet -> {
                 if (wavFiles == null) Log.e(TAG, "THIS IS NULL")
-                Log.d(TAG, "WAVFILE size ${wavFiles?.isEmpty()}")
+                if(BuildConfig.DEBUG) {
+                    Log.d(TAG, "WAVFILE size ${wavFiles?.isEmpty()}")
+                }
                 uri = wavFiles?.get("full_song")!!
                 button.setOnClickListener {
                     try {
@@ -195,7 +200,11 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                             isPlaying = true
                         }
                     } catch (e: Exception) {
-                        Log.d("Inspect", "${e.printStackTrace()}")
+                        if(BuildConfig.DEBUG) {
+                            Log.d("Inspect", "${e.printStackTrace()}")
+                        } else {
+                            e.printStackTrace()
+                        }
                     }
                 }
             }
@@ -211,14 +220,18 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                             isPlaying = true
                         }
                     } catch (e: Exception) {
-                        Log.d("Inspect", "${e.printStackTrace()}")
+                        if(BuildConfig.DEBUG) {
+                            Log.d("Inspect", "${e.printStackTrace()}")
+                        } else {
+                            e.printStackTrace()
+                        }
                     }
                 }
             }
         }
 
     }
-    private fun prepareMediaPlayer(uri: Uri?, mediaPlayer: MediaPlayer){
+    internal fun prepareMediaPlayer(uri: Uri?, mediaPlayer: MediaPlayer){
         if(mediaPlayer.isPlaying) {
             mediaPlayer.pause()
             mediaPlayer.seekTo(0)
@@ -268,33 +281,17 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     }
     override fun onItemClick(position: Int, view: TextView) {
-        //Button Click event exposes aligned TextView control
-//        jsonParser.mapOfTermsAndDef.forEach{
-//            (key, value) ->
-//            Log.i(TAG, "Key: $key, Value: $value")
-//        }
-        //TODO: Proof of concept
-        toast(view.text.toString() + " $position clicked")
-//        val definition: String? = jsonParser.mapOfTermsAndDef["Staff"]
-//        val bundle = bundleOf("term" to view.text.toString(), "definition" to definition)
-//        navController.navigate(R.id.action_inspectFragment_to_glossaryDefinitionFragment,bundle)
-
-
         val regexPattern =
             Regex("(?=.*?-.*?_?.*?)(note|gracenote|rest|multirest|clef|keySignature|timeSignature)[_\\-]?(?:([A-G][b#]?[1-6])|rest)?(\\S*)?")
 
         val matches = regexPattern.find(view.text.toString())
         matches?.let {
             val (first, second, third) = it.destructured
-            Log.d(TAG, "term caught: $first")
-            Log.d(TAG, "note caught: $second")
             val replacedDuration = third.replace(Regex("_\\.*-?"), " ").trim()
-            Log.d(TAG, "duration caught: $replacedDuration")
 
             val bundle = bundleOf("first" to first, "second" to second, "third" to replacedDuration)
             navController.navigate(R.id.action_inspectFragment_to_wikiFragment, bundle)
         }?: run {
-            Log.d(TAG, "This term is not matched by regex: ${view.text}")
             val bundle = bundleOf("first" to view.text.toString(), "second" to "", "third" to "")
             navController.navigate(R.id.action_inspectFragment_to_wikiFragment, bundle)
         }
@@ -306,9 +303,11 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
         object : ViewPager.OnPageChangeListener {
-            @SuppressLint("LogConditional")
+
             override fun onPageSelected(position: Int) {
-                Log.d("Inspect", "Selected: $position Max: $finalPosition")
+                if(BuildConfig.DEBUG) {
+                    Log.d("Inspect", "Selected: $position Max: $finalPosition")
+                }
                 setCurrentItem(position)
                 val uri = wavFiles?.get("staff$position")!!
                 prepareMediaPlayer(uri, mediaSegmentPlayer)
@@ -329,8 +328,10 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         private var count : Int = itemCount
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val layoutInflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            if(BuildConfig.DEBUG) {
+                Log.d("Inspect", "Pager Adapter: $position")
+            }
 
-            Log.d("Inspect", "Pager Adapter: $position")
             val view = layoutInflater.inflate(R.layout.fragment_inspect_image, container, false)
 
             val fileurl = imageMap?.get("slice$position")

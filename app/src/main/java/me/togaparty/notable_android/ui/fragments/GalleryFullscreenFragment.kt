@@ -1,6 +1,5 @@
 package me.togaparty.notable_android.ui.fragments
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -43,10 +42,12 @@ class GalleryFullscreenFragment : DialogFragment() {
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
 
-    internal lateinit var model: ImageListProvider// by activityViewModels()
+    internal lateinit var model: ImageListProvider
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+    }
 
-
-    @SuppressLint("LogConditional")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -88,12 +89,11 @@ class GalleryFullscreenFragment : DialogFragment() {
                                     "inspect it?"
                         ) {
                             val bundle = bundleOf("position" to selectedPosition)
-                            dismiss()
-
                             navController.navigate(
                                 R.id.action_galleryFragment_to_inspectFragment,
                                 bundle
                             )
+                            dismiss()
                         }
                         model.setProcessingStatus(Status.AVAILABLE)
                     }
@@ -105,6 +105,7 @@ class GalleryFullscreenFragment : DialogFragment() {
 
         return view
     }
+
     private fun editFloatingActionButton() {
         val floatingActionButton = view?.findViewById<SpeedDialView>(R.id.speedDial)
 
@@ -201,9 +202,9 @@ class GalleryFullscreenFragment : DialogFragment() {
 
     }
 
-    @SuppressLint("RestrictedApi")
+
     private fun processImage() {
-        //var image: GalleryImage? = null
+
         if(ConnectionDetector(requireContext()).connected) {
             toast("Processing image")
             GlobalScope.launch(Dispatchers.Default + NonCancellable) {

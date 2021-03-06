@@ -1,8 +1,9 @@
 package me.togaparty.notable_android.data.files
 
 import android.content.Context
-import android.util.JsonReader
 import me.togaparty.notable_android.ui.items.CategoryItem
+import me.togaparty.notable_android.utils.Constants.Companion.GLOSSARY_JSON
+import me.togaparty.notable_android.utils.Constants.Companion.WIKI_JSON
 import me.togaparty.notable_android.utils.SingletonHolder
 import org.json.JSONObject
 import java.io.IOException
@@ -11,13 +12,14 @@ import java.nio.charset.Charset
 
 private const val NAME = "name"
 private const val DEFINITION = "definition"
+private const val TYPE = "type"
 class JsonParser(appContext: Context) {
 	private val context = appContext
 
 	private val json: JSONObject by lazy {
 		JSONObject(
 			try {
-				val inputStream = context.assets?.open("glossary.json")
+				val inputStream = context.assets?.open(GLOSSARY_JSON)
 				val size = inputStream?.available()
 				val buffer = size?.let { ByteArray(it) }
 				val charset: Charset = Charsets.UTF_8
@@ -33,7 +35,7 @@ class JsonParser(appContext: Context) {
 	private val wikijson: JSONObject by lazy {
 		JSONObject(
 			try {
-				val inputStream = context.assets?.open("wiki.json")
+				val inputStream = context.assets?.open(WIKI_JSON)
 				val size = inputStream?.available()
 				val buffer = size?.let { ByteArray(it) }
 				val charset: Charset = Charsets.UTF_8
@@ -53,7 +55,7 @@ class JsonParser(appContext: Context) {
 			add(jsonObject.getString(NAME))
 			add(jsonObject.getString(DEFINITION))
 		}
-		jsonObject.getJSONObject("type").run {
+		jsonObject.getJSONObject(TYPE).run {
 			//Log.d(TAG, "return size of this object: ${length()}")
 			if(length() == 0) {
 				mutableList.addAll(listOf("",""))
@@ -69,13 +71,12 @@ class JsonParser(appContext: Context) {
 	}
 	fun getNameAndDefinition(key: String) : List<Any> {
 		val jsonObject = wikijson.getJSONObject(key)
-		val mutableList = mutableListOf<String>().apply {
+		return mutableListOf<String>().apply {
 			add(jsonObject.getString(NAME))
 			add(jsonObject.getString(DEFINITION))
 			add("")
 			add("")
 		}
-		return mutableList
 	}
 
 	fun getList(key: String, itemID: Int) : MutableList<CategoryItem> {

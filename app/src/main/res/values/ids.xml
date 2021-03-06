@@ -2,8 +2,6 @@
 <resources>
     <item name="retake" type="id" />
     <item name="crop" type="id" />
-    <item name="process" type="id" />
-    <item name="fab_action" type="id" />
     <item name="fab_delete" type="id" />
     <item name="fab_inspect" type="id" />
     <item name="fab_process" type="id" />

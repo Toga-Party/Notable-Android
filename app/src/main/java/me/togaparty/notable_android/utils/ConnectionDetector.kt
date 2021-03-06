@@ -15,7 +15,6 @@ class ConnectionDetector(context: Context) {
             return if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 connectivityManager.activeNetworkInfo?.isConnected ?: false
             } else {
-
                 val networks = connectivityManager.allNetworks
                 var hasNetwork = false
                 if( networks.isNotEmpty()) {

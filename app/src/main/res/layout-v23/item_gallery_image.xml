@@ -11,7 +11,8 @@
         android:id="@+id/ivGalleryImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:padding="10dp"
-        android:background="@color/white"/>
+        android:background="@color/white"
+        android:contentDescription="@string/show_image_in_gallery" />
 </me.togaparty.notable_android.helper.SquareLayout>
