@@ -10,7 +10,7 @@
 <p align="center">An open source android application designed to assist casual learners in understanding the fundamentals of Music Theory </p>
 
  <p align="center">
-    <a href="https://github.com/Toga-Party/Notable-Android/releases/latest"><img src="https://img.shields.io/github/v/release/Toga-Party/Notable-Android?style=for-the-badge"/></a>
+    <a href="https://github.com/Toga-Party/Notable-Android/releases/latest"><img src="https://img.shields.io/github/v/release/Toga-Party/Notable-Android?include_prereleases&style=for-the-badge"/></a>
     <img src="https://img.shields.io/github/stars/Toga-Party/Notable-Android.svg?style=for-the-badge" />
     <img src="https://img.shields.io/github/repo-size/Toga-Party/Notable-Android?style=for-the-badge" />
     <img src="https://img.shields.io/github/contributors/Toga-Party/Notable-Android?style=for-the-badge" />
