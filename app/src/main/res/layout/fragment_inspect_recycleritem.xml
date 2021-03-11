@@ -13,8 +13,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_weight="1"
-        android:textSize="18sp"
-        android:textIsSelectable="true" />
+        android:textColor="@android:color/primary_text_light"
+        android:textColorHighlight="?android:attr/textColorHighlight"
+        android:textColorHint="?android:attr/textColorHint"
+        android:textColorLink="?android:attr/textColorLink"
+        android:textIsSelectable="true"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/toGlossary_button"
