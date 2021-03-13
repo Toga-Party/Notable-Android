@@ -3,14 +3,18 @@ package me.togaparty.notable_android.ui.fragments
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -39,26 +43,38 @@ class GalleryFullscreenFragment : DialogFragment() {
     private lateinit var currentImage: GalleryImage
     private lateinit var navController: NavController
 
+    private lateinit var runnable: Runnable
+    private lateinit var progressHandler: Handler
+    private lateinit var loadingFragment: LoadingFragment
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
-
+    private lateinit var loadingScreen: ProgressBar
     internal lateinit var model: ImageListProvider
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
     }
 
+    private fun endProgress(option: Int) {
+        if (option == View.INVISIBLE) {
+            loadingScreen.visibility = View.INVISIBLE
+        } else {
+            loadingScreen.visibility = View.VISIBLE
+        }
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(
                 R.layout.fragment_gallery_fullscreen,
                 container,
                 false
         )
-
+        loadingScreen = view.findViewById(R.id.loading_progress) as ProgressBar
+        endProgress(View.INVISIBLE)
         navController = this.findNavController()
         galleryPagerAdapter = GalleryPagerAdapter()
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
@@ -73,25 +89,28 @@ class GalleryFullscreenFragment : DialogFragment() {
         model.getList().observe(viewLifecycleOwner, {
             Log.d(TAG, "Fullscreen: Something changed")
             viewPager.adapter?.notifyDataSetChanged()
-            if(model.getImageListSize() == 0) dismiss() else setCurrentItem(selectedPosition)
+            if (model.getImageListSize() == 0) dismiss() else setCurrentItem(selectedPosition)
             editFloatingActionButton()
             activity?.let {
-                when(model.getProcessingStatus()) {
+                when (model.getProcessingStatus()) {
                     Status.FAILED -> {
                         showFailedDialog("Upload failed",
                                 "The upload you sent failed.")
                         model.setProcessingStatus(Status.AVAILABLE)
+//                        loadingFragment.dismiss()
+//                        endProgress(View.INVISIBLE)
+
                     }
-                    Status.SUCCESSFUL-> {
+                    Status.SUCCESSFUL -> {
                         showSuccessDialog(
-                            "Processing finished",
-                            "We have received the response from the server want to " +
-                                    "inspect it?"
+                                "Processing finished",
+                                "We have received the response from the server want to " +
+                                        "inspect it?"
                         ) {
                             val bundle = bundleOf("position" to selectedPosition)
                             navController.navigate(
-                                R.id.action_galleryFragment_to_inspectFragment,
-                                bundle
+                                    R.id.action_galleryFragment_to_inspectFragment,
+                                    bundle
                             )
                             dismiss()
                         }
@@ -101,8 +120,6 @@ class GalleryFullscreenFragment : DialogFragment() {
                 }
             }
         })
-
-
         return view
     }
 
@@ -130,87 +147,90 @@ class GalleryFullscreenFragment : DialogFragment() {
         }
 
     }
-    private fun generateFloatingActionButton(view: View){
+
+    private fun generateFloatingActionButton(view: View) {
         val floatingActionButton = view.findViewById<SpeedDialView>(R.id.speedDial)
-
-            floatingActionButton.addActionItem(
+        floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_delete, R.drawable.ic_delete_black)
-                    .setLabel(getString(R.string.delete))
-                    .setTheme(R.style.Theme_Notable_OPENCV)
-                    .setLabelClickable(false)
-                    .create()
-            )
-            floatingActionButton.addActionItem( when(currentImage.processed == true) {
+                        .setLabel(getString(R.string.delete))
+                        .setTheme(R.style.Theme_Notable_OPENCV)
+                        .setLabelClickable(false)
+                        .create()
+        )
+        floatingActionButton.addActionItem(when (currentImage.processed == true) {
 
-                true -> SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
+            true -> SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                     .setLabel(getString(R.string.inspect))
                     .setTheme(R.style.Theme_Notable_OPENCV)
                     .setLabelClickable(false)
                     .create()
 
-                else -> SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
+            else -> SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
                     .setLabel(getString(R.string.process_music))
                     .setTheme(R.style.Theme_Notable_OPENCV)
                     .setLabelClickable(false)
                     .create()
-            })
+        })
 
-            floatingActionButton.setOnActionSelectedListener { actionItem ->
+        floatingActionButton.setOnActionSelectedListener { actionItem ->
 
-                when (actionItem.id) {
-                    R.id.fab_delete -> {
-                        if(model.getProcessingTag() != null  &&
-                                model.getProcessingTag() == currentImage.imageUrl) {
+            when (actionItem.id) {
+                R.id.fab_delete -> {
+                    if (model.getProcessingTag() != null &&
+                            model.getProcessingTag() == currentImage.imageUrl) {
+                        toast("Can't delete something that's being processed")
+                        Log.d(TAG, "Full screen: delete failed")
 
-                            toast("Can't delete something that's being processed")
-                            Log.d(TAG, "Full screen: delete failed")
+                    } else {
+                        GlobalScope.launch(Dispatchers.Main) {
 
-                        } else {
-                            GlobalScope.launch(Dispatchers.Main) {
+                            Log.d(TAG, "Full screen: deleting")
+                            if (model.getImageListSize() != 0) {
 
-                                Log.d(TAG, "Full screen: deleting")
-                                if(model.getImageListSize() != 0){
-
-                                    model.deleteGalleryImage(
-                                            selectedPosition,
-                                            currentImage.imageUrl
-                                    )
-                                }
-
+                                model.deleteGalleryImage(
+                                        selectedPosition,
+                                        currentImage.imageUrl
+                                )
                             }
-                            Log.d(TAG, "Full screen: deleted")
+
                         }
-                    }
-                    R.id.fab_inspect -> {
-                        dismiss()
-                        navController.navigate(
-                                R.id.action_galleryFragment_to_inspectFragment,
-                                bundleOf("currentImage" to currentImage)
-                        )
-                    }
-                    R.id.fab_process -> {
-                        if (model.getProcessingStatus() != Status.PROCESSING) {
-                            Log.d(TAG, "Status: ${model.getProcessingStatus().name}")
-                            processImage()
-                        } else {
-                            toast("Something is processing. Please wait for it to finish")
-                        }
+                        Log.d(TAG, "Full screen: deleted")
                     }
                 }
-                true
+                R.id.fab_inspect -> {
+                    dismiss()
+                    navController.navigate(
+                            R.id.action_galleryFragment_to_inspectFragment,
+                            bundleOf("currentImage" to currentImage)
+                    )
+                }
+                R.id.fab_process -> {
+                    if (model.getProcessingStatus() != Status.PROCESSING) {
+                        Log.d(TAG, "Status: ${model.getProcessingStatus().name}")
+//                        loadingFragment = LoadingFragment.show(childFragmentManager)
+//                        endProgress(View.VISIBLE)
+                        processImage()
+
+                    } else {
+                        toast("Something is processing. Please wait for it to finish")
+                    }
+                }
             }
+            true
+        }
 
     }
 
 
     private fun processImage() {
 
-        if(ConnectionDetector(requireContext()).connected) {
+        if (ConnectionDetector(requireContext()).connected) {
             toast("Processing image")
             GlobalScope.launch(Dispatchers.Default + NonCancellable) {
                 model.uploadImage(currentImage, selectedPosition)
             }
-        } else{
+
+        } else {
             toast("Please connect to the internet")
         }
     }
@@ -227,15 +247,18 @@ class GalleryFullscreenFragment : DialogFragment() {
 
     // viewpager page change listener
     private var viewPagerPageChangeListener: ViewPager.OnPageChangeListener =
-        object : ViewPager.OnPageChangeListener {
-            override fun onPageSelected(position: Int) {
-                setCurrentItem(position)
+            object : ViewPager.OnPageChangeListener {
+                override fun onPageSelected(position: Int) {
+                    setCurrentItem(position)
+                }
+
+                override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
+                }
+
+                override fun onPageScrollStateChanged(arg0: Int) {
+                }
             }
-            override fun onPageScrolled(arg0: Int, arg1: Float, arg2: Int) {
-            }
-            override fun onPageScrollStateChanged(arg0: Int) {
-            }
-        }
+
     //Gallery adapter
     inner class GalleryPagerAdapter : PagerAdapter() {
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
@@ -274,7 +297,7 @@ class GalleryFullscreenFragment : DialogFragment() {
 
             var flag = false
             model.getList().value?.forEach {
-                if(it.imageUrl == tag){
+                if (it.imageUrl == tag) {
                     flag = true
                     return@forEach
                 }
@@ -285,9 +308,11 @@ class GalleryFullscreenFragment : DialogFragment() {
         override fun getCount(): Int {
             return model.getImageListSize()
         }
+
         override fun isViewFromObject(view: View, obj: Any): Boolean {
             return view === obj as View
         }
+
         override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
             container.removeView(obj as View)
         }
