@@ -16,7 +16,7 @@
         <Preference
             app:key="build_version"
             app:title="Build Version"
-            app:summary="0.1.0"
+            app:summary="@string/version_code"
             />
     </PreferenceCategory>
 </PreferenceScreen>

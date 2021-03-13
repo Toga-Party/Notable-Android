@@ -52,7 +52,7 @@
 
     <!-- Preference Titles -->
     <string name="permissions_header">Permissions</string>
-
+    <string name="version_code">0.1.0-beta1</string>
     <!--Misc-->
     <string name="textview">TextView</string>
 </resources>

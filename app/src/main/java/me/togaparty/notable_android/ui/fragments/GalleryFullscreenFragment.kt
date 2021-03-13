@@ -3,14 +3,11 @@ package me.togaparty.notable_android.ui.fragments
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
@@ -43,24 +40,12 @@ class GalleryFullscreenFragment : DialogFragment() {
     private lateinit var currentImage: GalleryImage
     private lateinit var navController: NavController
 
-    private lateinit var runnable: Runnable
-    private lateinit var progressHandler: Handler
-    private lateinit var loadingFragment: LoadingFragment
     private var fileUri: Uri? = null
     private var selectedPosition: Int = 0
-    private lateinit var loadingScreen: ProgressBar
     internal lateinit var model: ImageListProvider
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
-    }
-
-    private fun endProgress(option: Int) {
-        if (option == View.INVISIBLE) {
-            loadingScreen.visibility = View.INVISIBLE
-        } else {
-            loadingScreen.visibility = View.VISIBLE
-        }
     }
 
     override fun onCreateView(
@@ -73,8 +58,6 @@ class GalleryFullscreenFragment : DialogFragment() {
                 container,
                 false
         )
-        loadingScreen = view.findViewById(R.id.loading_progress) as ProgressBar
-        endProgress(View.INVISIBLE)
         navController = this.findNavController()
         galleryPagerAdapter = GalleryPagerAdapter()
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
@@ -97,8 +80,6 @@ class GalleryFullscreenFragment : DialogFragment() {
                         showFailedDialog("Upload failed",
                                 "The upload you sent failed.")
                         model.setProcessingStatus(Status.AVAILABLE)
-//                        loadingFragment.dismiss()
-//                        endProgress(View.INVISIBLE)
 
                     }
                     Status.SUCCESSFUL -> {
@@ -106,14 +87,7 @@ class GalleryFullscreenFragment : DialogFragment() {
                                 "Processing finished",
                                 "We have received the response from the server want to " +
                                         "inspect it?"
-                        ) {
-                            val bundle = bundleOf("position" to selectedPosition)
-                            navController.navigate(
-                                    R.id.action_galleryFragment_to_inspectFragment,
-                                    bundle
-                            )
-                            dismiss()
-                        }
+                        ) {navigateToInspect()}
                         model.setProcessingStatus(Status.AVAILABLE)
                     }
                     else -> Unit
@@ -122,7 +96,14 @@ class GalleryFullscreenFragment : DialogFragment() {
         })
         return view
     }
-
+    private fun navigateToInspect() {
+        dismiss()
+        val bundle = bundleOf("position" to selectedPosition)
+        navController.navigate(
+                R.id.action_galleryFragment_to_inspectFragment,
+                bundle
+        )
+    }
     private fun editFloatingActionButton() {
         val floatingActionButton = view?.findViewById<SpeedDialView>(R.id.speedDial)
 
@@ -197,18 +178,10 @@ class GalleryFullscreenFragment : DialogFragment() {
                         Log.d(TAG, "Full screen: deleted")
                     }
                 }
-                R.id.fab_inspect -> {
-                    dismiss()
-                    navController.navigate(
-                            R.id.action_galleryFragment_to_inspectFragment,
-                            bundleOf("currentImage" to currentImage)
-                    )
-                }
+                R.id.fab_inspect -> navigateToInspect()
                 R.id.fab_process -> {
                     if (model.getProcessingStatus() != Status.PROCESSING) {
                         Log.d(TAG, "Status: ${model.getProcessingStatus().name}")
-//                        loadingFragment = LoadingFragment.show(childFragmentManager)
-//                        endProgress(View.VISIBLE)
                         processImage()
 
                     } else {
@@ -218,16 +191,19 @@ class GalleryFullscreenFragment : DialogFragment() {
             }
             true
         }
-
     }
-
 
     private fun processImage() {
 
         if (ConnectionDetector(requireContext()).connected) {
             toast("Processing image")
-            GlobalScope.launch(Dispatchers.Default + NonCancellable) {
-                model.uploadImage(currentImage, selectedPosition)
+            val loadingFragment = LoadingFragment.show(childFragmentManager)
+            lifecycleScope.launch {
+                val deferred = GlobalScope.async(Dispatchers.IO + NonCancellable) {
+                    model.uploadImage(currentImage, selectedPosition)
+                }
+                deferred.await()
+                withContext(Dispatchers.Main) {loadingFragment.dismiss()}
             }
 
         } else {

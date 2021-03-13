@@ -41,10 +41,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClic
     }
 
     override fun onPreferenceClick(preference: Preference?): Boolean {
-//        val i = Intent(Intent.ACTION_VIEW).apply {
-//            data = Uri.parse(GITHUB)
-//        }
-//        requireActivity().startActivity(i)
+
         if(preference != null) {
             when(preference.key) {
                 "permissions_header" -> navController.navigate(SettingsFragmentDirections.actionSettingsFragmentToPermissionsFragment())
@@ -57,10 +54,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClic
                 "developer_header" -> navController.navigate(SettingsFragmentDirections.actionSettingsFragmentToDevelopersFragment())
             }
         }
-
-
-
-
         return true
     }
 }

@@ -63,37 +63,38 @@ class GalleryFragment:
         galleryAdapter.listener = this
         swipeRefreshLayout = view.findViewById(R.id.swipeContainer)
 
-        model.getList().observe(viewLifecycleOwner, {
-            Log.d(TAG, "Gallery: Something changed")
-
-            activity?.let {
-                when (model.getProcessingStatus()) {
-                    Status.FAILED -> {
-                        showFailedDialog("Upload failed", "The upload you sent failed.")
-                        model.setProcessingStatus(Status.AVAILABLE)
-                    }
-                    Status.SUCCESSFUL -> {
-                        showSuccessDialog(
-                            "Processing finished",
-                            "We have received the response from the server. " +
-                                    "Please check the image you processed earlier to inspect it."
-                        ) {}
-                        model.setProcessingStatus(Status.AVAILABLE)
-                    }
-
-                    else -> Unit
-                }
-            }
-            swipeRefreshLayout.setOnRefreshListener(this)
-            swipeRefreshLayout.setColorSchemeResources(
+//        model.getList().observe(viewLifecycleOwner, {
+//            Log.d(TAG, "Gallery: Something changed")
+//
+//            activity?.let {
+//                when (model.getProcessingStatus()) {
+//                    Status.FAILED -> {
+//                        showFailedDialog("Upload failed", "The upload you sent failed.")
+//                        model.setProcessingStatus(Status.AVAILABLE)
+//                    }
+//                    Status.SUCCESSFUL -> {
+//                        showSuccessDialog(
+//                            "Processing finished",
+//                            "We have received the response from the server. " +
+//                                    "Please check the image you processed earlier to inspect it."
+//                        ) {}
+//                        model.setProcessingStatus(Status.AVAILABLE)
+//                    }
+//
+//                    else -> Unit
+//                }
+//            }
+//
+//
+//            galleryAdapter.notifyDataSetChanged()
+//        })
+        swipeRefreshLayout.setOnRefreshListener(this)
+        swipeRefreshLayout.setColorSchemeResources(
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light
-            )
-
-            galleryAdapter.notifyDataSetChanged()
-        })
+        )
         // init recyclerview
         recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
         recyclerView.adapter = galleryAdapter
