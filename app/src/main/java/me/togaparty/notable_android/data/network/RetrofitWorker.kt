@@ -53,6 +53,7 @@ class RetrofitWorker(val context: Context) {
         if (response != null) {
             if (response.isSuccessful) {
                 Log.v(TAG, "Retrofit: Success response received")
+
                 ZipInputStream(response.body()?.byteStream()).use { zip ->
                     var entry = zip.nextEntry
 

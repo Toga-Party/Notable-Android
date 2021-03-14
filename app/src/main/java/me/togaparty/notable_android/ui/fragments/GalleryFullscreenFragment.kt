@@ -98,7 +98,7 @@ class GalleryFullscreenFragment : DialogFragment() {
     }
     private fun navigateToInspect() {
         dismiss()
-        val bundle = bundleOf("position" to selectedPosition)
+        val bundle = bundleOf("currentImage" to currentImage)
         navController.navigate(
                 R.id.action_galleryFragment_to_inspectFragment,
                 bundle

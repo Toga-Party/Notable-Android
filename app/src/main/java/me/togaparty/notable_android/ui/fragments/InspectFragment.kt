@@ -75,11 +75,11 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         mediaSheetPlayer = MediaPlayer()
         arguments?.let { bundle ->
             Log.d(TAG, "Inspect: Retrieving Bundle")
+
             currentImage = bundle.getParcelable<GalleryImage>("currentImage") as GalleryImage
+
             wavFiles = currentImage.wavFiles
-
             textFiles = currentImage.textFiles
-
             imageFiles = ArrayList(currentImage.imageFiles.values)
 
             imageMap = currentImage.imageFiles
