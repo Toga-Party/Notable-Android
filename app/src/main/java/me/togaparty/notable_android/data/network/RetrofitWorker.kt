@@ -3,6 +3,7 @@ package me.togaparty.notable_android.data.network
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
@@ -54,6 +55,9 @@ class RetrofitWorker(val context: Context) {
             if (response.isSuccessful) {
                 Log.v(TAG, "Retrofit: Success response received")
 
+                if(response.body()?.contentLength()!! < 30) {
+                    throw  IllegalStateException("Server sent an error message: ${response.body()?.string()}")
+                }
                 ZipInputStream(response.body()?.byteStream()).use { zip ->
                     var entry = zip.nextEntry
 
@@ -79,7 +83,9 @@ class RetrofitWorker(val context: Context) {
                         }
 
                         val send = File(temp, entry.name)
-                        Log.d(TAG, "Retrofit: Extracting zip")
+                        if(BuildConfig.DEBUG) {
+                            Log.d(TAG, "Retrofit: Extracting zip")
+                        }
                         extractFile(zip, FileOutputStream(send))
                         when (send.extension) {
                             "wav" -> image.addWavFiles(
@@ -116,11 +122,11 @@ class RetrofitWorker(val context: Context) {
         }
         UploadResult.Success(retrieved = image.apply { processed = true })
     } catch (exe: IOException) {
-        UploadResult.Error("Failed to process the response", IOException())
+        UploadResult.Error("Failed to process the response: ${exe.message}", IOException())
     } catch (exe: ConnectException) {
-        UploadResult.Error("Failed to connect to server", ConnectException())
+        UploadResult.Error("Failed to connect to server: ${exe.message}", ConnectException())
     } catch (exe: Exception) {
-        UploadResult.Error("Failed to upload the image", Exception())
+        UploadResult.Error("Failed to upload the image: ${exe.message}", Exception())
     }
     @Throws(Exception::class)
     private fun extractFile(zipIn: ZipInputStream, fileOutputStream: FileOutputStream) {

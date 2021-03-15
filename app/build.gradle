@@ -84,6 +84,9 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
+    //Paper Onboard
+    implementation 'com.ramotion.paperonboarding:paper-onboarding:1.1.3'
+    
     // Navigation library
     def nav_version = "2.3.4"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"

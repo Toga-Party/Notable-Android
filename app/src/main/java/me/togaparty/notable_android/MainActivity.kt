@@ -1,12 +1,15 @@
 package me.togaparty.notable_android
 
+
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.os.Environment.MEDIA_MOUNTED
 import android.os.Environment.MEDIA_MOUNTED_READ_ONLY
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
+import androidx.preference.PreferenceManager
 import java.io.File
 
 
@@ -17,6 +20,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         container = findViewById(R.id.fragment_container)
+        PreferenceManager.getDefaultSharedPreferences(this).apply {
+            if (!getBoolean(OnboardingActivity.COMPLETED_ONBOARDING_PREF_NAME, false)) {
+                val intent = Intent(this@MainActivity, OnboardingActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            }
+        }
     }
     companion object {
         private fun isExternalStorageWritable(): Boolean {
@@ -47,6 +57,5 @@ class MainActivity : AppCompatActivity() {
             }
             return appContext.filesDir
         }
-
     }
 }

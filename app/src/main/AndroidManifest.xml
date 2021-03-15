@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="me.togaparty.notable_android">
 
-    <uses-feature android:name="android.hardware.camera.any"
+    <uses-feature
+        android:name="android.hardware.camera.any"
         android:required="false" />
     <uses-feature
         android:name="android.hardware.camera"
@@ -32,10 +33,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Notable_OPENCV"
         android:usesCleartextTraffic="true"
-        tools:targetApi="m"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:label"
+        tools:targetApi="m">
+        <activity android:name=".OnboardingActivity"></activity>
         <activity
-            android:name="me.togaparty.notable_android.MainActivity"
+            android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
