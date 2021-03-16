@@ -18,14 +18,14 @@ class OnboardingActivity : AppCompatActivity() {
 			findViewById(R.id.onboardingRootView), data, applicationContext
 		)
 		engine.setOnChangeListener { oldElementIndex, newElementIndex ->
-			Toast.makeText(
-				applicationContext,
-				"Swiped from $oldElementIndex to $newElementIndex", Toast.LENGTH_SHORT
-			).show()
+//			Toast.makeText(
+//				applicationContext,
+//				"Swiped from $oldElementIndex to $newElementIndex", Toast.LENGTH_SHORT
+//			).show()
 		}
 
 		engine.setOnRightOutListener { // Probably here will be your exit action
-			Toast.makeText(applicationContext, "Swiped out right", Toast.LENGTH_SHORT).show()
+//			Toast.makeText(applicationContext, "Swiped out right", Toast.LENGTH_SHORT).show()
 			PreferenceManager.getDefaultSharedPreferences(this).edit().apply {
 				putBoolean(COMPLETED_ONBOARDING_PREF_NAME, true)
 				apply()
@@ -40,20 +40,20 @@ class OnboardingActivity : AppCompatActivity() {
 		arrayListOf<PaperOnboardingPage>().apply {
 			add(
 				PaperOnboardingPage(
-				"Glossary", "Lorep ipsum yes",
-				Color.parseColor("#678FB4"), R.drawable.book_icon, R.drawable.search_icon
+				"Glossary", "Search the glossary for common terms and familiarize yourself with the fundamentals of music theory",
+				Color.parseColor("#ffffff"), R.drawable.book_icon_150, R.drawable.search_icon
 			)
 			)
 			add(
 				PaperOnboardingPage(
-				"Camera", "Testing",
-				Color.parseColor("#65B0B4"), R.drawable.camera_icon, R.drawable.camera_icon
+				"Scan", "Supports image cropping and rotation adjustments after capture of the music sheet; resulting image can then be saved into the app's gallery",
+				Color.parseColor("#ffffff"), R.drawable.camera_icon_150, R.drawable.image_icon
 			)
 			)
 			add(
 				PaperOnboardingPage(
-				"Files", "All files are categorized for your lazinees",
-				Color.parseColor("#9B90BC"), R.drawable.files_icon, R.drawable.files_icon
+				"Gallery", "Gives you the ability to process digital music sheets. Processed music sheets can then be inspected to provide an instant look-up of scanned symbols and access to the playback of a fully generated melody",
+				Color.parseColor("#ffffff"), R.drawable.files_icon_150, R.drawable.file_icon
 			)
 			)
 		}
