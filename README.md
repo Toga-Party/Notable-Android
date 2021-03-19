@@ -51,7 +51,7 @@ Get the app from our [releases page](https://github.com/Toga-Party/Notable-Andro
 
 ## Disclaimer
 
-The developer of this application has prepared a remote server to be used in conjunction with the application. In the event that the server may be down or indisposed of during your testing or usage of the app, please contact the developer responsible at the email address: aroueterra@gmail.com
+One of the developers of this application has prepared a remote server to be used in conjunction with the application. In the event that the server may be down or indisposed of during your testing or usage of the app, please contact the developer responsible at the email address: aroueterra@gmail.com
 
 # Kanban
 Observe the development of the application live at our project's Kanban Board! 
