@@ -36,7 +36,7 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:label"
         tools:targetApi="m">
-        <activity android:name=".OnboardingActivity"></activity>
+        <activity android:name=".OnBoardingActivity" />
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan">

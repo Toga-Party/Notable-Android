@@ -42,7 +42,7 @@
     <string name="play_sheet">Play Sheet</string>
     <string name="review">Review</string>
     <string name="image_banner">Image Banner</string>
-    <string name="musicsheets">musicsheets</string>
+    <string name="music_sheets">Music Sheets</string>
 
     <!--Wiki-->
     <string name="notes">Note attributes</string>
@@ -52,7 +52,7 @@
 
     <!-- Preference Titles -->
     <string name="permissions_header">Permissions</string>
-    <string name="version_code">0.1.0-beta1</string>
+    <string name="version_code">0.1.1</string>
     <!--Misc-->
-    <string name="textview">TextView</string>
+    <string name="text_view">TextView</string>
 </resources>

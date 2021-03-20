@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 class OkHttpClientBuilder {
 
     companion object {
-        internal var client: OkHttpClient? = null
+        private var client: OkHttpClient? = null
         val okHttpClient: OkHttpClient
             @Throws(NoSuchAlgorithmException::class, KeyManagementException::class)
             get() {

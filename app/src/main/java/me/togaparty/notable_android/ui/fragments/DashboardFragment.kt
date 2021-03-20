@@ -52,7 +52,6 @@ class DashboardFragment : Fragment(), View.OnClickListener {
                 }
             })
         }
-        Log.d(TAG, "Dashboard: OnViewCreated")
         setPermissions()
         navController = this.findNavController()
         view.findViewById<CardView>(R.id.camera_cardview).setOnClickListener(this)

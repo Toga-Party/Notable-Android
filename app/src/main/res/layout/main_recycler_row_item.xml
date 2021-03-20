@@ -8,7 +8,7 @@
         android:id="@+id/cat_title"
         android:layout_width="413dp"
         android:layout_height="150dp"
-        android:text="@string/textview"
+        android:text="@string/text_view"
         android:textSize="23sp"
         android:fontFamily="@font/amiko_bold"
         app:layout_constraintBottom_toBottomOf="parent"

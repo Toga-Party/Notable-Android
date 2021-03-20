@@ -21,8 +21,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         container = findViewById(R.id.fragment_container)
         PreferenceManager.getDefaultSharedPreferences(this).apply {
-            if (!getBoolean(OnboardingActivity.COMPLETED_ONBOARDING_PREF_NAME, false)) {
-                val intent = Intent(this@MainActivity, OnboardingActivity::class.java)
+            if (!getBoolean(OnBoardingActivity.COMPLETED_ONBOARDING_PREF_NAME, false)) {
+                val intent = Intent(this@MainActivity, OnBoardingActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
             }
