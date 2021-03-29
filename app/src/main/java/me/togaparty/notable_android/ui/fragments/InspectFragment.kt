@@ -20,26 +20,28 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.fragment_inspect_image.view.*
 import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.data.files.InspectPrediction
 import me.togaparty.notable_android.data.files.JsonParser
+import me.togaparty.notable_android.databinding.FragmentInspectBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
+import me.togaparty.notable_android.utils.viewBindingWithBinder
 
 
-class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
+class InspectFragment : Fragment(R.layout.fragment_inspect),
+    PredictionsAdapter.OnItemClickListener
+{
 
     private lateinit var viewPager: ViewPager
 
@@ -69,6 +71,8 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
 
     private lateinit var navController: NavController
 
+    private val binding by viewBindingWithBinder(FragmentInspectBinding::bind)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mediaSegmentPlayer = MediaPlayer()
@@ -91,27 +95,18 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         jsonParser = JsonParser.getInstance(requireContext())
         progressHandler = Handler(Looper.getMainLooper())
     }
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(
-                R.layout.fragment_inspect,
-                container,
-                false
-        )
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
 
         // Initial setup of media players to position 0
-        val btnPlaySegment: Button = view.findViewById(R.id.play_segment) as Button
-        val btnPlaySheet: Button = view.findViewById(R.id.play_sheet) as Button
-
-        seekBar = view.findViewById(R.id.seekBar) as SeekBar
+        seekBar = binding.seekBar
         seekBar.max = 0
 
-        setButtonEvents(btnPlaySheet)
-        setButtonEvents(btnPlaySegment)
+        setButtonEvents(binding.playSegment)
+        setButtonEvents(binding.playSheet)
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             var originalProgress: Int = 0
@@ -137,7 +132,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             }
         })
         // Lookup the recyclerview in activity layout
-        val inspectRecycler = view.findViewById(R.id.recycler_predictions) as RecyclerView
+        val inspectRecycler = binding.recyclerPredictions
         // Initialize predictions
         if(BuildConfig.DEBUG) {
             Log.d("Inspect", "Creating entry at position: $selectedPosition")
@@ -149,15 +144,16 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
         inspectRecycler.adapter = predictionsAdapter
         // Set layout manager to position the items
         inspectRecycler.layoutManager = LinearLayoutManager(requireContext())
-        viewPager = view.findViewById(R.id.viewPagerBanner)
+
+        viewPager = binding.viewPagerBanner
         galleryPagerAdapter = GalleryPagerAdapter(finalPosition)
         galleryPagerAdapter.notifyDataSetChanged()
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
         navController = this.findNavController()
-        return view
     }
+
     private fun setSeekBar(mediaPlayer: MediaPlayer){
         val fileDuration = mediaPlayer.duration
         seekBar.progress = 0
@@ -335,7 +331,6 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
             val view = layoutInflater.inflate(R.layout.fragment_inspect_image, container, false)
 
             val fileurl = imageMap?.get("slice$position")
-            view.inspectImage.tag = fileurl
 
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
             circularProgressDrawable.strokeWidth = 5f
@@ -348,7 +343,7 @@ class InspectFragment : Fragment(), PredictionsAdapter.OnItemClickListener {
                 .placeholder(circularProgressDrawable)
                 .fitCenter()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(view.inspectImage)
+                .into(view.findViewById(R.id.inspectImage))
             container.addView(view)
             return view
         }

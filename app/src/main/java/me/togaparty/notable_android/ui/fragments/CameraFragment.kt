@@ -4,8 +4,9 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
-import android.view.*
-import android.widget.ImageButton
+import android.view.OrientationEventListener
+import android.view.Surface
+import android.view.View
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -13,7 +14,6 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -26,16 +26,18 @@ import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.launch
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.R
+import me.togaparty.notable_android.databinding.FragmentCameraBinding
 import me.togaparty.notable_android.utils.ALL_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.permissionsGranted
+import me.togaparty.notable_android.utils.viewBindingWithBinder
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 
 
-class CameraFragment : Fragment() {
+class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private lateinit var outputDirectory: File
 
@@ -49,6 +51,8 @@ class CameraFragment : Fragment() {
 
     private lateinit var orientationEventListener: OrientationEventListener
 
+    private val binding by viewBindingWithBinder(FragmentCameraBinding::bind)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         navController = this.findNavController()
@@ -58,17 +62,11 @@ class CameraFragment : Fragment() {
         outputDirectory = MainActivity.getOutputCacheDirectory(requireContext())
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_camera, container, false)
-    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val container = view as ConstraintLayout
-        previewView = container.findViewById(R.id.view_finder)
-        container.findViewById<ImageButton>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
+
+        previewView = binding.viewFinder
+        binding.camCaptureButton.setOnClickListener{takePhoto()}
 
         lifecycleScope.launch {
             processCameraProviderFuture = ProcessCameraProvider.getInstance(requireContext()).apply {
@@ -159,9 +157,9 @@ class CameraFragment : Fragment() {
                             navController.navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
                         }
                     }
-                })
+                }
+        )
     }
-
 
     companion object {
         private const val FILENAME_FORMAT = "EEE_dd_MM_yyyy_HHmmss"

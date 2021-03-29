@@ -6,33 +6,34 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_glossary.*
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.files.JsonParser
+import me.togaparty.notable_android.databinding.FragmentGlossaryBinding
 import me.togaparty.notable_android.ui.adapter.CategoryItemAdapter
 import me.togaparty.notable_android.ui.adapter.MainRecyclerAdapter
 import me.togaparty.notable_android.ui.items.AllCategory
 import me.togaparty.notable_android.ui.items.CategoryItem
+import me.togaparty.notable_android.utils.viewBindingWithBinder
 import org.json.JSONException
 
 
-class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
+class GlossaryFragment : Fragment(R.layout.fragment_glossary),
+    CategoryItemAdapter.OnItemClickListener
+{
     internal var mainRecyclerAdapter: MainRecyclerAdapter? = null
     private lateinit var navController: NavController
-    private lateinit var editText: EditText
     private lateinit var jsonParser: JsonParser
+    private val binding by viewBindingWithBinder(FragmentGlossaryBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        editText = view.findViewById(R.id.edit_text_glossary)
-//        mainRecyclerAdapter = view.findViewById(R.id.main_recycler)
+
 
         navController = this.findNavController()
 
@@ -70,7 +71,7 @@ class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
 
         setMainCategoryRecycler(allCategory)
 
-        editText.addTextChangedListener(object:TextWatcher{
+        binding.editTextGlossary.addTextChangedListener(object:TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
@@ -91,9 +92,9 @@ class GlossaryFragment : Fragment(), CategoryItemAdapter.OnItemClickListener{
 
     private fun setMainCategoryRecycler(allCategory: List<AllCategory>){
         val layoutManager:RecyclerView.LayoutManager = LinearLayoutManager(this.context)
-        main_recycler!!.layoutManager = layoutManager
+        binding.mainRecycler.layoutManager = layoutManager
         mainRecyclerAdapter = this.context?.let { MainRecyclerAdapter(it, allCategory, this) }
-        main_recycler!!.adapter = mainRecyclerAdapter
+        binding.mainRecycler.adapter = mainRecyclerAdapter
     }
 
 

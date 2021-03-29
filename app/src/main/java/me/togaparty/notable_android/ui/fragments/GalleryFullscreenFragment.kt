@@ -19,21 +19,20 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.leinardi.android.speeddial.SpeedDialActionItem
-import com.leinardi.android.speeddial.SpeedDialView
-import kotlinx.android.synthetic.main.gallery_image_fullscreen.view.*
-import kotlinx.android.synthetic.main.item_gallery_image.view.*
 import kotlinx.coroutines.*
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.databinding.FragmentGalleryFullscreenBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
 
-class GalleryFullscreenFragment : DialogFragment() {
+class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fullscreen) {
 
+    private val binding by viewBindingWithBinder(FragmentGalleryFullscreenBinding::bind)
     private lateinit var viewPager: ViewPager
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
 
@@ -48,45 +47,41 @@ class GalleryFullscreenFragment : DialogFragment() {
         setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(
-                R.layout.fragment_gallery_fullscreen,
-                container,
-                false
-        )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         navController = this.findNavController()
         galleryPagerAdapter = GalleryPagerAdapter()
+
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
-        viewPager = view.findViewById(R.id.viewPager)
+
+        viewPager = binding.viewPager
         viewPager.adapter = galleryPagerAdapter
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
 
         setCurrentItem(requireArguments().getInt("position"))
-        generateFloatingActionButton(view)
+        generateFloatingActionButton()
 
         model.getList().observe(viewLifecycleOwner, {
             Log.d(TAG, "Fullscreen: Something changed")
             viewPager.adapter?.notifyDataSetChanged()
+
             if (model.getImageListSize() == 0) dismiss() else setCurrentItem(selectedPosition)
+
             editFloatingActionButton()
             activity?.let {
                 when (model.getProcessingStatus()) {
                     Status.FAILED -> {
                         showFailedDialog("Upload failed",
-                                "The upload you sent failed.")
+                            "The upload you sent failed.")
                         model.setProcessingStatus(Status.AVAILABLE)
 
                     }
                     Status.SUCCESSFUL -> {
                         showSuccessDialog(
-                                "Processing finished",
-                                "We have received the response from the server want to " +
-                                        "inspect it?"
+                            "Processing finished",
+                            "We have received the response from the server want to " +
+                                    "inspect it?"
                         ) {navigateToInspect()}
                         model.setProcessingStatus(Status.AVAILABLE)
                     }
@@ -94,8 +89,8 @@ class GalleryFullscreenFragment : DialogFragment() {
                 }
             }
         })
-        return view
     }
+
     private fun navigateToInspect() {
         dismiss()
         val bundle = bundleOf("currentImage" to currentImage)
@@ -105,32 +100,32 @@ class GalleryFullscreenFragment : DialogFragment() {
         )
     }
     private fun editFloatingActionButton() {
-        val floatingActionButton = view?.findViewById<SpeedDialView>(R.id.speedDial)
+        val floatingActionButton = binding.speedDial
 
         if (currentImage.processed == true) {
-            floatingActionButton?.removeActionItem(1)
-            floatingActionButton?.addActionItem(
-                    SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
-                            .setLabel(getString(R.string.inspect))
-                            .setTheme(R.style.Theme_Notable_OPENCV)
-                            .setLabelClickable(false)
-                            .create()
+            floatingActionButton.removeActionItem(1)
+            floatingActionButton.addActionItem(
+                SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
+                    .setLabel(getString(R.string.inspect))
+                    .setTheme(R.style.Theme_Notable_OPENCV)
+                    .setLabelClickable(false)
+                    .create()
             )
         } else {
-            floatingActionButton?.removeActionItem(1)
-            floatingActionButton?.addActionItem(
-                    SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
-                            .setLabel(getString(R.string.process_music))
-                            .setTheme(R.style.Theme_Notable_OPENCV)
-                            .setLabelClickable(false)
-                            .create()
+            floatingActionButton.removeActionItem(1)
+            floatingActionButton.addActionItem(
+                SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
+                    .setLabel(getString(R.string.process_music))
+                    .setTheme(R.style.Theme_Notable_OPENCV)
+                    .setLabelClickable(false)
+                    .create()
             )
         }
 
     }
 
-    private fun generateFloatingActionButton(view: View) {
-        val floatingActionButton = view.findViewById<SpeedDialView>(R.id.speedDial)
+    private fun generateFloatingActionButton() {
+        val floatingActionButton = binding.speedDial
         floatingActionButton.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_delete, R.drawable.ic_delete_black)
                         .setLabel(getString(R.string.delete))
@@ -248,7 +243,8 @@ class GalleryFullscreenFragment : DialogFragment() {
             )
 
             val image = model.getGalleryImage(position)
-            view.ivFullscreenImage.tag = image.imageUrl
+
+            view.findViewById<ImageView>(R.id.ivFullscreenImage).tag = image.imageUrl
 
             val circularProgressDrawable = CircularProgressDrawable(requireContext())
             circularProgressDrawable.strokeWidth = 5f
@@ -261,7 +257,7 @@ class GalleryFullscreenFragment : DialogFragment() {
                     .placeholder(circularProgressDrawable)
                     .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(view.ivFullscreenImage)
+                    .into(view.findViewById(R.id.ivFullscreenImage))
 
             container.addView(view)
             return view

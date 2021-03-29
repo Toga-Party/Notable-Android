@@ -10,15 +10,19 @@ import android.os.Environment.MEDIA_MOUNTED_READ_ONLY
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
 import androidx.preference.PreferenceManager
+import me.togaparty.notable_android.databinding.ActivityMainBinding
 import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var container: FragmentContainerView
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         container = findViewById(R.id.fragment_container)
         PreferenceManager.getDefaultSharedPreferences(this).apply {
             if (!getBoolean(OnBoardingActivity.COMPLETED_ONBOARDING_PREF_NAME, false)) {

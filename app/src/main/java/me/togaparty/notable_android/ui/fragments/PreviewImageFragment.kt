@@ -8,10 +8,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
@@ -19,7 +16,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -33,18 +30,19 @@ import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.databinding.FragmentPreviewImageBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.utils.showDialog
 import me.togaparty.notable_android.utils.toast
+import me.togaparty.notable_android.utils.viewBindingWithBinder
 import java.io.File
 
 
-class PreviewImageFragment : Fragment() {
+class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
 
     private lateinit var fileName: String
     private var fileUri: Uri? = null
 
-    private lateinit var container: RelativeLayout
     internal lateinit var imageView: ImageView
 
     private lateinit var outputCacheDirectory: File
@@ -52,6 +50,7 @@ class PreviewImageFragment : Fragment() {
 
     private lateinit var model: ImageListProvider
 
+    private val binding by viewBindingWithBinder(FragmentPreviewImageBinding::bind)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -62,23 +61,17 @@ class PreviewImageFragment : Fragment() {
             fileUri = Uri.fromFile(File(outputCacheDirectory, fileName))
         }
     }
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_preview_image, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        container = view as RelativeLayout
-        navController = container.findNavController()
-        imageView = container.findViewById(R.id.imageView)
-        container.findViewById<ImageButton>(R.id.save_button_1).setOnClickListener { saveImage() }
-        loadSpeedDials(container) //goes BBRRR
+
+        navController = this.findNavController()
+        imageView = binding.imageView
+        binding.saveButton1.setOnClickListener { saveImage() }
+        loadSpeedDials(binding.root) //goes BBRRR
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         lifecycleScope.launchWhenCreated {
-            container.post{
+            binding.root.post{
                 setImageView()
             }
         }
@@ -165,7 +158,7 @@ class PreviewImageFragment : Fragment() {
             .load(fileUri)
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .into(object : CustomTarget<Drawable>(container.width, container.height) {
+            .into(object : CustomTarget<Drawable>(binding.root.width, binding.root.height) {
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                     imageView.setImageDrawable(resource)
                 }

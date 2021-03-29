@@ -3,12 +3,9 @@ package me.togaparty.notable_android.ui.fragments
 import android.Manifest
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -16,22 +13,18 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.databinding.FragmentDashboardBinding
 import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
-class DashboardFragment : Fragment(), View.OnClickListener {
+
+class DashboardFragment : Fragment(R.layout.fragment_dashboard), View.OnClickListener {
     private lateinit var navController: NavController
     private lateinit var checkPermissions: ActivityResultLauncher<Array<String>>
     private var navDirections: NavDirections? = null
 
+    private val binding by viewBindingWithBinder(FragmentDashboardBinding::bind)
     private lateinit var model: ImageListProvider
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dashboard, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,10 +46,14 @@ class DashboardFragment : Fragment(), View.OnClickListener {
         }
         setPermissions()
         navController = this.findNavController()
-        view.findViewById<CardView>(R.id.camera_cardview).setOnClickListener(this)
-        view.findViewById<CardView>(R.id.files_cardview).setOnClickListener(this)
-        view.findViewById<CardView>(R.id.settings_cardview).setOnClickListener(this)
-        view.findViewById<CardView>(R.id.glossary_cardview).setOnClickListener(this)
+        binding.cameraCardview.setOnClickListener(this)
+        binding.filesCardview.setOnClickListener(this)
+        binding.glossaryCardview.setOnClickListener(this)
+        binding.settingsCardview.setOnClickListener(this)
+//        view.findViewById<CardView>(R.id.camera_cardview).setOnClickListener(this)
+//        view.findViewById<CardView>(R.id.files_cardview).setOnClickListener(this)
+//        view.findViewById<CardView>(R.id.settings_cardview).setOnClickListener(this)
+//        view.findViewById<CardView>(R.id.glossary_cardview).setOnClickListener(this)
     }
 
 
