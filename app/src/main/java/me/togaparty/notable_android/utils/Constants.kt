@@ -2,7 +2,7 @@
 
 class Constants {
     companion object {
-        private const val baseURL = "https://d5d94bf7cd79.ngrok.io/"
+        private const val baseURL = "https://c025a69f98cd.ngrok.io/"
         const val URL = baseURL + "predict/"
         const val HEADER = "/predict"
         const val TAG = "Notable!"

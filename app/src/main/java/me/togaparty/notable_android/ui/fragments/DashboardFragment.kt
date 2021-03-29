@@ -16,7 +16,6 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.ImageListProvider
-import me.togaparty.notable_android.utils.Status
 import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 

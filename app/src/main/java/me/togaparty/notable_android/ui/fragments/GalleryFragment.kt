@@ -25,8 +25,9 @@ import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
-import me.togaparty.notable_android.utils.*
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
+import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
+import me.togaparty.notable_android.utils.permissionsGranted
 
 
 class GalleryFragment:
