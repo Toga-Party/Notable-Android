@@ -25,12 +25,39 @@ import java.io.OutputStream
 
 class FileWorker(val context: Context){
 
+    private fun query(): Cursor? {
 
+        //val collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        } else {
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DISPLAY_NAME,
+        )
+        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Images.Media.RELATIVE_PATH + " like ? "
+        } else {
+            MediaStore.Images.Media.DATA + " like ? "
+        }
+        val selectionArgs = arrayOf("%Notable%")
+        return context.contentResolver.query(
+            collection,
+            projection,
+            selection,
+            selectionArgs,
+            MediaStore.Images.ImageColumns.DATE_ADDED
+        )
+
+    }
     fun loadImages():  ArrayList<GalleryImage> {
         val imageList = arrayListOf<GalleryImage>()
 
         val outputDirectory = MainActivity.externalAppSpecificStorage(context)
         query()?.use {  cursor ->
+            Log.d(TAG, "Content size of query: ${cursor.count}")
             val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
 
@@ -72,8 +99,12 @@ class FileWorker(val context: Context){
     ): GalleryImage? {
 
         var image: GalleryImage? = null
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val values = contentValues(filename).apply {
+            values.apply {
                 put(
                     MediaStore.Images.Media.RELATIVE_PATH,
                     Environment.DIRECTORY_PICTURES + File.separator + directory
@@ -92,6 +123,7 @@ class FileWorker(val context: Context){
                     uri,
                     context.contentResolver.openOutputStream(imageUri)
                 )
+                values.clear()
                 values.put(MediaStore.Images.Media.IS_PENDING, false)
                 context.contentResolver.update(
                     imageUri,
@@ -116,7 +148,6 @@ class FileWorker(val context: Context){
 
             saveImageOutput(uri, FileOutputStream(file))
 
-            val values = contentValues(filename)
             values.put(MediaStore.Images.Media.DATA, file.absolutePath)
 
             // .DATA is deprecated in API 29
@@ -127,31 +158,6 @@ class FileWorker(val context: Context){
             image = imageUri?.let { GalleryImage(it, filename, false) }
         }
         return image
-    }
-    private fun query(): Cursor? {
-        val collection = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        }else {
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        }
-        val projection = arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DISPLAY_NAME,
-        )
-        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            MediaStore.Images.Media.RELATIVE_PATH + " like ? "
-        } else {
-            MediaStore.Images.Media.DATA + " like ? "
-        }
-        val selectionArgs = arrayOf("%Notable%")
-        return context.contentResolver.query(
-                collection,
-                projection,
-                selection,
-                selectionArgs,
-                MediaStore.Images.ImageColumns.DATE_ADDED
-        )
-
     }
     private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
         val matrix = Matrix()
@@ -176,11 +182,7 @@ class FileWorker(val context: Context){
         }
         return map
     }
-    private fun contentValues(fileName: String) : ContentValues =
-            ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/*")
-            }
+
     private fun saveImageOutput(fileUri: Uri, outputStream: OutputStream?) {
 
         var bitmap = BitmapFactory.decodeFile(fileUri.path!!)

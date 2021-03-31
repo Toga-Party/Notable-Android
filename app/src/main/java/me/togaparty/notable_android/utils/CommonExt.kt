@@ -2,9 +2,17 @@ package me.togaparty.notable_android.utils
 
 import android.app.AlertDialog
 import android.content.Context
+import android.view.LayoutInflater
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 
+inline fun <T : ViewBinding> AppCompatActivity.viewBinding(
+    crossinline bindingInflater: (LayoutInflater) -> T) =
+    lazy(LazyThreadSafetyMode.NONE) {
+        bindingInflater.invoke(layoutInflater)
+    }
 fun Fragment.toast(text: String?) {
     Toast.makeText(this.requireContext(), text, Toast.LENGTH_LONG).show()
 }

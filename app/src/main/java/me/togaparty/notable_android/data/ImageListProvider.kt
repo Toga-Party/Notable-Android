@@ -88,7 +88,6 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         }
     }
 
-
     fun getProcessingStatus() = processingStatus
 
     fun setProcessingStatus(status: Status) { processingStatus = status}

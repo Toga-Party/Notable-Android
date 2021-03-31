@@ -64,8 +64,17 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         generateFloatingActionButton()
         model.getList().observe(viewLifecycleOwner, {
             binding.viewPager.adapter?.notifyDataSetChanged()
-            if (model.getImageListSize() == 0) dismiss() else setCurrentItem(selectedPosition)
+            if (model.getImageListSize() == 0) {
+                dismiss()
+            } else{
+                if(selectedPosition >= model.getImageListSize()) {
+                    selectedPosition -= 1
+                }
+                setCurrentItem(selectedPosition)
+            }
             editFloatingActionButton()
+
+
             activity?.let {
                 when (model.getProcessingStatus()) {
                     Status.FAILED -> {
@@ -257,11 +266,12 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
 
             // load image
             GlideApp.with(context!!)
-                    .load(image.imageUrl)
-                    .placeholder(circularProgressDrawable)
-                    .fitCenter()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(view.findViewById(R.id.ivFullscreenImage))
+                .load(image.imageUrl)
+                .placeholder(circularProgressDrawable)
+                .fitCenter()
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(view.findViewById(R.id.ivFullscreenImage))
 
             container.addView(view)
             return view

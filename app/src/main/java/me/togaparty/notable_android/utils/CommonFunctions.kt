@@ -21,10 +21,10 @@ val ALL_REQUIRED_PERMISSIONS = mutableListOf(
 
 val FILE_REQUIRED_PERMISSIONS = mutableListOf(
         Manifest.permission.READ_EXTERNAL_STORAGE).also {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            it.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
-        }  else {
-            it.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        it.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+    }  else {
+        it.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
 }
 

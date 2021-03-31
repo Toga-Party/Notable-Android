@@ -126,11 +126,12 @@ class GalleryFragment:
 
                 // load image
                 GlideApp.with(context!!)
-                        .load(image.imageUrl)
-                        .placeholder(circularProgressDrawable)
-                        .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(itemView.findViewById(R.id.ivGalleryImage))
+                    .load(image.imageUrl)
+                    .placeholder(circularProgressDrawable)
+                    .centerCrop()
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(itemView.findViewById(R.id.ivGalleryImage))
                 // adding click or tap handler for our image layout
                 itemView.findViewById<View>(R.id.container).setOnClickListener {
                     listener?.onClick(adapterPosition)

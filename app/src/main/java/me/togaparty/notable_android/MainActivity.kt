@@ -2,35 +2,30 @@ package me.togaparty.notable_android
 
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.os.Environment.MEDIA_MOUNTED
 import android.os.Environment.MEDIA_MOUNTED_READ_ONLY
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentContainerView
-import androidx.preference.PreferenceManager
 import me.togaparty.notable_android.databinding.ActivityMainBinding
+import me.togaparty.notable_android.utils.viewBinding
 import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var container: FragmentContainerView
-    private lateinit var binding: ActivityMainBinding
+    private val binding by viewBinding(ActivityMainBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        container = findViewById(R.id.fragment_container)
-        PreferenceManager.getDefaultSharedPreferences(this).apply {
-            if (!getBoolean(OnBoardingActivity.COMPLETED_ONBOARDING_PREF_NAME, false)) {
-                val intent = Intent(this@MainActivity, OnBoardingActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-            }
-        }
+//        PreferenceManager.getDefaultSharedPreferences(this).apply {
+//            if (!getBoolean(OnBoardingActivity.COMPLETED_ONBOARDING_PREF_NAME, false)) {
+//                val intent = Intent(this@MainActivity, OnBoardingActivity::class.java)
+//                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                startActivity(intent)
+//            }
+//        }
     }
     companion object {
         private fun isExternalStorageWritable(): Boolean {
