@@ -2,14 +2,8 @@ package me.togaparty.notable_android.utils
 
 import android.app.AlertDialog
 import android.content.Context
-import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.viewbinding.ViewBinding
-
-fun <T : ViewBinding> viewBindingWithBinder(
-    binder: (View) -> T
-) = FragmentAutoClearedValueBinding(binder)
 
 fun Fragment.toast(text: String?) {
     Toast.makeText(this.requireContext(), text, Toast.LENGTH_LONG).show()

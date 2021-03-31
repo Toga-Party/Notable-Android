@@ -15,6 +15,7 @@ import me.togaparty.notable_android.utils.permissionsGranted
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClickListener {
     private lateinit var navController: NavController
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.header_preferences, rootKey)
         preferenceScreen

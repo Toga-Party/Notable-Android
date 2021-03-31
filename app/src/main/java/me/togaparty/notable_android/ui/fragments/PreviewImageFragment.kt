@@ -9,8 +9,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
@@ -23,8 +21,8 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.leinardi.android.speeddial.SpeedDialActionItem
-import com.leinardi.android.speeddial.SpeedDialView
 import com.yalantis.ucrop.UCrop
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import kotlinx.coroutines.*
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.R
@@ -34,28 +32,24 @@ import me.togaparty.notable_android.databinding.FragmentPreviewImageBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.utils.showDialog
 import me.togaparty.notable_android.utils.toast
-import me.togaparty.notable_android.utils.viewBindingWithBinder
 import java.io.File
 
 
 class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
 
+    private val binding by viewBinding(FragmentPreviewImageBinding::bind)
+
     private lateinit var fileName: String
     private var fileUri: Uri? = null
-
-    internal lateinit var imageView: ImageView
-
     private lateinit var outputCacheDirectory: File
     private lateinit var navController: NavController
 
     private lateinit var model: ImageListProvider
 
-    private val binding by viewBindingWithBinder(FragmentPreviewImageBinding::bind)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener("requestKey") { _, bundle ->
-            Log.d("PreviewDebug", "Bundle retrieved.")
             fileName = bundle.getString("photoPath").toString()
             outputCacheDirectory = MainActivity.getOutputCacheDirectory(requireContext())
             fileUri = Uri.fromFile(File(outputCacheDirectory, fileName))
@@ -66,9 +60,8 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
         super.onViewCreated(view, savedInstanceState)
 
         navController = this.findNavController()
-        imageView = binding.imageView
-        binding.saveButton1.setOnClickListener { saveImage() }
-        loadSpeedDials(binding.root) //goes BBRRR
+        binding.saveButton1.setOnClickListener{saveImage()}
+        loadSpeedDials()
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         lifecycleScope.launchWhenCreated {
             binding.root.post{
@@ -78,31 +71,29 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
 
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("PreviewDebug", "On Activity result is called.")
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            Log.d("PreviewDebug", "Image cropped successfully")
             fileUri = data?.let { UCrop.getOutput(it) }
-            Log.d("PreviewDebug", "Received uri: $fileUri")
             setImageView()
         }
     }
-    private fun loadSpeedDials(container: RelativeLayout) {
-        val floatingActionButton = container.findViewById<SpeedDialView>(R.id.speedDial2)
-        floatingActionButton.addActionItem(
+    private fun loadSpeedDials() {
+
+        binding.speedDial2.addActionItem(
                 SpeedDialActionItem.Builder(R.id.crop, R.drawable.ic_crop)
                         .setLabel(getString(R.string.crop))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
         )
-        floatingActionButton.addActionItem(
+
+        binding.speedDial2.addActionItem(
             SpeedDialActionItem.Builder(R.id.retake, R.drawable.ic_arrow_back_24px)
                 .setLabel(getString(R.string.retake))
                 .setTheme(R.style.Theme_Notable_OPENCV)
                 .setLabelClickable(false)
                 .create()
         )
-        floatingActionButton.setOnActionSelectedListener { actionItem ->
+        binding.speedDial2.setOnActionSelectedListener { actionItem ->
 
             when(actionItem.id) {
                 R.id.retake -> navController.navigate(PreviewImageFragmentDirections.actionPreviewImagePop())
@@ -115,7 +106,7 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
     private fun cropImage() {
         fileUri?.let {
             UCrop.of(it, it)
-                .withMaxResultSize(imageView.width, imageView.height)
+                .withMaxResultSize(binding.imageView.width, binding.imageView.height)
                 .start(requireContext(), this)
         }
     }
@@ -134,11 +125,9 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
                     savingOperation.await()
                     withContext(Dispatchers.Main) {
                         image?.let {
-                            Log.d("Preview", "Adding to list")
                             model.addToList(it)
                         }
                         loadingFragment.dismiss()
-                        Log.d("Preview", "Navigating to Gallery")
                         navController.navigate(PreviewImageFragmentDirections.actionPreviewImageToGalleryFragment())
                         toast("Image Saved")
                     }
@@ -160,7 +149,7 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(object : CustomTarget<Drawable>(binding.root.width, binding.root.height) {
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    imageView.setImageDrawable(resource)
+                    binding.imageView.setImageDrawable(resource)
                 }
                 override fun onLoadCleared(placeholder: Drawable?) {}
             })

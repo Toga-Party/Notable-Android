@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.databinding.FragmentDashboardBinding
@@ -19,11 +20,13 @@ import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
 
 class DashboardFragment : Fragment(R.layout.fragment_dashboard), View.OnClickListener {
+
+    private val binding by viewBinding(FragmentDashboardBinding::bind)
+
     private lateinit var navController: NavController
     private lateinit var checkPermissions: ActivityResultLauncher<Array<String>>
-    private var navDirections: NavDirections? = null
 
-    private val binding by viewBindingWithBinder(FragmentDashboardBinding::bind)
+    private var navDirections: NavDirections? = null
     private lateinit var model: ImageListProvider
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -31,7 +34,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard), View.OnClickLis
 
         if(permissionsGranted(requireContext(), FILE_REQUIRED_PERMISSIONS)){
             model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
-
             model.getList().observe(viewLifecycleOwner, {
                 activity?.let {
                     when(model.getProcessingStatus()) {
@@ -50,10 +52,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard), View.OnClickLis
         binding.filesCardview.setOnClickListener(this)
         binding.glossaryCardview.setOnClickListener(this)
         binding.settingsCardview.setOnClickListener(this)
-//        view.findViewById<CardView>(R.id.camera_cardview).setOnClickListener(this)
-//        view.findViewById<CardView>(R.id.files_cardview).setOnClickListener(this)
-//        view.findViewById<CardView>(R.id.settings_cardview).setOnClickListener(this)
-//        view.findViewById<CardView>(R.id.glossary_cardview).setOnClickListener(this)
     }
 
 
@@ -73,7 +71,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard), View.OnClickLis
                             "Permission Required",
                             "Camera access and File access is required to use this feature."
                         ) {
-                            Log.d(TAG, "Dashboard: Launching required camera permissions.")
+
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToCameraFragment()
                             checkPermissions.launch(ALL_REQUIRED_PERMISSIONS.toTypedArray())
@@ -98,14 +96,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard), View.OnClickLis
                             "Permission Required",
                             "File access is required to use this feature."
                         ) {
-                            Log.d(TAG, "Dashboard: Launching required file permissions.")
                             navDirections =
                                     DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment()
                             checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())
                         }
                     }
                     else -> {
-                        Log.d(TAG, "Dashboard: Launching required file permissions.")
                         navDirections =
                                 DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment()
                         checkPermissions.launch(FILE_REQUIRED_PERMISSIONS.toTypedArray())

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,22 +28,17 @@ import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.utils.permissionsGranted
-import me.togaparty.notable_android.utils.viewBindingWithBinder
 
-
+private const val COLUMN_COUNT = 2
 class GalleryFragment:
     Fragment(R.layout.fragment_gallery),
     GalleryImageClickListener,
-    SwipeRefreshLayout.OnRefreshListener
-{
-    // Gallery Column Count
-    private val spanCount = 2
-
+    SwipeRefreshLayout.OnRefreshListener {
+    private val binding by viewBinding(FragmentGalleryBinding::bind)
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit  var model: ImageListProvider
-    private val binding by viewBindingWithBinder(FragmentGalleryBinding::bind)
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,16 +51,19 @@ class GalleryFragment:
 
         galleryAdapter = GalleryImageAdapter(model.getList().value as MutableList<GalleryImage>)
         galleryAdapter.listener = this
-        swipeRefreshLayout = view.findViewById(R.id.swipeContainer)
-        swipeRefreshLayout.setOnRefreshListener(this)
-        swipeRefreshLayout.setColorSchemeResources(
+        model.getList().observe(viewLifecycleOwner, {
+            galleryAdapter.notifyDataSetChanged()
+        })
+
+        binding.swipeContainer.setOnRefreshListener(this)
+        binding.swipeContainer.setColorSchemeResources(
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light
         )
         // init recyclerview
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), COLUMN_COUNT)
         binding.recyclerView.adapter = galleryAdapter
     }
 
@@ -75,7 +74,7 @@ class GalleryFragment:
             model.refreshList()
             galleryAdapter.notifyDataSetChanged()
         }
-        swipeRefreshLayout.isRefreshing = false
+        binding.swipeContainer.isRefreshing = false
 
     }
     override fun onClick(position: Int) {

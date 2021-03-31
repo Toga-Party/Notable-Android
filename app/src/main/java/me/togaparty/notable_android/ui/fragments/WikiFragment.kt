@@ -10,15 +10,16 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.files.JsonParser
 import me.togaparty.notable_android.databinding.FragmentWikiBinding
 import me.togaparty.notable_android.utils.Constants
-import me.togaparty.notable_android.utils.viewBindingWithBinder
-
 
 class WikiFragment : Fragment(R.layout.fragment_wiki) {
+    private val binding by viewBinding(FragmentWikiBinding::bind)
+
     private var term: String? = null
     private var note: String? = null
     private var duration: String? = null
@@ -29,7 +30,7 @@ class WikiFragment : Fragment(R.layout.fragment_wiki) {
 
     private lateinit var coloredFoot: SpannableStringBuilder
     private val jsonParser by lazy { JsonParser.getInstance(requireContext()) }
-    private val binding by viewBindingWithBinder(FragmentWikiBinding::bind)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {

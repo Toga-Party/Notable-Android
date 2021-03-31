@@ -24,6 +24,7 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
@@ -36,14 +37,12 @@ import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.ui.adapter.PredictionsAdapter
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.toast
-import me.togaparty.notable_android.utils.viewBindingWithBinder
 
+class InspectFragment :
+    Fragment(R.layout.fragment_inspect),
+    PredictionsAdapter.OnItemClickListener {
 
-class InspectFragment : Fragment(R.layout.fragment_inspect),
-    PredictionsAdapter.OnItemClickListener
-{
-
-    private lateinit var viewPager: ViewPager
+    private val binding by viewBinding(FragmentInspectBinding::bind)
 
     internal var selectedPosition: Int = 0
     internal var finalPosition: Int = 0
@@ -63,6 +62,7 @@ class InspectFragment : Fragment(R.layout.fragment_inspect),
     private lateinit var runnable: Runnable
 
     private lateinit var currentImage: GalleryImage
+
     private var isPlaying: Boolean = false
     internal var wavFiles: Map<String, Uri>? = null
     internal var textFiles: Map<String, Uri>? = null
@@ -71,7 +71,6 @@ class InspectFragment : Fragment(R.layout.fragment_inspect),
 
     private lateinit var navController: NavController
 
-    private val binding by viewBindingWithBinder(FragmentInspectBinding::bind)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,12 +144,13 @@ class InspectFragment : Fragment(R.layout.fragment_inspect),
         // Set layout manager to position the items
         inspectRecycler.layoutManager = LinearLayoutManager(requireContext())
 
-        viewPager = binding.viewPagerBanner
+
         galleryPagerAdapter = GalleryPagerAdapter(finalPosition)
         galleryPagerAdapter.notifyDataSetChanged()
-        viewPager.adapter = galleryPagerAdapter
-        viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
-        viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
+
+        binding.viewPagerBanner.adapter = galleryPagerAdapter
+        binding.viewPagerBanner.addOnPageChangeListener(viewPagerPageChangeListener)
+        binding.viewPagerBanner.setPageTransformer(true, GlideZoomOutPageTransformer())
         navController = this.findNavController()
     }
 
@@ -293,7 +293,7 @@ class InspectFragment : Fragment(R.layout.fragment_inspect),
         }
     }
     internal fun setCurrentItem(position: Int) {
-        viewPager.setCurrentItem(position, false)
+        binding.viewPagerBanner.setCurrentItem(position, false)
         selectedPosition = position
     }
 

@@ -1,9 +1,12 @@
 package me.togaparty.notable_android.ui.fragments
 
+import android.app.Activity
+import android.app.RecoverableSecurityException
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +22,7 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.leinardi.android.speeddial.SpeedDialActionItem
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import kotlinx.coroutines.*
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
@@ -27,21 +31,20 @@ import me.togaparty.notable_android.databinding.FragmentGalleryFullscreenBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.utils.*
-import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
 
 class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fullscreen) {
 
-    private val binding by viewBindingWithBinder(FragmentGalleryFullscreenBinding::bind)
-    private lateinit var viewPager: ViewPager
+    private val binding by viewBinding(FragmentGalleryFullscreenBinding::bind)
+
     private lateinit var galleryPagerAdapter: GalleryPagerAdapter
 
     private lateinit var currentImage: GalleryImage
     private lateinit var navController: NavController
-
-    private var fileUri: Uri? = null
+    private var pendingDeleteImage: Pair<Int, Uri>? = null
     private var selectedPosition: Int = 0
     internal lateinit var model: ImageListProvider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -51,23 +54,17 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         super.onViewCreated(view, savedInstanceState)
         navController = this.findNavController()
         galleryPagerAdapter = GalleryPagerAdapter()
-
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
 
-        viewPager = binding.viewPager
-        viewPager.adapter = galleryPagerAdapter
-        viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
-        viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
-
-        setCurrentItem(requireArguments().getInt("position"))
+        binding.viewPager.adapter = galleryPagerAdapter
+        binding.viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
+        binding.viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
+        val position = requireArguments().getInt("position")
+        setCurrentItem(position)
         generateFloatingActionButton()
-
         model.getList().observe(viewLifecycleOwner, {
-            Log.d(TAG, "Fullscreen: Something changed")
-            viewPager.adapter?.notifyDataSetChanged()
-
+            binding.viewPager.adapter?.notifyDataSetChanged()
             if (model.getImageListSize() == 0) dismiss() else setCurrentItem(selectedPosition)
-
             editFloatingActionButton()
             activity?.let {
                 when (model.getProcessingStatus()) {
@@ -100,11 +97,9 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         )
     }
     private fun editFloatingActionButton() {
-        val floatingActionButton = binding.speedDial
-
         if (currentImage.processed == true) {
-            floatingActionButton.removeActionItem(1)
-            floatingActionButton.addActionItem(
+            binding.speedDial.removeActionItem(1)
+            binding.speedDial.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                     .setLabel(getString(R.string.inspect))
                     .setTheme(R.style.Theme_Notable_OPENCV)
@@ -112,8 +107,8 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
                     .create()
             )
         } else {
-            floatingActionButton.removeActionItem(1)
-            floatingActionButton.addActionItem(
+            binding.speedDial.removeActionItem(1)
+            binding.speedDial.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
                     .setLabel(getString(R.string.process_music))
                     .setTheme(R.style.Theme_Notable_OPENCV)
@@ -125,15 +120,14 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
     }
 
     private fun generateFloatingActionButton() {
-        val floatingActionButton = binding.speedDial
-        floatingActionButton.addActionItem(
+        binding.speedDial.addActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_delete, R.drawable.ic_delete_black)
                         .setLabel(getString(R.string.delete))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
         )
-        floatingActionButton.addActionItem(when (currentImage.processed == true) {
+        binding.speedDial.addActionItem(when (currentImage.processed == true) {
 
             true -> SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                     .setLabel(getString(R.string.inspect))
@@ -148,46 +142,58 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
                     .create()
         })
 
-        floatingActionButton.setOnActionSelectedListener { actionItem ->
+        binding.speedDial.setOnActionSelectedListener { actionItem ->
 
             when (actionItem.id) {
                 R.id.fab_delete -> {
-                    if (model.getProcessingTag() != null &&
-                            model.getProcessingTag() == currentImage.imageUrl) {
-                        toast("Can't delete something that's being processed")
-                        Log.d(TAG, "Full screen: delete failed")
 
-                    } else {
-                        GlobalScope.launch(Dispatchers.Main) {
+                    GlobalScope.launch(Dispatchers.Main) {
 
-                            Log.d(TAG, "Full screen: deleting")
-                            if (model.getImageListSize() != 0) {
+                        if (model.getImageListSize() != 0) {
+                            try{
+                                coroutineScope {
+                                    launch {
+                                        model.deleteGalleryImage(
+                                            selectedPosition,
+                                            currentImage.imageUrl
+                                        )
+                                    }
+                                }
+                            } catch (exec: SecurityException) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    val recoverableSecurityException = exec as?
+                                            RecoverableSecurityException ?:
+                                    throw RuntimeException(exec.message, exec)
 
-                                model.deleteGalleryImage(
-                                        selectedPosition,
-                                        currentImage.imageUrl
-                                )
+                                    val intentSender =
+                                        recoverableSecurityException.userAction.actionIntent.intentSender
+                                    intentSender?.let {
+                                        startIntentSenderForResult(intentSender, 101,
+                                            null, 0, 0, 0, null)
+                                    }
+                                    pendingDeleteImage = Pair(selectedPosition, currentImage.imageUrl)
+                                } else {
+                                    throw RuntimeException(exec.message, exec)
+                                }
                             }
-
                         }
-                        Log.d(TAG, "Full screen: deleted")
                     }
                 }
                 R.id.fab_inspect -> navigateToInspect()
-                R.id.fab_process -> {
-                    if (model.getProcessingStatus() != Status.PROCESSING) {
-                        Log.d(TAG, "Status: ${model.getProcessingStatus().name}")
-                        processImage()
-
-                    } else {
-                        toast("Something is processing. Please wait for it to finish")
-                    }
-                }
+                R.id.fab_process -> processImage()
             }
             true
         }
     }
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == 101) {
+            pendingDeleteImage?.let {
+                model.deleteGalleryImage(it.first, it.second)
+            }
+        }
+        pendingDeleteImage = null
+    }
     private fun processImage() {
 
         if (ConnectionDetector(requireContext()).connected) {
@@ -208,11 +214,9 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
 
 
     internal fun setCurrentItem(position: Int) {
-        viewPager.setCurrentItem(position, false)
+        binding.viewPager.setCurrentItem(position, false)
         currentImage = model.getGalleryImage(position)
         selectedPosition = position
-        fileUri = currentImage.imageUrl
-        editFloatingActionButton()
     }
 
 

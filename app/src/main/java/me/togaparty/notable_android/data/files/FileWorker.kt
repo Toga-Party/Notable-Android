@@ -57,8 +57,8 @@ class FileWorker(val context: Context){
         return imageList
     }
 
+    @Throws(SecurityException::class)
     fun deleteImage(fileUri: Uri) {
-        Log.d(TAG, "$fileUri")
         fileUri.let {
             context.contentResolver
                 .delete(it, null, null)

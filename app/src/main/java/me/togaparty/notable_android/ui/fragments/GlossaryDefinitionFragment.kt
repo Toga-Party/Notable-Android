@@ -4,15 +4,15 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.databinding.FragmentGlossaryDefinitionBinding
-import me.togaparty.notable_android.utils.viewBindingWithBinder
 
 
 class GlossaryDefinitionFragment : Fragment(R.layout.fragment_glossary_definition) {
+    private val binding by viewBinding(FragmentGlossaryDefinitionBinding::bind)
     private var term : String? = null
     private var definition : String? = null
-    private val binding by viewBindingWithBinder(FragmentGlossaryDefinitionBinding::bind)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {

@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.files.JsonParser
 import me.togaparty.notable_android.databinding.FragmentGlossaryBinding
@@ -19,17 +20,19 @@ import me.togaparty.notable_android.ui.adapter.CategoryItemAdapter
 import me.togaparty.notable_android.ui.adapter.MainRecyclerAdapter
 import me.togaparty.notable_android.ui.items.AllCategory
 import me.togaparty.notable_android.ui.items.CategoryItem
-import me.togaparty.notable_android.utils.viewBindingWithBinder
 import org.json.JSONException
 
 
-class GlossaryFragment : Fragment(R.layout.fragment_glossary),
-    CategoryItemAdapter.OnItemClickListener
-{
+class GlossaryFragment :
+    Fragment(R.layout.fragment_glossary),
+    CategoryItemAdapter.OnItemClickListener {
+
+    private val binding by viewBinding(FragmentGlossaryBinding::bind)
+
     internal var mainRecyclerAdapter: MainRecyclerAdapter? = null
     private lateinit var navController: NavController
     private lateinit var jsonParser: JsonParser
-    private val binding by viewBindingWithBinder(FragmentGlossaryBinding::bind)
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,38 +41,22 @@ class GlossaryFragment : Fragment(R.layout.fragment_glossary),
         navController = this.findNavController()
 
         jsonParser = JsonParser.getInstance(requireContext())
-        val categoryItemList: MutableList<CategoryItem> = ArrayList()
-        val categoryItemList2: MutableList<CategoryItem> = ArrayList()
-        val categoryItemList3: MutableList<CategoryItem> = ArrayList()
-        val categoryItemList4: MutableList<CategoryItem> = ArrayList()
-        val categoryItemList5: MutableList<CategoryItem> = ArrayList()
-        val categoryItemList6: MutableList<CategoryItem> = ArrayList()
-        val categoryItemList7: MutableList<CategoryItem> = ArrayList()
-
+        val keys = listOf("Lines", "Clefs", "Notes", "Rests", "Articulations", "Time Signatures", "Key Signatures")
+        val categories: MutableList<List<CategoryItem>> = arrayListOf()
         try {
-            categoryItemList.addAll(jsonParser.getList("Lines", 1))
-            categoryItemList2.addAll(jsonParser.getList("Clefs", 2))
-            categoryItemList3.addAll(jsonParser.getList("Notes", 3))
-            categoryItemList4.addAll(jsonParser.getList("Rests", 4))
-            categoryItemList5.addAll(jsonParser.getList("Articulations", 5))
-            categoryItemList6.addAll(jsonParser.getList("Time Signatures", 6))
-            categoryItemList7.addAll(jsonParser.getList("Key Signatures", 7))
+            for (item in keys.indices) {
+                categories.add(jsonParser.getList(keys[item], item))
+            }
         }
         catch (e: JSONException) {
             e.printStackTrace()
         }
-
-
-        val allCategory: MutableList<AllCategory> = ArrayList()
-        allCategory.add(AllCategory("Lines", categoryItemList))
-        allCategory.add(AllCategory("Clefs", categoryItemList2))
-        allCategory.add(AllCategory("Notes", categoryItemList3))
-        allCategory.add(AllCategory("Rests", categoryItemList4))
-        allCategory.add(AllCategory("Articulations", categoryItemList5))
-        allCategory.add(AllCategory("Time Signatures", categoryItemList6))
-        allCategory.add(AllCategory("Key Signatures", categoryItemList7))
-
+        val allCategory: MutableList<AllCategory> = arrayListOf()
+        for (item in keys.indices) {
+            allCategory.add(AllCategory(keys[item], categories[item]))
+        }
         setMainCategoryRecycler(allCategory)
+
 
         binding.editTextGlossary.addTextChangedListener(object:TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -96,7 +83,6 @@ class GlossaryFragment : Fragment(R.layout.fragment_glossary),
         mainRecyclerAdapter = this.context?.let { MainRecyclerAdapter(it, allCategory, this) }
         binding.mainRecycler.adapter = mainRecyclerAdapter
     }
-
 
     override fun onItemClick(position: Int, itemtext: String, itemdefinition: String) {
         val bundle = bundleOf("term" to itemtext, "definition" to itemdefinition)
