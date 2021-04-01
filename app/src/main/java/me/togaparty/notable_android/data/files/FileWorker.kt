@@ -1,15 +1,18 @@
 package me.togaparty.notable_android.data.files
 
+
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
@@ -25,30 +28,28 @@ import java.io.OutputStream
 
 class FileWorker(val context: Context){
 
-    private fun query(): Cursor? {
 
-        //val collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        } else {
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        }
-        val projection = arrayOf(
-            MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DISPLAY_NAME,
-        )
-        val selection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            MediaStore.Images.Media.RELATIVE_PATH + " like ? "
-        } else {
-            MediaStore.Images.Media.DATA + " like ? "
-        }
-        val selectionArgs = arrayOf("%Notable%")
+    fun query(
+            collection: Uri =
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+
+            projection: Array<String> = arrayOf(
+                    MediaStore.Images.Media._ID,
+                    MediaStore.Images.Media.DISPLAY_NAME,
+            ),
+            selection: String? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Images.Media.RELATIVE_PATH + " like ? "
+            } else {
+                MediaStore.Images.Media.DATA + " like ? "
+            },
+            selectionArgs: Array<String>? = arrayOf("%$TAG%")
+    ): Cursor? {
         return context.contentResolver.query(
-            collection,
-            projection,
-            selection,
-            selectionArgs,
-            MediaStore.Images.ImageColumns.DATE_ADDED
+                collection,
+                projection,
+                selection,
+                selectionArgs,
+                MediaStore.Images.ImageColumns.DATE_ADDED
         )
 
     }
@@ -56,8 +57,7 @@ class FileWorker(val context: Context){
         val imageList = arrayListOf<GalleryImage>()
 
         val outputDirectory = MainActivity.externalAppSpecificStorage(context)
-        query()?.use {  cursor ->
-            Log.d(TAG, "Content size of query: ${cursor.count}")
+        query()?.use { cursor ->
             val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
 
@@ -65,10 +65,10 @@ class FileWorker(val context: Context){
                 val id = cursor.getLong(idCol)
                 val name = cursor.getString(nameCol)
                 val contentUri: Uri = ContentUris.withAppendedId(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        id
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    id
                 )
-                val tempImage = GalleryImage(contentUri, name)
+                val tempImage = GalleryImage(contentUri, name, id)
 
                 val checkDir = File(outputDirectory, File(name).nameWithoutExtension)
                 if (checkDir.exists()) {
@@ -92,8 +92,75 @@ class FileWorker(val context: Context){
         }
     }
 
+    fun copyImage(
+            filename: String,
+            uri:Uri
+    ):GalleryImage? {
+        var image: GalleryImage? = null
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.apply {
+                put(
+                        MediaStore.Images.Media.RELATIVE_PATH,
+                        Environment.DIRECTORY_PICTURES + File.separator + TAG
+                )
+                put(MediaStore.Images.Media.IS_PENDING, true)
+            }
+
+            // RELATIVE_PATH and IS_PENDING are introduced in API 29.
+            val imageUri: Uri? = context.contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    values
+            )
+            if (imageUri != null) {
+                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                val bitmap = ImageDecoder.decodeBitmap(source)
+                context.contentResolver.openOutputStream(imageUri).use {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                }
+                values.clear()
+                values.put(MediaStore.Images.Media.IS_PENDING, false)
+                context.contentResolver.update(
+                        imageUri,
+                        values,
+                        null, null
+                )
+                image = GalleryImage(imageUri, filename, processed = false)
+            }
+        } else {
+
+            val saveDirectory = File(
+                    Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES
+                    ), File.separator + TAG
+            )
+
+            if (!saveDirectory.exists()) {
+                saveDirectory.mkdirs()
+            }
+            val saveFile = System.currentTimeMillis().toString() + ".png"
+            val file = File(saveDirectory, saveFile)
+
+            val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            val imageUri = context.contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    values
+            )
+            file.outputStream().use {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+            // .DATA is deprecated in API 29
+            values.put(MediaStore.Images.Media.DATA, file.absolutePath)
+            image = imageUri?.let { GalleryImage(it, filename, processed = false) }
+        }
+
+        return image
+    }
     fun saveImage(
-            directory: String,
             filename: String,
             uri: Uri
     ): GalleryImage? {
@@ -107,37 +174,37 @@ class FileWorker(val context: Context){
             values.apply {
                 put(
                     MediaStore.Images.Media.RELATIVE_PATH,
-                    Environment.DIRECTORY_PICTURES + File.separator + directory
+                    Environment.DIRECTORY_PICTURES + File.separator + TAG
                 )
                 put(MediaStore.Images.Media.IS_PENDING, true)
             }
             // RELATIVE_PATH and IS_PENDING are introduced in API 29.
             val imageUri: Uri? =
                 context.contentResolver.insert(
-                    MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     values
                 )
 
             if (imageUri != null) {
                 saveImageOutput(
-                    uri,
-                    context.contentResolver.openOutputStream(imageUri)
+                        uri,
+                        context.contentResolver.openOutputStream(imageUri)
                 )
                 values.clear()
                 values.put(MediaStore.Images.Media.IS_PENDING, false)
                 context.contentResolver.update(
-                    imageUri,
-                    values,
-                    null, null
+                        imageUri,
+                        values,
+                        null, null
                 )
-                image = GalleryImage(imageUri, filename, false)
+                image = GalleryImage(imageUri, filename, processed = false)
             }
         } else {
 
             val saveDirectory = File(
-                Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_PICTURES
-                ), File.separator + directory
+                    Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES
+                    ), File.separator + TAG
             )
 
             if (!saveDirectory.exists()) {
@@ -152,13 +219,14 @@ class FileWorker(val context: Context){
 
             // .DATA is deprecated in API 29
             val imageUri = context.contentResolver.insert(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                values
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    values
             )
-            image = imageUri?.let { GalleryImage(it, filename, false) }
+            image = imageUri?.let { GalleryImage(it, filename, processed = false) }
         }
         return image
     }
+
     private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
         val matrix = Matrix()
         matrix.postRotate(degrees.toFloat())
@@ -182,7 +250,6 @@ class FileWorker(val context: Context){
         }
         return map
     }
-
     private fun saveImageOutput(fileUri: Uri, outputStream: OutputStream?) {
 
         var bitmap = BitmapFactory.decodeFile(fileUri.path!!)

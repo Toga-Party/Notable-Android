@@ -1,13 +1,17 @@
 package me.togaparty.notable_android.ui.fragments
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -65,6 +69,7 @@ class GalleryFragment:
         // init recyclerview
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), COLUMN_COUNT)
         binding.recyclerView.adapter = galleryAdapter
+        binding.importImage.setOnClickListener { openGallery()}
     }
 
     override fun onRefresh() {
@@ -84,6 +89,24 @@ class GalleryFragment:
         val galleryFragment = GalleryFullscreenFragment()
         galleryFragment.arguments = bundle
         galleryFragment.show(fragmentTransaction, "gallery")
+    }
+    fun openGallery(){
+        val intent = Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.type = "*/*"
+        val mimeTypes = arrayOf("image/*")
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+        startActivityForResult(intent, 102)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        //super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == 102 && resultCode == RESULT_OK && data != null) {
+            Log.d(TAG,"Getting data from gallery")
+            lifecycleScope.launch(Dispatchers.IO) {
+                model.copyImageToList(data)
+            }
+        }
+
     }
 
     inner class GalleryImageAdapter(private val itemList: MutableList<GalleryImage>) :

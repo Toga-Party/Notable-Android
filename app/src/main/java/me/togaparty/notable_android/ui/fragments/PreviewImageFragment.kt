@@ -120,7 +120,7 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
                 CoroutineScope(Dispatchers.IO).launch {
                     var image: GalleryImage? = null
                     val savingOperation = async(Dispatchers.IO) {
-                        image = model.saveImageToStorage("Notable", fileName, it)
+                        image = model.saveImageToStorage(fileName, it)
                     }
                     savingOperation.await()
                     withContext(Dispatchers.Main) {
