@@ -103,8 +103,9 @@ class GalleryFragment:
         //super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == 102 && resultCode == RESULT_OK && data != null) {
             Log.d(TAG,"Getting data from gallery")
+            val loadingFragment = LoadingFragment.show(childFragmentManager)
             lifecycleScope.launch {
-                val loadingFragment = LoadingFragment.show(childFragmentManager)
+                
                 val deferred = GlobalScope.async{
                     model.copyImageToList(data)
                 }
