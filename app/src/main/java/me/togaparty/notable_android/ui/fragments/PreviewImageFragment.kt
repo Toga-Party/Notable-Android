@@ -8,45 +8,39 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.leinardi.android.speeddial.SpeedDialActionItem
-import com.leinardi.android.speeddial.SpeedDialView
 import com.yalantis.ucrop.UCrop
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import kotlinx.coroutines.*
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.databinding.FragmentPreviewImageBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.utils.showDialog
 import me.togaparty.notable_android.utils.toast
 import java.io.File
 
 
-class PreviewImageFragment : Fragment() {
+class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
+
+    private val binding by viewBinding(FragmentPreviewImageBinding::bind)
 
     private lateinit var fileName: String
     private var fileUri: Uri? = null
-
-    private lateinit var container: RelativeLayout
-    internal lateinit var imageView: ImageView
-
     private lateinit var outputCacheDirectory: File
     private lateinit var navController: NavController
 
@@ -56,60 +50,50 @@ class PreviewImageFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener("requestKey") { _, bundle ->
-            Log.d("PreviewDebug", "Bundle retrieved.")
             fileName = bundle.getString("photoPath").toString()
             outputCacheDirectory = MainActivity.getOutputCacheDirectory(requireContext())
             fileUri = Uri.fromFile(File(outputCacheDirectory, fileName))
         }
     }
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_preview_image, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        container = view as RelativeLayout
-        navController = container.findNavController()
-        imageView = container.findViewById(R.id.imageView)
-        container.findViewById<ImageButton>(R.id.save_button_1).setOnClickListener { saveImage() }
-        loadSpeedDials(container) //goes BBRRR
+
+        navController = this.findNavController()
+        binding.saveButton1.setOnClickListener{saveImage()}
+        loadSpeedDials()
         model = ViewModelProvider(requireActivity()).get(ImageListProvider::class.java)
         lifecycleScope.launchWhenCreated {
-            container.post{
+            binding.root.post{
                 setImageView()
             }
         }
 
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("PreviewDebug", "On Activity result is called.")
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            Log.d("PreviewDebug", "Image cropped successfully")
             fileUri = data?.let { UCrop.getOutput(it) }
-            Log.d("PreviewDebug", "Received uri: $fileUri")
             setImageView()
         }
     }
-    private fun loadSpeedDials(container: RelativeLayout) {
-        val floatingActionButton = container.findViewById<SpeedDialView>(R.id.speedDial2)
-        floatingActionButton.addActionItem(
+    private fun loadSpeedDials() {
+
+        binding.speedDial2.addActionItem(
                 SpeedDialActionItem.Builder(R.id.crop, R.drawable.ic_crop)
                         .setLabel(getString(R.string.crop))
                         .setTheme(R.style.Theme_Notable_OPENCV)
                         .setLabelClickable(false)
                         .create()
         )
-        floatingActionButton.addActionItem(
+
+        binding.speedDial2.addActionItem(
             SpeedDialActionItem.Builder(R.id.retake, R.drawable.ic_arrow_back_24px)
                 .setLabel(getString(R.string.retake))
                 .setTheme(R.style.Theme_Notable_OPENCV)
                 .setLabelClickable(false)
                 .create()
         )
-        floatingActionButton.setOnActionSelectedListener { actionItem ->
+        binding.speedDial2.setOnActionSelectedListener { actionItem ->
 
             when(actionItem.id) {
                 R.id.retake -> navController.navigate(PreviewImageFragmentDirections.actionPreviewImagePop())
@@ -122,7 +106,7 @@ class PreviewImageFragment : Fragment() {
     private fun cropImage() {
         fileUri?.let {
             UCrop.of(it, it)
-                .withMaxResultSize(imageView.width, imageView.height)
+                .withMaxResultSize(binding.imageView.width, binding.imageView.height)
                 .start(requireContext(), this)
         }
     }
@@ -141,11 +125,9 @@ class PreviewImageFragment : Fragment() {
                     savingOperation.await()
                     withContext(Dispatchers.Main) {
                         image?.let {
-                            Log.d("Preview", "Adding to list")
                             model.addToList(it)
                         }
                         loadingFragment.dismiss()
-                        Log.d("Preview", "Navigating to Gallery")
                         navController.navigate(PreviewImageFragmentDirections.actionPreviewImageToGalleryFragment())
                         toast("Image Saved")
                     }
@@ -165,9 +147,9 @@ class PreviewImageFragment : Fragment() {
             .load(fileUri)
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .into(object : CustomTarget<Drawable>(container.width, container.height) {
+            .into(object : CustomTarget<Drawable>(binding.root.width, binding.root.height) {
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    imageView.setImageDrawable(resource)
+                    binding.imageView.setImageDrawable(resource)
                 }
                 override fun onLoadCleared(placeholder: Drawable?) {}
             })

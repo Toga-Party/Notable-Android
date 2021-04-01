@@ -7,18 +7,19 @@ import android.text.SpannableStringBuilder
 import android.text.method.ScrollingMovementMethod
 import android.text.style.ForegroundColorSpan
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.files.JsonParser
+import me.togaparty.notable_android.databinding.FragmentWikiBinding
 import me.togaparty.notable_android.utils.Constants
 
+class WikiFragment : Fragment(R.layout.fragment_wiki) {
+    private val binding by viewBinding(FragmentWikiBinding::bind)
 
-class WikiFragment : Fragment() {
     private var term: String? = null
     private var note: String? = null
     private var duration: String? = null
@@ -39,30 +40,6 @@ class WikiFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-
-        val list = term?.let {
-
-            when (it) {
-                "keySignature", "timeSignature", "rest" ->
-                    jsonParser.getNoteNameDuration(it, duration?: "")
-                "barline", "tie", "multirest" ->
-                    jsonParser.getNameAndDefinition(it)
-                else ->
-                    jsonParser.getNoteNameDuration(it, note ?: "")
-            }
-        } ?: listOf("", "", "", "")
-
-        setFormattedText(list)
-
-        if(BuildConfig.DEBUG) {
-            Log.d(Constants.TAG, "$term $note $duration")
-        }
-        return inflater.inflate(R.layout.fragment_wiki, container, false)
-    }
     private fun setFormattedText(list: List<Any>){
         coloredFoot = SpannableStringBuilder()
         title = list[0] as String
@@ -99,21 +76,33 @@ class WikiFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val list = term?.let {
 
-        view.findViewById<TextView>(R.id.term_textview).text = title
+            when (it) {
+                "keySignature", "timeSignature", "rest" ->
+                    jsonParser.getNoteNameDuration(it, duration?: "")
+                "barline", "tie", "multirest" ->
+                    jsonParser.getNameAndDefinition(it)
+                else ->
+                    jsonParser.getNoteNameDuration(it, note ?: "")
+            }
+        } ?: listOf("", "", "", "")
 
-        val definitionTextView: TextView = view.findViewById(R.id.definition_textview)
-        definitionTextView.text = definition
-        definitionTextView.movementMethod = ScrollingMovementMethod()
+        setFormattedText(list)
 
-        val notesTextView: TextView = view.findViewById(R.id.notes_textview)
-        notesTextView.text = body
-        notesTextView.movementMethod = ScrollingMovementMethod()
+        if(BuildConfig.DEBUG) {
+            Log.d(Constants.TAG, "$term $note $duration")
+        }
+        binding.termTextview.text = title
 
-        val durationTextView: TextView = view.findViewById(R.id.duration_textview)
-        durationTextView.setText(coloredFoot, TextView.BufferType.SPANNABLE)
-        //durationTextView.text = foot
-        durationTextView.movementMethod = ScrollingMovementMethod()
+        binding.definitionTextview.text = definition
+        binding.definitionTextview.movementMethod = ScrollingMovementMethod()
+
+        binding.notesTextview.text = body
+        binding.notesTextview.movementMethod = ScrollingMovementMethod()
+
+        binding.durationTextview.setText(coloredFoot, TextView.BufferType.SPANNABLE)
+        binding.durationTextview.movementMethod = ScrollingMovementMethod()
     }
 
     companion object {

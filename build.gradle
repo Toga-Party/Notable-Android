@@ -2,7 +2,7 @@
 apply from: 'buildenvironment/dependencies.gradle'
 buildscript {
 
-    ext.kotlin_version = "1.4.31"
+    ext.kotlin_version = "1.4.32"
     repositories {
         google()
         jcenter()

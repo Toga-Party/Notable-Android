@@ -4,16 +4,15 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
-import android.view.*
-import android.widget.ImageButton
+import android.view.OrientationEventListener
+import android.view.Surface
+import android.view.View
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -23,9 +22,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.common.util.concurrent.ListenableFuture
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.R
+import me.togaparty.notable_android.databinding.FragmentCameraBinding
 import me.togaparty.notable_android.utils.ALL_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.permissionsGranted
@@ -35,19 +37,20 @@ import java.util.*
 import java.util.concurrent.Executors
 
 
-class CameraFragment : Fragment() {
+class CameraFragment : Fragment(R.layout.fragment_camera) {
 
+    private val binding by viewBinding(FragmentCameraBinding::bind)
     private lateinit var outputDirectory: File
 
     private lateinit var processCameraProvider: ProcessCameraProvider
     private lateinit var processCameraProviderFuture: ListenableFuture<ProcessCameraProvider>
 
-    internal lateinit var previewView: PreviewView
-
     internal lateinit var imageCapture: ImageCapture
     internal lateinit var navController: NavController
 
     private lateinit var orientationEventListener: OrientationEventListener
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,17 +61,10 @@ class CameraFragment : Fragment() {
         outputDirectory = MainActivity.getOutputCacheDirectory(requireContext())
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_camera, container, false)
-    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val container = view as ConstraintLayout
-        previewView = container.findViewById(R.id.view_finder)
-        container.findViewById<ImageButton>(R.id.cam_capture_button).setOnClickListener{takePhoto()}
+
+        binding.camCaptureButton.setOnClickListener{takePhoto()}
 
         lifecycleScope.launch {
             processCameraProviderFuture = ProcessCameraProvider.getInstance(requireContext()).apply {
@@ -104,18 +100,18 @@ class CameraFragment : Fragment() {
     private fun startCamera() {
         processCameraProvider.unbindAll()
         fun previewUseCase() : Preview {
-            val display = previewView.display
+            val display = binding.viewFinder.display
             val metrics = DisplayMetrics().also { display.getRealMetrics(it) }
             return Preview.Builder()
                     .setTargetRotation(display.rotation)
                     .setTargetResolution(Size(metrics.widthPixels, metrics.heightPixels))
                     .build()
                     .also {
-                        it.setSurfaceProvider(previewView.surfaceProvider)
+                        it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
                     }
         }
         fun captureUseCase(): ImageCapture {
-            val display = previewView.display
+            val display = binding.viewFinder.display
             val metrics = DisplayMetrics().also { display.getRealMetrics(it) }
             imageCapture = ImageCapture.Builder()
                     .setTargetRotation(display.rotation)
@@ -144,8 +140,7 @@ class CameraFragment : Fragment() {
 
                     override fun onError(error: ImageCaptureException) {
                         val message = "Image captured successfully"
-                        Log.d(TAG, message)
-                        previewView.post {
+                        lifecycleScope.launch(Dispatchers.Main) {
                             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                         }
                     }
@@ -154,14 +149,14 @@ class CameraFragment : Fragment() {
                         val message = "Image captured successfully"
                         setFragmentResult("requestKey",
                                 bundleOf("photoPath" to photoName))
-                        previewView.post {
+                        lifecycleScope.launch(Dispatchers.Main){
                             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                             navController.navigate(CameraFragmentDirections.actionCameraFragmentToPreviewImage())
                         }
                     }
-                })
+                }
+        )
     }
-
 
     companion object {
         private const val FILENAME_FORMAT = "EEE_dd_MM_yyyy_HHmmss"

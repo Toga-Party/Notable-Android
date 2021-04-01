@@ -27,10 +27,6 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     private val newList = arrayListOf<GalleryImage>()
 
-    private var processingTag: Uri? = null
-    @Volatile
-    private var processingPosition: Int = 0
-
     private var processingStatus = Status.AVAILABLE
 
     private val imageList: MutableLiveData<List<GalleryImage>> by lazy {
@@ -57,9 +53,6 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     suspend fun uploadImage(image: GalleryImage, position: Int)  {
 
         processingStatus = Status.PROCESSING
-        processingTag = image.imageUrl
-        processingPosition = position
-
         var returnedImage: GalleryImage? = null
         var message = "Upload failed:"
 
@@ -84,7 +77,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         value.await()
         returnedImage?.let {
             returned ->
-            newList[processingPosition] = returned.copy(
+            newList[position] = returned.copy(
                     imageFiles = returned.imageFiles.toMutableMap(),
                     textFiles =  returned.textFiles.toMutableMap(),
                     wavFiles =  returned.wavFiles.toMutableMap(),
@@ -93,17 +86,11 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         withContext(Dispatchers.Main) {
             imageList.value = newList
         }
-        processingPosition = 0
-        processingTag = null
-
     }
-
 
     fun getProcessingStatus() = processingStatus
 
     fun setProcessingStatus(status: Status) { processingStatus = status}
-
-    fun getProcessingTag() = processingTag
 
     fun getImageListSize(): Int = newList.size
 
@@ -120,9 +107,9 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         imageList.value = newList
     }
 
+    @Throws(SecurityException::class)
     fun deleteGalleryImage(position: Int, fileUri: Uri) {
         newList.removeAt(position)
-        if(processingPosition > 0) processingPosition -= 1
         fileWorker.deleteImage(fileUri)
         imageList.value = newList
     }

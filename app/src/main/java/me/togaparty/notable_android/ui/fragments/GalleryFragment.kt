@@ -15,41 +15,30 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.fragment_gallery.*
-import kotlinx.android.synthetic.main.item_gallery_image.view.*
+import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import me.togaparty.notable_android.R
 import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
+import me.togaparty.notable_android.databinding.FragmentGalleryBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.ui.adapter.GalleryImageClickListener
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.FILE_REQUIRED_PERMISSIONS
 import me.togaparty.notable_android.utils.permissionsGranted
 
-
+private const val COLUMN_COUNT = 2
 class GalleryFragment:
-    Fragment(),
+    Fragment(R.layout.fragment_gallery),
     GalleryImageClickListener,
-    SwipeRefreshLayout.OnRefreshListener
-{
-    // Gallery Column Count
-    private val spanCount = 2
-
+    SwipeRefreshLayout.OnRefreshListener {
+    private val binding by viewBinding(FragmentGalleryBinding::bind)
     private lateinit var galleryAdapter: GalleryImageAdapter
     private lateinit var navController: NavController
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit  var model: ImageListProvider// by activityViewModels()
+    private lateinit  var model: ImageListProvider
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_gallery, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,43 +51,20 @@ class GalleryFragment:
 
         galleryAdapter = GalleryImageAdapter(model.getList().value as MutableList<GalleryImage>)
         galleryAdapter.listener = this
-        swipeRefreshLayout = view.findViewById(R.id.swipeContainer)
+        model.getList().observe(viewLifecycleOwner, {
+            galleryAdapter.notifyDataSetChanged()
+        })
 
-//        model.getList().observe(viewLifecycleOwner, {
-//            Log.d(TAG, "Gallery: Something changed")
-//
-//            activity?.let {
-//                when (model.getProcessingStatus()) {
-//                    Status.FAILED -> {
-//                        showFailedDialog("Upload failed", "The upload you sent failed.")
-//                        model.setProcessingStatus(Status.AVAILABLE)
-//                    }
-//                    Status.SUCCESSFUL -> {
-//                        showSuccessDialog(
-//                            "Processing finished",
-//                            "We have received the response from the server. " +
-//                                    "Please check the image you processed earlier to inspect it."
-//                        ) {}
-//                        model.setProcessingStatus(Status.AVAILABLE)
-//                    }
-//
-//                    else -> Unit
-//                }
-//            }
-//
-//
-//            galleryAdapter.notifyDataSetChanged()
-//        })
-        swipeRefreshLayout.setOnRefreshListener(this)
-        swipeRefreshLayout.setColorSchemeResources(
+        binding.swipeContainer.setOnRefreshListener(this)
+        binding.swipeContainer.setColorSchemeResources(
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light
         )
         // init recyclerview
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
-        recyclerView.adapter = galleryAdapter
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), COLUMN_COUNT)
+        binding.recyclerView.adapter = galleryAdapter
     }
 
     override fun onRefresh() {
@@ -108,7 +74,7 @@ class GalleryFragment:
             model.refreshList()
             galleryAdapter.notifyDataSetChanged()
         }
-        swipeRefreshLayout.isRefreshing = false
+        binding.swipeContainer.isRefreshing = false
 
     }
     override fun onClick(position: Int) {
@@ -143,7 +109,9 @@ class GalleryFragment:
             holder.bind()
         }
 
-        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        inner class ViewHolder(
+            itemView: View
+        ) : RecyclerView.ViewHolder(itemView) {
             fun bind() {
                 val image = itemList[adapterPosition]
 
@@ -158,13 +126,14 @@ class GalleryFragment:
 
                 // load image
                 GlideApp.with(context!!)
-                        .load(image.imageUrl)
-                        .placeholder(circularProgressDrawable)
-                        .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(itemView.ivGalleryImage)
+                    .load(image.imageUrl)
+                    .placeholder(circularProgressDrawable)
+                    .centerCrop()
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(itemView.findViewById(R.id.ivGalleryImage))
                 // adding click or tap handler for our image layout
-                itemView.container.setOnClickListener {
+                itemView.findViewById<View>(R.id.container).setOnClickListener {
                     listener?.onClick(adapterPosition)
                 }
             }

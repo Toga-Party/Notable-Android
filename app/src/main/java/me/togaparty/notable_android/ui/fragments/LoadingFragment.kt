@@ -12,7 +12,6 @@ import me.togaparty.notable_android.R
 
 class LoadingFragment: DialogFragment() {
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return requireActivity().layoutInflater.inflate(R.layout.fragment_loading, container)

@@ -9,13 +9,16 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.ramotion.paperonboarding.PaperOnboardingFragment
 import com.ramotion.paperonboarding.PaperOnboardingPage
+import me.togaparty.notable_android.databinding.ActivityOnboardingBinding
+import me.togaparty.notable_android.utils.viewBinding
 
 
 class OnBoardingActivity : AppCompatActivity() {
+
+	private val binding by viewBinding(ActivityOnboardingBinding::inflate)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_onboarding)
-
+		setContentView(binding.root)
 
 		val onBoardingFragment = PaperOnboardingFragment.newInstance(data)
 
