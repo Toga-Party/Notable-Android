@@ -39,20 +39,23 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         }
         data
     }
-    suspend fun copyImageToList(intent: Intent) {
+    suspend fun copyImageToList(intent: Intent): Status {
         val uri = intent.data!!
-        var returnedID: Long = -1
         lateinit var returnedName: String
+
 
         fun checkForDuplicates() : Boolean {
             fileWorker.query(collection = uri, selection = null, selectionArgs = null)?.use {
                 cursor ->
                 cursor.moveToFirst()
-                returnedID = cursor.getLong(0)
                 returnedName = cursor.getString(1)
             }
+            newList.forEach {
+                Log.d(TAG, "${it.name} == $returnedName")
+
+            }
             return !newList.any { galleryImage ->
-                galleryImage.name == returnedName && galleryImage.id != (-1).toLong() && galleryImage.id == returnedID
+                galleryImage.name == returnedName
             }
         }
         if(checkForDuplicates()) {
@@ -62,7 +65,10 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                     addToList(returnedImage)
                 }
             }
+        } else {
+            return Status.CONFLICT
         }
+        return Status.SUCCESSFUL
     }
     fun refreshList() {
         newList.clear()
@@ -131,8 +137,8 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     @Throws(SecurityException::class)
     fun deleteGalleryImage(position: Int, fileUri: Uri) {
-        newList.removeAt(position)
         fileWorker.deleteImage(fileUri)
+        newList.removeAt(position)
         imageList.value = newList
     }
 

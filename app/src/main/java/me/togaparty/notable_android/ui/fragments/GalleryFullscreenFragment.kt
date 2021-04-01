@@ -198,7 +198,7 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 101) {
             pendingDeleteImage?.let {
-                model.deleteGalleryImage(it.first, it.second)
+               model.deleteGalleryImage(it.first, it.second)
             }
         }
         pendingDeleteImage = null

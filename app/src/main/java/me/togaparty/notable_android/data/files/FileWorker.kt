@@ -96,7 +96,7 @@ class FileWorker(val context: Context){
             filename: String,
             uri:Uri
     ):GalleryImage? {
-        var image: GalleryImage? = null
+        val image: GalleryImage?
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, filename)
             put(MediaStore.Images.Media.MIME_TYPE, "image/*")
@@ -130,6 +130,8 @@ class FileWorker(val context: Context){
                         null, null
                 )
                 image = GalleryImage(imageUri, filename, processed = false)
+            } else {
+                throw IOException("Failed to create new MediaStore record.")
             }
         } else {
 
@@ -142,20 +144,31 @@ class FileWorker(val context: Context){
             if (!saveDirectory.exists()) {
                 saveDirectory.mkdirs()
             }
-            val saveFile = System.currentTimeMillis().toString() + ".png"
-            val file = File(saveDirectory, saveFile)
 
-            val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            val file = File(saveDirectory, filename)
+
+            context.contentResolver.openInputStream(uri).use {
+                input ->
+                if (input != null) {
+                    file.outputStream().use {
+                        output ->
+                        input.copyTo(output, 4096)
+                    }
+                } else{
+                    throw IOException("Failed to create output stream.")
+                }
+            }
+            //saveImageOutput(uri, FileOutputStream(file))
+
+            values.put(MediaStore.Images.Media.DATA, file.absolutePath)
+
+            // .DATA is deprecated in API 29
             val imageUri = context.contentResolver.insert(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     values
             )
-            file.outputStream().use {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
-            }
-            // .DATA is deprecated in API 29
-            values.put(MediaStore.Images.Media.DATA, file.absolutePath)
             image = imageUri?.let { GalleryImage(it, filename, processed = false) }
+                    ?: throw IOException("Failed to insert new MediaStore record.")
         }
 
         return image
