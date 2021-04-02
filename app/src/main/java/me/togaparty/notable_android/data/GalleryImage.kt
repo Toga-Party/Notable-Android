@@ -11,7 +11,7 @@ data class GalleryImage (
         val imageUrl: Uri,
         val name: String,
         var id: Long = (-1).toLong(),
-        var processed: Boolean? = false,
+        var processed: Boolean = false,
         var textFiles: Map<String,Uri> = linkedMapOf(),
         var wavFiles: Map<String,Uri> = linkedMapOf(),
         var imageFiles: Map<String,Uri> = linkedMapOf(),

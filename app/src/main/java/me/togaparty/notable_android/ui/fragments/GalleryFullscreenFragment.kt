@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ import me.togaparty.notable_android.databinding.FragmentGalleryFullscreenBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.utils.*
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
 
 class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fullscreen) {
@@ -44,6 +46,7 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
     private var pendingDeleteImage: Pair<Int, Uri>? = null
     private var selectedPosition: Int = 0
     internal lateinit var model: ImageListProvider
+    private  var loadingFragment: ProgressLoadingFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +62,12 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         binding.viewPager.adapter = galleryPagerAdapter
         binding.viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         binding.viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
+
+
         val position = requireArguments().getInt("position")
-        setCurrentItem(position)
+        selectedPosition = position
+        currentImage = model.getGalleryImage(position)
+
         generateFloatingActionButton()
         model.getList().observe(viewLifecycleOwner, {
             binding.viewPager.adapter?.notifyDataSetChanged()
@@ -72,24 +79,37 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
                 }
                 setCurrentItem(selectedPosition)
             }
-            editFloatingActionButton()
-
-
             activity?.let {
+
                 when (model.getProcessingStatus()) {
                     Status.FAILED -> {
                         showFailedDialog("Upload failed",
                             "The upload you sent failed.")
                         model.setProcessingStatus(Status.AVAILABLE)
+                        loadingFragment?.dismiss()
 
                     }
+                    Status.PROCESSING -> {
+                        Log.d(TAG, "Processing image")
+                        loadingFragment = ProgressLoadingFragment.show(childFragmentManager)
+                    }
+                    Status.EXTRACTING_DATA -> {
+                        Log.d(TAG, "Extracting image")
+                        loadingFragment?.editStateNumber(2)
+                    }
                     Status.SUCCESSFUL -> {
-                        showSuccessDialog(
-                            "Processing finished",
-                            "We have received the response from the server want to " +
-                                    "inspect it?"
-                        ) {navigateToInspect()}
-                        model.setProcessingStatus(Status.AVAILABLE)
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            loadingFragment?.editStateNumber(3)
+                            delay(1500)
+                            loadingFragment?.finishedAllStates(true)
+                            delay(1500)
+                            showSuccessDialog(
+                                "Processing finished",
+                                "We have received the response from the server want to " +
+                                        "inspect it?"
+                            ) {navigateToInspect()}
+                            model.setProcessingStatus(Status.AVAILABLE)
+                        }
                     }
                     else -> Unit
                 }
@@ -106,24 +126,23 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         )
     }
     private fun editFloatingActionButton() {
-        if (currentImage.processed == true) {
-            binding.speedDial.removeActionItem(1)
-            binding.speedDial.addActionItem(
+
+        if (currentImage.processed) {
+            binding.speedDial.replaceActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                     .setLabel(getString(R.string.inspect))
                     .setTheme(R.style.Theme_Notable_OPENCV)
                     .setLabelClickable(false)
                     .create()
-            )
+            , 1)
         } else {
-            binding.speedDial.removeActionItem(1)
-            binding.speedDial.addActionItem(
+            binding.speedDial.replaceActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
                     .setLabel(getString(R.string.process_music))
                     .setTheme(R.style.Theme_Notable_OPENCV)
                     .setLabelClickable(false)
                     .create()
-            )
+            , 1)
         }
 
     }
@@ -136,7 +155,7 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
                         .setLabelClickable(false)
                         .create()
         )
-        binding.speedDial.addActionItem(when (currentImage.processed == true) {
+        binding.speedDial.addActionItem(when (currentImage.processed) {
 
             true -> SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                     .setLabel(getString(R.string.inspect))
@@ -207,13 +226,11 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
 
         if (ConnectionDetector(requireContext()).connected) {
             toast("Processing image")
-            val loadingFragment = LoadingFragment.show(childFragmentManager)
+
             lifecycleScope.launch {
-                val deferred = GlobalScope.async(Dispatchers.IO + NonCancellable) {
+                GlobalScope.launch(Dispatchers.IO + NonCancellable) {
                     model.uploadImage(currentImage, selectedPosition)
                 }
-                deferred.await()
-                withContext(Dispatchers.Main) {loadingFragment.dismiss()}
             }
 
         } else {
@@ -224,8 +241,9 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
 
     internal fun setCurrentItem(position: Int) {
         binding.viewPager.setCurrentItem(position, false)
-        currentImage = model.getGalleryImage(position)
         selectedPosition = position
+        currentImage = model.getGalleryImage(position)
+        editFloatingActionButton()
     }
 
 

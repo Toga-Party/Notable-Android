@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,15 +9,34 @@
         android:id="@+id/state_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:spb_currentStateNumber="one"
-        app:spb_maxStateNumber="four"
-        app:spb_stateBackgroundColor="#BDBDBD"
-        app:spb_stateForegroundColor="#009688"
-        app:spb_stateNumberBackgroundColor="#808080"
-        app:spb_stateNumberForegroundColor="#eeeeee"
-        app:spb_currentStateDescriptionColor="#009688"
-        app:spb_stateDescriptionColor="#808080"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:spb_animateToCurrentProgressState="true"
-        app:spb_checkStateCompleted="true"/>
+        app:spb_animationDuration="2000"
+        app:spb_checkStateCompleted="true"
+        app:spb_currentStateDescriptionColor="@color/ic_launcher_background"
+        app:spb_currentStateNumber="one"
+        app:spb_maxStateNumber="three"
+        app:spb_stateBackgroundColor="#BDBDBD"
+        app:spb_stateDescriptionColor="@color/design_default_color_on_secondary"
+        app:spb_stateForegroundColor="@color/yellow"
+        app:spb_stateNumberBackgroundColor="#808080"
+        app:spb_stateNumberForegroundColor="@color/background_color" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow"
+        android:fontFamily="@font/amiko_bold"
+        android:padding="16dp"
+        android:text="TextView"
+        android:textColor="@color/design_default_color_on_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/state_progress_bar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

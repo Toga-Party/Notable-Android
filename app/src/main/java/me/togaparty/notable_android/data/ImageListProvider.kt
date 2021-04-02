@@ -1,3 +1,5 @@
+@file:Suppress("BlockingMethodInNonBlockingContext")
+
 package me.togaparty.notable_android.data
 
 import android.app.Application
@@ -8,10 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.data.files.FileWorker
 import me.togaparty.notable_android.data.network.RetrofitWorker
@@ -39,7 +38,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         }
         data
     }
-    suspend fun copyImageToList(intent: Intent): Status {
+    fun copyImageToList(intent: Intent): Status {
         val uri = intent.data!!
         lateinit var returnedName: String
         fun checkForDuplicates() : Boolean {
@@ -57,12 +56,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
             }
         }
         if(checkForDuplicates()) {
-            val returnedImage = fileWorker.copyImage(returnedName, uri)
-            if(returnedImage != null) {
-                withContext(Dispatchers.Main) {
-                    addToList(returnedImage)
-                }
-            }
+            fileWorker.copyImage(returnedName, uri)
         } else {
             return Status.CONFLICT
         }
@@ -80,6 +74,11 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     suspend fun uploadImage(image: GalleryImage, position: Int)  {
 
         processingStatus = Status.PROCESSING
+        withContext(Dispatchers.Main) {
+            imageList.value = newList
+        }
+
+
         var returnedImage: GalleryImage? = null
         var message = "Upload failed:"
 
@@ -87,7 +86,6 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
             when(val returnedValue = retrofitWorker.uploadFile(image)) {
                 is RetrofitWorker.UploadResult.Success -> {
                     returnedImage = returnedValue.retrieved
-                    processingStatus = Status.SUCCESSFUL
                 }
                 is RetrofitWorker.UploadResult.Error -> {
                     message += returnedValue.message
@@ -102,16 +100,32 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
             Log.d(TAG, "Returned image textfiles count: ${returnedImage?.textFiles?.size}")
             Log.d(TAG, "Returned image imagefiles count: ${returnedImage?.imageFiles?.size}")
         }
-        returnedImage?.let { returned ->
-            newList[position] = returned.copy(
-                imageFiles = returned.imageFiles.toMutableMap(),
-                textFiles = returned.textFiles.toMutableMap(),
-                wavFiles = returned.wavFiles.toMutableMap(),
-            )
+        if(processingStatus != Status.FAILED) {
+            returnedImage?.let { returned ->
 
-        }
-        withContext(Dispatchers.Main) {
-            imageList.value = newList
+                processingStatus = Status.EXTRACTING_DATA
+
+                withContext(Dispatchers.Main) {
+                    imageList.value = newList
+                }
+
+                newList[position] = returned.copy(
+                    imageFiles = returned.imageFiles.toMutableMap(),
+                    textFiles = returned.textFiles.toMutableMap(),
+                    wavFiles = returned.wavFiles.toMutableMap(),
+                )
+                Thread.sleep(2000) //I am blocking the UI anyway, then just block everything all together.
+                //Really hacky solution for flashing screen issue.
+            }
+            withContext(Dispatchers.Main) {
+                processingStatus = Status.SUCCESSFUL
+                imageList.value = newList
+            }
+        }else {
+            withContext(Dispatchers.Main) {
+
+                imageList.value = newList
+            }
         }
     }
 
@@ -125,22 +139,8 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     fun getList() : LiveData<List<GalleryImage>> = imageList
 
-    suspend fun saveImageToStorage(filename: String, fileUri: Uri): GalleryImage? {
-        val returnedImage = fileWorker.saveImage(filename, fileUri)
-        if (returnedImage != null) {
-            addToList(image=returnedImage)
-        } else {
-            return null
-        }
-        return returnedImage
-    }
-
-    suspend fun addToList(image: GalleryImage) {
-        withContext(Dispatchers.Main) {
-
-            newList.add(image)
-            imageList.value = newList
-        }
+    fun saveImageToStorage(filename: String, fileUri: Uri) {
+        fileWorker.saveImage(filename, fileUri)
     }
 
     @Throws(SecurityException::class)

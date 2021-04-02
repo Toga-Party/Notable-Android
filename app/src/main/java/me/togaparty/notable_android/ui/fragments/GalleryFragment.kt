@@ -73,15 +73,18 @@ class GalleryFragment:
     }
 
     override fun onRefresh() {
-
-        Log.d(TAG, "Gallery: Refreshing list")
         GlobalScope.launch(Dispatchers.Main) {
             model.refreshList()
             galleryAdapter.notifyDataSetChanged()
         }
         binding.swipeContainer.isRefreshing = false
-
     }
+
+    override fun onResume() {
+        super.onResume()
+        onRefresh()
+    }
+
     override fun onClick(position: Int) {
         val bundle = Bundle()
             bundle.putInt("position", position)
@@ -111,6 +114,8 @@ class GalleryFragment:
                 }
                 deferred.await()
                 withContext(Dispatchers.Main) {
+
+
                     loadingFragment.dismiss()
                     when(deferred.getCompleted()) {
                         Status.SUCCESSFUL -> toast("Successfully imported the image")
