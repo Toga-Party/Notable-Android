@@ -63,6 +63,8 @@ dependencies {
     //Speed Dial
     implementation "com.leinardi.android:speed-dial:3.1.1"
     implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation 'com.mikhaellopez:circularprogressbar:3.0.3'
+    implementation 'com.kofigyan.stateprogressbar:stateprogressbar:0.0.1'
 
     //LifeCycle
     def lifecycle_version = "2.3.1"

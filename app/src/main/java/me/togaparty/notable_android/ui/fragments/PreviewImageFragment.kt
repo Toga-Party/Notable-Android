@@ -118,15 +118,12 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
 
             fileUri?.let {
                 CoroutineScope(Dispatchers.IO).launch {
-                    var image: GalleryImage? = null
                     val savingOperation = async(Dispatchers.IO) {
-                        image = model.saveImageToStorage(fileName, it)
+                        model.saveImageToStorage(fileName, it)
+                        Thread.sleep(100000)
                     }
                     savingOperation.await()
                     withContext(Dispatchers.Main) {
-                        image?.let {
-                            model.addToList(it)
-                        }
                         loadingFragment.dismiss()
                         navController.navigate(PreviewImageFragmentDirections.actionPreviewImageToGalleryFragment())
                         toast("Image Saved")

@@ -42,8 +42,6 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     suspend fun copyImageToList(intent: Intent): Status {
         val uri = intent.data!!
         lateinit var returnedName: String
-
-
         fun checkForDuplicates() : Boolean {
             fileWorker.query(collection = uri, selection = null, selectionArgs = null)?.use {
                 cursor ->
@@ -126,13 +124,21 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     fun getList() : LiveData<List<GalleryImage>> = imageList
 
-    fun saveImageToStorage(filename: String, fileUri: Uri): GalleryImage? {
-        return fileWorker.saveImage(filename, fileUri)
+    suspend fun saveImageToStorage(filename: String, fileUri: Uri): GalleryImage? {
+        val returnedImage = fileWorker.saveImage(filename, fileUri)
+        if (returnedImage != null) {
+            addToList(returnedImage)
+        } else {
+            return null
+        }
+        return returnedImage
     }
 
-    fun addToList(image: GalleryImage) {
-        newList.add(image)
-        imageList.value = newList
+    suspend fun addToList(image: GalleryImage) {
+        withContext(Dispatchers.Main) {
+            newList.add(image)
+            imageList.value = newList
+        }
     }
 
     @Throws(SecurityException::class)
