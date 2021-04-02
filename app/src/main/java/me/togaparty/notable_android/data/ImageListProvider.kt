@@ -96,18 +96,19 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                 }
             }
         }
+        value.await()
         if(BuildConfig.DEBUG) {
             Log.d(TAG, "Returned image wavfiles count: ${returnedImage?.wavFiles?.size}")
             Log.d(TAG, "Returned image textfiles count: ${returnedImage?.textFiles?.size}")
             Log.d(TAG, "Returned image imagefiles count: ${returnedImage?.imageFiles?.size}")
         }
-        value.await()
         returnedImage?.let { returned ->
             newList[position] = returned.copy(
                 imageFiles = returned.imageFiles.toMutableMap(),
                 textFiles = returned.textFiles.toMutableMap(),
                 wavFiles = returned.wavFiles.toMutableMap(),
             )
+
         }
         withContext(Dispatchers.Main) {
             imageList.value = newList
@@ -127,7 +128,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     suspend fun saveImageToStorage(filename: String, fileUri: Uri): GalleryImage? {
         val returnedImage = fileWorker.saveImage(filename, fileUri)
         if (returnedImage != null) {
-            addToList(returnedImage)
+            addToList(image=returnedImage)
         } else {
             return null
         }
@@ -136,6 +137,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     suspend fun addToList(image: GalleryImage) {
         withContext(Dispatchers.Main) {
+
             newList.add(image)
             imageList.value = newList
         }

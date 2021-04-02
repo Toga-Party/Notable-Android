@@ -120,7 +120,7 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
                 CoroutineScope(Dispatchers.IO).launch {
                     val savingOperation = async(Dispatchers.IO) {
                         model.saveImageToStorage(fileName, it)
-                        Thread.sleep(100000)
+                        Thread.sleep(1500)
                     }
                     savingOperation.await()
                     withContext(Dispatchers.Main) {
