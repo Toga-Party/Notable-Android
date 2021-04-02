@@ -1,6 +1,7 @@
 package me.togaparty.notable_android.data
 
 import android.app.Application
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -16,7 +17,6 @@ import me.togaparty.notable_android.data.files.FileWorker
 import me.togaparty.notable_android.data.network.RetrofitWorker
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.Status
-
 
 
 class ImageListProvider(app: Application) : AndroidViewModel(app) {
@@ -39,8 +39,35 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         }
         data
     }
+    suspend fun copyImageToList(intent: Intent): Status {
+        val uri = intent.data!!
+        lateinit var returnedName: String
+        fun checkForDuplicates() : Boolean {
+            fileWorker.query(collection = uri, selection = null, selectionArgs = null)?.use {
+                cursor ->
+                cursor.moveToFirst()
+                returnedName = cursor.getString(1)
+            }
+            newList.forEach {
+                Log.d(TAG, "${it.name} == $returnedName")
 
-
+            }
+            return !newList.any { galleryImage ->
+                galleryImage.name == returnedName
+            }
+        }
+        if(checkForDuplicates()) {
+            val returnedImage = fileWorker.copyImage(returnedName, uri)
+            if(returnedImage != null) {
+                withContext(Dispatchers.Main) {
+                    addToList(returnedImage)
+                }
+            }
+        } else {
+            return Status.CONFLICT
+        }
+        return Status.SUCCESSFUL
+    }
     fun refreshList() {
         newList.clear()
         imageList.value = newList
@@ -75,12 +102,11 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
             Log.d(TAG, "Returned image imagefiles count: ${returnedImage?.imageFiles?.size}")
         }
         value.await()
-        returnedImage?.let {
-            returned ->
+        returnedImage?.let { returned ->
             newList[position] = returned.copy(
-                    imageFiles = returned.imageFiles.toMutableMap(),
-                    textFiles =  returned.textFiles.toMutableMap(),
-                    wavFiles =  returned.wavFiles.toMutableMap(),
+                imageFiles = returned.imageFiles.toMutableMap(),
+                textFiles = returned.textFiles.toMutableMap(),
+                wavFiles = returned.wavFiles.toMutableMap(),
             )
         }
         withContext(Dispatchers.Main) {
@@ -98,19 +124,27 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     fun getList() : LiveData<List<GalleryImage>> = imageList
 
-    fun saveImageToStorage(directory: String, filename: String, fileUri: Uri): GalleryImage? {
-        return fileWorker.saveImage(directory, filename, fileUri)
+    suspend fun saveImageToStorage(filename: String, fileUri: Uri): GalleryImage? {
+        val returnedImage = fileWorker.saveImage(filename, fileUri)
+        if (returnedImage != null) {
+            addToList(returnedImage)
+        } else {
+            return null
+        }
+        return returnedImage
     }
 
-    fun addToList(image: GalleryImage) {
-        newList.add(image)
-        imageList.value = newList
+    suspend fun addToList(image: GalleryImage) {
+        withContext(Dispatchers.Main) {
+            newList.add(image)
+            imageList.value = newList
+        }
     }
 
     @Throws(SecurityException::class)
     fun deleteGalleryImage(position: Int, fileUri: Uri) {
-        newList.removeAt(position)
         fileWorker.deleteImage(fileUri)
+        newList.removeAt(position)
         imageList.value = newList
     }
 

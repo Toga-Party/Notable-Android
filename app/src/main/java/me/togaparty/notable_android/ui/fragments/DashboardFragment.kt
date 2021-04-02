@@ -52,7 +52,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard), View.OnClickLis
                     }
                     shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) ||
                             shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
-                            shouldShowRequestPermissionRationale(Manifest.permission.MANAGE_EXTERNAL_STORAGE) ||
                             shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                         requireContext().showPermissionRequestDialog(
                                 "Permission Required",
@@ -78,7 +77,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard), View.OnClickLis
                                 DashboardFragmentDirections.actionDashboardFragmentToGalleryFragment())
                     }
                     shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
-                            shouldShowRequestPermissionRationale(Manifest.permission.MANAGE_EXTERNAL_STORAGE) ||
                             shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                         requireContext().showPermissionRequestDialog(
                                 "Permission Required",

@@ -97,12 +97,21 @@ class OnBoardingActivity : AppCompatActivity() {
 				)
 			)
 			add(
+					PaperOnboardingPage(
+							"Import Image", "The user has the option to import an image from another directory.",
+							Color.parseColor("#ffe573"),
+							R.drawable.ic_import_black,
+							R.drawable.ic_import_black
+					)
+			)
+			add(
 				PaperOnboardingPage(
 					"Delete Image", "The user has the option to delete an image.",
 					Color.parseColor("#ffe573"),
 					R.drawable.trash,
 					R.drawable.trash
 				)
+
 			)
 			add(
 				PaperOnboardingPage(
@@ -131,6 +140,50 @@ class OnBoardingActivity : AppCompatActivity() {
 					R.drawable.book_icon_150,
 					R.drawable.search_icon
 				)
+			)
+
+			add(
+					PaperOnboardingPage(
+							"Monophonic Music Sheet",
+							"This application is limited to processing Monophonic music sheets only. The Monophonic texture is the simplest among all the types of texture in music. " +
+									"It is defined as a piece of music where there is only one melodic sound being heard. " +
+									"An example of a Monophonic music sheet is shown at the next page.",
+							Color.parseColor("#ffffff"),
+							R.drawable.ic_check,
+							R.drawable.ic_check_yellow
+					)
+			)
+
+			add(
+					PaperOnboardingPage(
+							"",
+							"",
+							Color.parseColor("#ffffff"),
+							R.drawable.ic_monophonic__joytotheworld,
+							R.drawable.ic_musicnote
+					)
+			)
+
+			add(
+					PaperOnboardingPage(
+							"Non-Monophonic Music Sheet",
+							"Please refrain from using Non-monophonic music sheets. " +
+									"Non-monophonic textures include polyphonic, homophonic, and heterophonic textures. " +
+									"An example of non-monophonic music sheet (polyphonic) is shown at the next page.",
+							Color.parseColor("#ffffff"),
+							R.drawable.ic_close,
+							R.drawable.ic_close_yellow
+					)
+			)
+
+			add(
+					PaperOnboardingPage(
+							"",
+							"",
+							Color.parseColor("#ffffff"),
+							R.drawable.ic_polyphonic,
+							R.drawable.ic_musicnote
+					)
 			)
 		}
 	}
