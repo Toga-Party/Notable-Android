@@ -126,9 +126,15 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
 
     private fun processFailedProcessingMessages(message: String, callback: () -> Unit ) {
 
-        //TODO: handle message here before passing it to dialog.
 
-        showFailedDialog("Upload failed", "$message Please contact support for more inquiries.")
+        val processed = if (message.startsWith("Processing Failed:", true)) {
+            //TODO: handle message here before passing it to dialog.
+            message
+        } else {
+            message
+        }
+
+        showFailedDialog("Upload failed", "$processed Please contact support for more inquiries.")
 
         return callback()
     }

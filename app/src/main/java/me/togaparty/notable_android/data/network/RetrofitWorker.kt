@@ -67,8 +67,7 @@ class RetrofitWorker(val context: Context) {
                 Log.v(TAG, "Retrofit: Success response received ${response.body()!!.contentLength()}")
 
                 if(response.body()!!.contentLength() <= 100) {
-                    throw  RuntimeException("Processing Failed: ${response.body()?.string()} " +
-                            "Please contact support for more inquiries.")
+                    throw  RuntimeException("Processing Failed: ${response.body()?.string()}")
                 }
                 ZipInputStream(response.body()?.byteStream()).use { zip ->
                     var entry = zip.nextEntry
