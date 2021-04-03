@@ -37,7 +37,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         }
         data
     }
-    val imageList = arrayListOf<GalleryImage>()
+    private val imageList = arrayListOf<GalleryImage>()
 
     fun copyImageToList(intent: Intent): Status {
         val uri = intent.data!!
