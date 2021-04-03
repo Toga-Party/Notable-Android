@@ -10,6 +10,8 @@ import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
+import retrofit2.Response
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.File.separator
@@ -44,11 +46,20 @@ class RetrofitWorker(val context: Context) {
 
         Log.d(TAG, "Retrofit: Uploading the image")
         val retrofit: RetrofitService = RetrofitBuilder.retrofitInstance
-        val response = imageToSend?.let { sendImage ->
-            Log.v(TAG, "Retrofit: Waiting for response")
-            retrofit
-                .upload(sendImage, filename)
-                .execute()
+
+        val response: Response<ResponseBody>? = try {
+            imageToSend?.let { sendImage ->
+                Log.v(TAG, "Retrofit: Waiting for response")
+                retrofit
+                    .upload(sendImage, filename)
+                    .execute()
+            }
+        } catch (exec: IOException) {
+            exec.printStackTrace()
+            throw IOException("Failed to upload the file to the server.")
+        } catch (exec: RuntimeException) {
+            exec.printStackTrace()
+            throw RuntimeException("Failed to decode the response from the server.")
         }
 
         if (response != null) {
@@ -56,7 +67,8 @@ class RetrofitWorker(val context: Context) {
                 Log.v(TAG, "Retrofit: Success response received ${response.body()!!.contentLength()}")
 
                 if(response.body()!!.contentLength() <= 100) {
-                    throw  IllegalStateException("Server sent an error message: ${response.body()?.string()}")
+                    throw  RuntimeException("Processing Failed: ${response.body()?.string()} " +
+                            "Please contact support for more inquiries.")
                 }
                 ZipInputStream(response.body()?.byteStream()).use { zip ->
                     var entry = zip.nextEntry
@@ -86,7 +98,13 @@ class RetrofitWorker(val context: Context) {
                         if(BuildConfig.DEBUG) {
                             Log.d(TAG, "Retrofit: Extracting zip")
                         }
-                        extractFile(zip, FileOutputStream(send))
+                        try {
+                            extractFile(zip, FileOutputStream(send))
+                        } catch (exec: IOException) {
+                            exec.printStackTrace()
+                            throw IOException("Failed to extract the response received from the server.")
+                        }
+
                         when (send.extension) {
                             "wav" -> image.addWavFiles(
                                 mapOf(Pair(
@@ -117,12 +135,12 @@ class RetrofitWorker(val context: Context) {
                     }
                 }
             } else {
-                throw IOException("Response is empty. Upload failed.")
+                throw IOException("Upload failed. Server might be down.")
             }
         }
         return image.apply { processed = true }
     }
-    @Throws(Exception::class)
+    @Throws(IOException::class)
     private fun extractFile(zipIn: ZipInputStream, fileOutputStream: FileOutputStream) {
         val bytesIn = ByteArray(4096)
         var read: Int

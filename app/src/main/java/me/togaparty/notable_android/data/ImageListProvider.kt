@@ -37,7 +37,7 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         }
         data
     }
-    val imageList = arrayListOf<GalleryImage>()
+    private val imageList = arrayListOf<GalleryImage>()
 
     fun copyImageToList(intent: Intent): Status {
         val uri = intent.data!!
@@ -94,8 +94,9 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                                 _imageList.value = imageList
                             }
                         }
-                    } catch (ex: Exception) {
-                        _states.postValue(Pair(Status.FAILED, UploadResult.Error(message = "Something went wrong: ${ex.message}", ex)))
+                    } catch (exec: Exception) {
+                        exec.printStackTrace()
+                        _states.postValue(Pair(Status.FAILED, UploadResult.Error(message = exec.message.toString(), exec)))
                     }
                 }
             }
