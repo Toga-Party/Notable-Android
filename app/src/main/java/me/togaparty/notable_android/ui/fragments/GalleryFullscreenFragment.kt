@@ -74,10 +74,10 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
 
                 when(status.first) {
                     Status.FAILED -> {
-                        showFailedDialog("Upload failed",
-                                (status.second as UploadResult.Error).message)
-                        loadingFragment?.dismiss()
-                        model.resetStatus()
+                        processFailedProcessingMessages((status.second as UploadResult.Error).message) {
+                            loadingFragment?.dismiss()
+                            model.resetStatus()
+                        }
                     }
                     Status.PROCESSING -> {
                         Log.d(TAG, "Processing image")
@@ -99,8 +99,11 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
                                     "Processing finished",
                                     "We have received the response from the server. Do you want to " +
                                             "inspect it?"
-                            ) {navigateToInspect()}
-                            model.resetStatus()
+                            ) {
+                                model.resetStatus()
+                                navigateToInspect()
+                            }
+
                         }
                     }
                     else -> Unit
@@ -121,6 +124,20 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         })
     }
 
+    private fun processFailedProcessingMessages(message: String, callback: () -> Unit ) {
+
+
+        val processed = if (message.startsWith("Processing Failed:", true)) {
+            //TODO: handle message here before passing it to dialog.
+            message
+        } else {
+            message
+        }
+
+        showFailedDialog("Upload failed", "$processed Please contact support for more inquiries.")
+
+        return callback()
+    }
     private fun navigateToInspect() {
         dismiss()
         val bundle = bundleOf("currentImage" to currentImage)

@@ -73,11 +73,11 @@ class GalleryFragment:
     }
 
     override fun onRefresh() {
-        GlobalScope.launch(Dispatchers.Main) {
+        lifecycleScope.launch(Dispatchers.Main) {
             model.refreshList()
             galleryAdapter.notifyDataSetChanged()
+            binding.swipeContainer.isRefreshing = false
         }
-        binding.swipeContainer.isRefreshing = false
     }
 
     override fun onResume() {
@@ -114,15 +114,13 @@ class GalleryFragment:
                 }
                 deferred.await()
                 withContext(Dispatchers.Main) {
-
-
-                    loadingFragment.dismiss()
                     when(deferred.getCompleted()) {
                         Status.SUCCESSFUL -> toast("Successfully imported the image")
                         Status.CONFLICT -> toast("Please delete the original entry if you want to replace it.")
                         else ->  toast("Something went wrong.")
                     }
-
+                    onRefresh()
+                    loadingFragment.dismiss()
                 }
             }
         }
