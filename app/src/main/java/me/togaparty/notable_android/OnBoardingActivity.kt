@@ -7,9 +7,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
-import com.ramotion.paperonboarding.PaperOnboardingFragment
 import com.ramotion.paperonboarding.PaperOnboardingPage
 import me.togaparty.notable_android.databinding.ActivityOnboardingBinding
+import me.togaparty.notable_android.ui.fragments.CustomOnBoardingFragment
 import me.togaparty.notable_android.utils.viewBinding
 
 
@@ -20,7 +20,7 @@ class OnBoardingActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		setContentView(binding.root)
 
-		val onBoardingFragment = PaperOnboardingFragment.newInstance(data)
+		val onBoardingFragment = CustomOnBoardingFragment.newInstance(data)
 
 		val fragmentTransaction: FragmentTransaction = supportFragmentManager.beginTransaction()
 		fragmentTransaction.add(R.id.fragment_container, onBoardingFragment)
