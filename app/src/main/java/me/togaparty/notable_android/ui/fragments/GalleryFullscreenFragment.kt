@@ -69,25 +69,15 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         currentImage = model.getGalleryImage(position)
 
         generateFloatingActionButton()
-        model.getList().observe(viewLifecycleOwner, {
-            binding.viewPager.adapter?.notifyDataSetChanged()
-            if (model.getImageListSize() == 0) {
-                dismiss()
-            } else{
-                if(selectedPosition >= model.getImageListSize()) {
-                    selectedPosition -= 1
-                }
-                setCurrentItem(selectedPosition)
-            }
+        model.states.observe(viewLifecycleOwner, { status ->
             activity?.let {
 
-                when (model.getProcessingStatus()) {
+                when(status.first) {
                     Status.FAILED -> {
                         showFailedDialog("Upload failed",
-                            "The upload you sent failed.")
-                        model.setProcessingStatus(Status.AVAILABLE)
+                                (status.second as UploadResult.Error).message)
                         loadingFragment?.dismiss()
-
+                        model.resetStatus()
                     }
                     Status.PROCESSING -> {
                         Log.d(TAG, "Processing image")
@@ -98,21 +88,35 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
                         loadingFragment?.editStateNumber(2)
                     }
                     Status.SUCCESSFUL -> {
+
                         lifecycleScope.launch(Dispatchers.Main) {
                             loadingFragment?.editStateNumber(3)
                             delay(1500)
                             loadingFragment?.finishedAllStates(true)
                             delay(1500)
+
                             showSuccessDialog(
-                                "Processing finished",
-                                "We have received the response from the server want to " +
-                                        "inspect it?"
+                                    "Processing finished",
+                                    "We have received the response from the server. Do you want to " +
+                                            "inspect it?"
                             ) {navigateToInspect()}
-                            model.setProcessingStatus(Status.AVAILABLE)
+                            model.resetStatus()
                         }
                     }
                     else -> Unit
                 }
+            }
+        })
+
+        model.getList().observe(viewLifecycleOwner, {
+            binding.viewPager.adapter?.notifyDataSetChanged()
+            if (model.getImageListSize() == 0) {
+                dismiss()
+            } else{
+                if(selectedPosition >= model.getImageListSize()) {
+                    selectedPosition -= 1
+                }
+                setCurrentItem(selectedPosition)
             }
         })
     }
@@ -214,7 +218,7 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        //super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 101) {
             pendingDeleteImage?.let {
                model.deleteGalleryImage(it.first, it.second)
@@ -225,8 +229,6 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
     private fun processImage() {
 
         if (ConnectionDetector(requireContext()).connected) {
-            toast("Processing image")
-
             lifecycleScope.launch {
                 GlobalScope.launch(Dispatchers.IO + NonCancellable) {
                     model.uploadImage(currentImage, selectedPosition)

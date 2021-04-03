@@ -11,11 +11,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
-import me.togaparty.notable_android.BuildConfig
 import me.togaparty.notable_android.data.files.FileWorker
 import me.togaparty.notable_android.data.network.RetrofitWorker
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.Status
+import me.togaparty.notable_android.utils.UploadResult
 
 
 class ImageListProvider(app: Application) : AndroidViewModel(app) {
@@ -24,20 +24,21 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     private val retrofitWorker = RetrofitWorker(getApplication())
 
-    private val newList = arrayListOf<GalleryImage>()
+    private val _states = MutableLiveData<Pair<Status, UploadResult<String>?>>()
+    val states: LiveData<Pair<Status, UploadResult<String>?>> = _states
 
-    private var processingStatus = Status.AVAILABLE
-
-    private val imageList: MutableLiveData<List<GalleryImage>> by lazy {
-        val data = MutableLiveData<List<GalleryImage>>().apply {
+    private val _imageList: MutableLiveData<List<GalleryImage>> by lazy {
+        val data = MutableLiveData<List<GalleryImage>>().apply { //Could've created a separate logic for this. This might do for now.
             value = mutableListOf()
             viewModelScope.launch {
-                newList += fileWorker.loadImages()
+                imageList += fileWorker.loadImages()
             }
-            value = newList
+            value = imageList
         }
         data
     }
+    val imageList = arrayListOf<GalleryImage>()
+
     fun copyImageToList(intent: Intent): Status {
         val uri = intent.data!!
         lateinit var returnedName: String
@@ -47,11 +48,11 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                 cursor.moveToFirst()
                 returnedName = cursor.getString(1)
             }
-            newList.forEach {
+            imageList.forEach {
                 Log.d(TAG, "${it.name} == $returnedName")
 
             }
-            return !newList.any { galleryImage ->
+            return !imageList.any { galleryImage ->
                 galleryImage.name == returnedName
             }
         }
@@ -63,81 +64,48 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
         return Status.SUCCESSFUL
     }
     fun refreshList() {
-        newList.clear()
-        imageList.value = newList
+        imageList.clear()
+        _imageList.value = imageList
         viewModelScope.launch {
-            newList += fileWorker.loadImages()
+            imageList += fileWorker.loadImages()
         }
-        imageList.value = newList
+        _imageList.value = imageList
     }
 
-    suspend fun uploadImage(image: GalleryImage, position: Int)  {
+    suspend fun uploadImage(image: GalleryImage, position: Int) {
+        val value = viewModelScope.async(Dispatchers.IO) {
+            coroutineScope {
+                launch(Dispatchers.IO) {
+                    try {
+                        _states.postValue(Pair(Status.PROCESSING, null))
+                        retrofitWorker.uploadFile(image).let { returned ->
 
-        processingStatus = Status.PROCESSING
-        withContext(Dispatchers.Main) {
-            imageList.value = newList
-        }
+                            _states.postValue(Pair(Status.EXTRACTING_DATA, null))
+                            delay(1800)
 
-
-        var returnedImage: GalleryImage? = null
-        var message = "Upload failed:"
-
-        val value = viewModelScope.async(context = Dispatchers.IO) {
-            when(val returnedValue = retrofitWorker.uploadFile(image)) {
-                is RetrofitWorker.UploadResult.Success -> {
-                    returnedImage = returnedValue.retrieved
-                }
-                is RetrofitWorker.UploadResult.Error -> {
-                    message += returnedValue.message
-                    Log.e(TAG, message, returnedValue.cause)
-                    processingStatus = Status.FAILED
+                            imageList[position] = returned.copy(
+                                    imageFiles = returned.imageFiles.toMutableMap(),
+                                    textFiles = returned.textFiles.toMutableMap(),
+                                    wavFiles = returned.wavFiles.toMutableMap(),
+                            )
+                            _states.postValue(Pair(Status.SUCCESSFUL, UploadResult.Success(message = "Upload successful")))
+                            delay(1800)
+                            withContext(Dispatchers.Main) {
+                                _imageList.value = imageList
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        _states.postValue(Pair(Status.FAILED, UploadResult.Error(message = "Something went wrong: ${ex.message}", ex)))
+                    }
                 }
             }
         }
         value.await()
-        if(BuildConfig.DEBUG) {
-            Log.d(TAG, "Returned image wavfiles count: ${returnedImage?.wavFiles?.size}")
-            Log.d(TAG, "Returned image textfiles count: ${returnedImage?.textFiles?.size}")
-            Log.d(TAG, "Returned image imagefiles count: ${returnedImage?.imageFiles?.size}")
-        }
-        if(processingStatus != Status.FAILED) {
-            returnedImage?.let { returned ->
-
-                processingStatus = Status.EXTRACTING_DATA
-
-                withContext(Dispatchers.Main) {
-                    imageList.value = newList
-                }
-
-                newList[position] = returned.copy(
-                    imageFiles = returned.imageFiles.toMutableMap(),
-                    textFiles = returned.textFiles.toMutableMap(),
-                    wavFiles = returned.wavFiles.toMutableMap(),
-                )
-                Thread.sleep(2000) //I am blocking the UI anyway, then just block everything all together.
-                //Really hacky solution for flashing screen issue.
-            }
-            withContext(Dispatchers.Main) {
-                processingStatus = Status.SUCCESSFUL
-                imageList.value = newList
-            }
-        }else {
-            withContext(Dispatchers.Main) {
-
-                imageList.value = newList
-            }
-        }
     }
-
-    fun getProcessingStatus() = processingStatus
-
-    fun setProcessingStatus(status: Status) { processingStatus = status}
-
-    fun getImageListSize(): Int = newList.size
-
-    fun getGalleryImage(position: Int): GalleryImage = newList[position]
-
-    fun getList() : LiveData<List<GalleryImage>> = imageList
+    fun resetStatus() = _states.postValue(Pair(Status.NIL,null))
+    fun getImageListSize(): Int = imageList.size
+    fun getGalleryImage(position: Int): GalleryImage = imageList[position]
+    fun getList() : LiveData<List<GalleryImage>> = _imageList
 
     fun saveImageToStorage(filename: String, fileUri: Uri) {
         fileWorker.saveImage(filename, fileUri)
@@ -146,8 +114,8 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
     @Throws(SecurityException::class)
     fun deleteGalleryImage(position: Int, fileUri: Uri) {
         fileWorker.deleteImage(fileUri)
-        newList.removeAt(position)
-        imageList.value = newList
+        imageList.removeAt(position)
+        _imageList.value = imageList
     }
 
 

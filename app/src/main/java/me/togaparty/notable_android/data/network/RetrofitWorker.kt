@@ -15,13 +15,13 @@ import java.io.File
 import java.io.File.separator
 import java.io.FileOutputStream
 import java.io.IOException
-import java.net.ConnectException
 import java.util.zip.ZipInputStream
 
 
 class RetrofitWorker(val context: Context) {
 
-    fun uploadFile(currentImage: GalleryImage): UploadResult = try {
+    @Throws(Exception::class)
+    fun uploadFile(currentImage: GalleryImage): GalleryImage {
 
         val image = GalleryImage(
             imageUrl = currentImage.imageUrl,
@@ -53,9 +53,9 @@ class RetrofitWorker(val context: Context) {
 
         if (response != null) {
             if (response.isSuccessful) {
-                Log.v(TAG, "Retrofit: Success response received")
+                Log.v(TAG, "Retrofit: Success response received ${response.body()!!.contentLength()}")
 
-                if(response.body()?.contentLength()!! < 30) {
+                if(response.body()!!.contentLength() <= 100) {
                     throw  IllegalStateException("Server sent an error message: ${response.body()?.string()}")
                 }
                 ZipInputStream(response.body()?.byteStream()).use { zip ->
@@ -120,13 +120,7 @@ class RetrofitWorker(val context: Context) {
                 throw IOException("Response is empty. Upload failed.")
             }
         }
-        UploadResult.Success(retrieved = image.apply { processed = true })
-    } catch (exe: IOException) {
-        UploadResult.Error("Failed to process the response: ${exe.message}", IOException())
-    } catch (exe: ConnectException) {
-        UploadResult.Error("Failed to connect to server: ${exe.message}", ConnectException())
-    } catch (exe: Exception) {
-        UploadResult.Error("Failed to upload the image: ${exe.message}", Exception())
+        return image.apply { processed = true }
     }
     @Throws(Exception::class)
     private fun extractFile(zipIn: ZipInputStream, fileOutputStream: FileOutputStream) {
@@ -137,9 +131,5 @@ class RetrofitWorker(val context: Context) {
                 bos.write(bytesIn, 0, read)
             }
         }
-    }
-    sealed class UploadResult {
-        data class Success(val retrieved: GalleryImage) : UploadResult()
-        data class Error(val message: String, val cause: Exception? = null) : UploadResult()
     }
 }
