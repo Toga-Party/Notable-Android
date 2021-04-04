@@ -127,12 +127,30 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
     private fun processFailedProcessingMessages(message: String, callback: () -> Unit ) {
 
 
-        val processed = if (message.startsWith("Processing Failed:", true)) {
+        val regex = Regex("(?:Processing Failed:)([^\\n\\r]*)", RegexOption.IGNORE_CASE)
+        val matches = regex.find(message)
+        val processed = matches?.let {
             //TODO: handle message here before passing it to dialog.
-            message
-        } else {
-            message
-        }
+            var (found) = it.destructured
+            found = found.trim()
+            Log.d(TAG, found)
+            if (found.startsWith("Audio error", true)) {
+                "Server can't generate music from the image you sent. Please try to place the sheet in a flat surface and adjust the camera to focus directly above the sheet before capturing."
+            } else if (found.startsWith("Prediction error", true)) {
+                "Server can't process the image you sent. Please try to isolate the music sheet with better lighting before capturing."
+            } else if(found.contains(Regex("black", RegexOption.IGNORE_CASE))) {
+                "The server detected an unusual amount of black pixels in the image sent, and cannot properly segment the music sheet. Capture only the sheet and staves, and use a better lighting environment."
+            } else if (found.startsWith("Atypical", true)){
+                "Server can't process the image you sent. Please make sure the image you sent only has the music sheet in it with minimal to no noises on background."
+            } else if(found.startsWith("Image sent")) {
+                "The image you sent might have been corrupted for the server to recognize. Please retry."
+            } else if(found.startsWith("Compression error")){
+                "Server might have encountered an issue with sending the response back to the client. This will be fixed ASAP."
+            } else {
+                found
+            }
+
+        } ?: message
 
         showFailedDialog("Upload failed", "$processed Please contact support for more inquiries.")
 
