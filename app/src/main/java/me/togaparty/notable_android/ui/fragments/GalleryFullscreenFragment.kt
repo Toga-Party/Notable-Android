@@ -136,10 +136,10 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
             Log.d(TAG, found)
             if (found.startsWith("Audio error", true)) {
                 "Server can't generate music from the image you sent. Please try to place the sheet in a flat surface and adjust the camera to focus directly above the sheet before capturing."
-            } else if (found.startsWith("Prediction error", true)) {
-                "Server can't process the image you sent. Please try to isolate the music sheet with better lighting before capturing."
             } else if(found.contains(Regex("black", RegexOption.IGNORE_CASE))) {
                 "The server detected an unusual amount of black pixels in the image sent, and cannot properly segment the music sheet. Capture only the sheet and staves, and use a better lighting environment."
+            } else if (found.startsWith("Prediction error", true)) {
+                "Server can't process the image you sent. Please try to isolate the music sheet with better lighting before capturing."
             } else if (found.startsWith("Atypical", true)){
                 "Server can't process the image you sent. Please make sure the image you sent only has the music sheet in it with minimal to no noises on background."
             } else if(found.startsWith("Image sent")) {
