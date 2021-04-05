@@ -1,3 +1,5 @@
+@file:Suppress("BlockingMethodInNonBlockingContext")
+
 package me.togaparty.notable_android.data
 
 import android.app.Application
@@ -8,15 +10,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import me.togaparty.notable_android.BuildConfig
+import kotlinx.coroutines.*
 import me.togaparty.notable_android.data.files.FileWorker
 import me.togaparty.notable_android.data.network.RetrofitWorker
 import me.togaparty.notable_android.utils.Constants.Companion.TAG
 import me.togaparty.notable_android.utils.Status
+import me.togaparty.notable_android.utils.UploadResult
 
 
 class ImageListProvider(app: Application) : AndroidViewModel(app) {
@@ -25,21 +24,22 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
 
     private val retrofitWorker = RetrofitWorker(getApplication())
 
-    private val newList = arrayListOf<GalleryImage>()
+    private val _states = MutableLiveData<Pair<Status, UploadResult<String>?>>()
+    val states: LiveData<Pair<Status, UploadResult<String>?>> = _states
 
-    private var processingStatus = Status.AVAILABLE
-
-    private val imageList: MutableLiveData<List<GalleryImage>> by lazy {
-        val data = MutableLiveData<List<GalleryImage>>().apply {
+    private val _imageList: MutableLiveData<List<GalleryImage>> by lazy {
+        val data = MutableLiveData<List<GalleryImage>>().apply { //Could've created a separate logic for this. This might do for now.
             value = mutableListOf()
             viewModelScope.launch {
-                newList += fileWorker.loadImages()
+                imageList += fileWorker.loadImages()
             }
-            value = newList
+            value = imageList
         }
         data
     }
-    suspend fun copyImageToList(intent: Intent): Status {
+    private val imageList = arrayListOf<GalleryImage>()
+
+    fun copyImageToList(intent: Intent): Status {
         val uri = intent.data!!
         lateinit var returnedName: String
         fun checkForDuplicates() : Boolean {
@@ -48,104 +48,75 @@ class ImageListProvider(app: Application) : AndroidViewModel(app) {
                 cursor.moveToFirst()
                 returnedName = cursor.getString(1)
             }
-            newList.forEach {
+            imageList.forEach {
                 Log.d(TAG, "${it.name} == $returnedName")
 
             }
-            return !newList.any { galleryImage ->
+            return !imageList.any { galleryImage ->
                 galleryImage.name == returnedName
             }
         }
         if(checkForDuplicates()) {
-            val returnedImage = fileWorker.copyImage(returnedName, uri)
-            if(returnedImage != null) {
-                withContext(Dispatchers.Main) {
-                    addToList(returnedImage)
-                }
-            }
+            fileWorker.copyImage(returnedName, uri)
         } else {
             return Status.CONFLICT
         }
         return Status.SUCCESSFUL
     }
     fun refreshList() {
-        newList.clear()
-        imageList.value = newList
+        imageList.clear()
+        _imageList.value = imageList
         viewModelScope.launch {
-            newList += fileWorker.loadImages()
+            imageList += fileWorker.loadImages()
         }
-        imageList.value = newList
+        _imageList.value = imageList
     }
 
-    suspend fun uploadImage(image: GalleryImage, position: Int)  {
+    suspend fun uploadImage(image: GalleryImage, position: Int) {
+        val value = viewModelScope.async(Dispatchers.IO) {
+            coroutineScope {
+                launch(Dispatchers.IO) {
+                    try {
+                        _states.postValue(Pair(Status.PROCESSING, null))
+                        retrofitWorker.uploadFile(image).let { returned ->
 
-        processingStatus = Status.PROCESSING
-        var returnedImage: GalleryImage? = null
-        var message = "Upload failed:"
+                            _states.postValue(Pair(Status.EXTRACTING_DATA, null))
+                            delay(1800)
 
-        val value = viewModelScope.async(context = Dispatchers.IO) {
-            when(val returnedValue = retrofitWorker.uploadFile(image)) {
-                is RetrofitWorker.UploadResult.Success -> {
-                    returnedImage = returnedValue.retrieved
-                    processingStatus = Status.SUCCESSFUL
-                }
-                is RetrofitWorker.UploadResult.Error -> {
-                    message += returnedValue.message
-                    Log.e(TAG, message, returnedValue.cause)
-                    processingStatus = Status.FAILED
+                            imageList[position] = returned.copy(
+                                    imageFiles = returned.imageFiles.toMutableMap(),
+                                    textFiles = returned.textFiles.toMutableMap(),
+                                    wavFiles = returned.wavFiles.toMutableMap(),
+                            )
+                            _states.postValue(Pair(Status.SUCCESSFUL, UploadResult.Success(message = "Upload successful")))
+                            delay(1800)
+                            withContext(Dispatchers.Main) {
+                                _imageList.value = imageList
+                            }
+                        }
+                    } catch (exec: Exception) {
+                        exec.printStackTrace()
+                        _states.postValue(Pair(Status.FAILED, UploadResult.Error(message = exec.message.toString(), exec)))
+                    }
                 }
             }
         }
-        if(BuildConfig.DEBUG) {
-            Log.d(TAG, "Returned image wavfiles count: ${returnedImage?.wavFiles?.size}")
-            Log.d(TAG, "Returned image textfiles count: ${returnedImage?.textFiles?.size}")
-            Log.d(TAG, "Returned image imagefiles count: ${returnedImage?.imageFiles?.size}")
-        }
         value.await()
-        returnedImage?.let { returned ->
-            newList[position] = returned.copy(
-                imageFiles = returned.imageFiles.toMutableMap(),
-                textFiles = returned.textFiles.toMutableMap(),
-                wavFiles = returned.wavFiles.toMutableMap(),
-            )
-        }
-        withContext(Dispatchers.Main) {
-            imageList.value = newList
-        }
     }
+    fun resetStatus() = _states.postValue(Pair(Status.NIL,null))
+    fun getImageListSize(): Int = imageList.size
+    fun getGalleryImage(position: Int): GalleryImage = imageList[position]
+    fun getList() : LiveData<List<GalleryImage>> = _imageList
 
-    fun getProcessingStatus() = processingStatus
-
-    fun setProcessingStatus(status: Status) { processingStatus = status}
-
-    fun getImageListSize(): Int = newList.size
-
-    fun getGalleryImage(position: Int): GalleryImage = newList[position]
-
-    fun getList() : LiveData<List<GalleryImage>> = imageList
-
-    suspend fun saveImageToStorage(filename: String, fileUri: Uri): GalleryImage? {
-        val returnedImage = fileWorker.saveImage(filename, fileUri)
-        if (returnedImage != null) {
-            addToList(returnedImage)
-        } else {
-            return null
-        }
-        return returnedImage
-    }
-
-    suspend fun addToList(image: GalleryImage) {
-        withContext(Dispatchers.Main) {
-            newList.add(image)
-            imageList.value = newList
-        }
+    fun saveImageToStorage(filename: String, fileUri: Uri) {
+        fileWorker.saveImage(filename, fileUri)
     }
 
     @Throws(SecurityException::class)
     fun deleteGalleryImage(position: Int, fileUri: Uri) {
         fileWorker.deleteImage(fileUri)
-        newList.removeAt(position)
-        imageList.value = newList
+        imageList.removeAt(position)
+        _imageList.value = imageList
     }
 
 

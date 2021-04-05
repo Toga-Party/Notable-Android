@@ -26,7 +26,6 @@ import com.zhuinden.fragmentviewbindingdelegatekt.viewBinding
 import kotlinx.coroutines.*
 import me.togaparty.notable_android.MainActivity
 import me.togaparty.notable_android.R
-import me.togaparty.notable_android.data.GalleryImage
 import me.togaparty.notable_android.data.ImageListProvider
 import me.togaparty.notable_android.databinding.FragmentPreviewImageBinding
 import me.togaparty.notable_android.helper.GlideApp
@@ -120,7 +119,7 @@ class PreviewImageFragment : Fragment(R.layout.fragment_preview_image) {
                 CoroutineScope(Dispatchers.IO).launch {
                     val savingOperation = async(Dispatchers.IO) {
                         model.saveImageToStorage(fileName, it)
-                        Thread.sleep(100000)
+                        Thread.sleep(1500)
                     }
                     savingOperation.await()
                     withContext(Dispatchers.Main) {

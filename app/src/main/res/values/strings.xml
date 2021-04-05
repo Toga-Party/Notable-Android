@@ -33,6 +33,7 @@
     <!--Gallery-->
     <string name="image_gallery">Image Gallery</string>
     <string name="gallery_item_image">Gallery Item Image</string>
+    <string name="import_image">Import Image</string>
 
     <!--Glossary-->
     <string name="search_words">Search Words…</string>
@@ -52,7 +53,9 @@
 
     <!-- Preference Titles -->
     <string name="permissions_header">Permissions</string>
-    <string name="version_code">0.1.1</string>
+    <string name="version_code">0.1.3</string>
     <!--Misc-->
     <string name="text_view">TextView</string>
+    <string name="skip_to_dashboard">Skip to dashboard</string>
+
 </resources>

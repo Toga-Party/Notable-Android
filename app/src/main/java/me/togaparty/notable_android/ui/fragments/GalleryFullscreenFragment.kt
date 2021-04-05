@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ import me.togaparty.notable_android.databinding.FragmentGalleryFullscreenBinding
 import me.togaparty.notable_android.helper.GlideApp
 import me.togaparty.notable_android.helper.GlideZoomOutPageTransformer
 import me.togaparty.notable_android.utils.*
+import me.togaparty.notable_android.utils.Constants.Companion.TAG
 
 
 class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fullscreen) {
@@ -44,6 +46,7 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
     private var pendingDeleteImage: Pair<Int, Uri>? = null
     private var selectedPosition: Int = 0
     internal lateinit var model: ImageListProvider
+    private  var loadingFragment: ProgressLoadingFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,9 +62,55 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         binding.viewPager.adapter = galleryPagerAdapter
         binding.viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
         binding.viewPager.setPageTransformer(true, GlideZoomOutPageTransformer())
+
+
         val position = requireArguments().getInt("position")
-        setCurrentItem(position)
+        selectedPosition = position
+        currentImage = model.getGalleryImage(position)
+
         generateFloatingActionButton()
+        model.states.observe(viewLifecycleOwner, { status ->
+            activity?.let {
+
+                when(status.first) {
+                    Status.FAILED -> {
+                        processFailedProcessingMessages((status.second as UploadResult.Error).message) {
+                            loadingFragment?.dismiss()
+                            model.resetStatus()
+                        }
+                    }
+                    Status.PROCESSING -> {
+                        Log.d(TAG, "Processing image")
+                        loadingFragment = ProgressLoadingFragment.show(childFragmentManager)
+                    }
+                    Status.EXTRACTING_DATA -> {
+                        Log.d(TAG, "Extracting image")
+                        loadingFragment?.editStateNumber(2)
+                    }
+                    Status.SUCCESSFUL -> {
+
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            loadingFragment?.editStateNumber(3)
+                            delay(1500)
+                            loadingFragment?.finishedAllStates(true)
+                            delay(1500)
+
+                            showSuccessDialog(
+                                    "Processing finished",
+                                    "We have received the response from the server. Do you want to " +
+                                            "inspect it?"
+                            ) {
+                                model.resetStatus()
+                                navigateToInspect()
+                            }
+
+                        }
+                    }
+                    else -> Unit
+                }
+            }
+        })
+
         model.getList().observe(viewLifecycleOwner, {
             binding.viewPager.adapter?.notifyDataSetChanged()
             if (model.getImageListSize() == 0) {
@@ -72,31 +121,41 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
                 }
                 setCurrentItem(selectedPosition)
             }
-            editFloatingActionButton()
-
-
-            activity?.let {
-                when (model.getProcessingStatus()) {
-                    Status.FAILED -> {
-                        showFailedDialog("Upload failed",
-                            "The upload you sent failed.")
-                        model.setProcessingStatus(Status.AVAILABLE)
-
-                    }
-                    Status.SUCCESSFUL -> {
-                        showSuccessDialog(
-                            "Processing finished",
-                            "We have received the response from the server want to " +
-                                    "inspect it?"
-                        ) {navigateToInspect()}
-                        model.setProcessingStatus(Status.AVAILABLE)
-                    }
-                    else -> Unit
-                }
-            }
         })
     }
 
+    private fun processFailedProcessingMessages(message: String, callback: () -> Unit ) {
+
+
+        val regex = Regex("(?:Processing Failed:)([^\\n\\r]*)", RegexOption.IGNORE_CASE)
+        val matches = regex.find(message)
+        val processed = matches?.let {
+            //TODO: handle message here before passing it to dialog.
+            var (found) = it.destructured
+            found = found.trim()
+            Log.d(TAG, found)
+            if (found.startsWith("Audio error", true)) {
+                "Server can't generate music from the image you sent. Please try to place the sheet in a flat surface and adjust the camera to focus directly above the sheet before capturing."
+            } else if(found.contains(Regex("black", RegexOption.IGNORE_CASE))) {
+                "The server detected an unusual amount of black pixels in the image sent, and cannot properly segment the music sheet. Capture only the sheet and staves, and use a better lighting environment."
+            } else if (found.startsWith("Prediction error", true)) {
+                "Server can't process the image you sent. Please try to isolate the music sheet with better lighting before capturing."
+            } else if (found.startsWith("Atypical", true)){
+                "Server can't process the image you sent. Please make sure the image you sent only has the music sheet in it with minimal to no noises on background."
+            } else if(found.startsWith("Image sent")) {
+                "The image you sent might have been corrupted for the server to recognize. Please retry."
+            } else if(found.startsWith("Compression error")){
+                "Server might have encountered an issue with sending the response back to the client. This will be fixed ASAP."
+            } else {
+                found
+            }
+
+        } ?: message
+
+        showFailedDialog("Upload failed", "$processed Please contact support for more inquiries.")
+
+        return callback()
+    }
     private fun navigateToInspect() {
         dismiss()
         val bundle = bundleOf("currentImage" to currentImage)
@@ -106,24 +165,23 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         )
     }
     private fun editFloatingActionButton() {
-        if (currentImage.processed == true) {
-            binding.speedDial.removeActionItem(1)
-            binding.speedDial.addActionItem(
+
+        if (currentImage.processed) {
+            binding.speedDial.replaceActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                     .setLabel(getString(R.string.inspect))
                     .setTheme(R.style.Theme_Notable_OPENCV)
                     .setLabelClickable(false)
                     .create()
-            )
+            , 1)
         } else {
-            binding.speedDial.removeActionItem(1)
-            binding.speedDial.addActionItem(
+            binding.speedDial.replaceActionItem(
                 SpeedDialActionItem.Builder(R.id.fab_process, R.drawable.sync)
                     .setLabel(getString(R.string.process_music))
                     .setTheme(R.style.Theme_Notable_OPENCV)
                     .setLabelClickable(false)
                     .create()
-            )
+            , 1)
         }
 
     }
@@ -136,7 +194,7 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
                         .setLabelClickable(false)
                         .create()
         )
-        binding.speedDial.addActionItem(when (currentImage.processed == true) {
+        binding.speedDial.addActionItem(when (currentImage.processed) {
 
             true -> SpeedDialActionItem.Builder(R.id.fab_inspect, R.drawable.search_icon)
                     .setLabel(getString(R.string.inspect))
@@ -195,7 +253,7 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        //super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 101) {
             pendingDeleteImage?.let {
                model.deleteGalleryImage(it.first, it.second)
@@ -206,14 +264,10 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
     private fun processImage() {
 
         if (ConnectionDetector(requireContext()).connected) {
-            toast("Processing image")
-            val loadingFragment = LoadingFragment.show(childFragmentManager)
             lifecycleScope.launch {
-                val deferred = GlobalScope.async(Dispatchers.IO + NonCancellable) {
+                GlobalScope.launch(Dispatchers.IO + NonCancellable) {
                     model.uploadImage(currentImage, selectedPosition)
                 }
-                deferred.await()
-                withContext(Dispatchers.Main) {loadingFragment.dismiss()}
             }
 
         } else {
@@ -224,8 +278,9 @@ class GalleryFullscreenFragment : DialogFragment(R.layout.fragment_gallery_fulls
 
     internal fun setCurrentItem(position: Int) {
         binding.viewPager.setCurrentItem(position, false)
-        currentImage = model.getGalleryImage(position)
         selectedPosition = position
+        currentImage = model.getGalleryImage(position)
+        editFloatingActionButton()
     }
 
 

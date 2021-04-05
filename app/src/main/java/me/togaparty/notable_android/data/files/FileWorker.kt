@@ -12,7 +12,6 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
@@ -92,11 +91,8 @@ class FileWorker(val context: Context){
         }
     }
 
-    fun copyImage(
-            filename: String,
-            uri:Uri
-    ):GalleryImage? {
-        val image: GalleryImage?
+    fun copyImage(filename: String, uri:Uri) {
+
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, filename)
             put(MediaStore.Images.Media.MIME_TYPE, "image/*")
@@ -129,7 +125,6 @@ class FileWorker(val context: Context){
                         values,
                         null, null
                 )
-                image = GalleryImage(imageUri, filename, processed = false)
             } else {
                 throw IOException("Failed to create new MediaStore record.")
             }
@@ -164,21 +159,17 @@ class FileWorker(val context: Context){
 
             // .DATA is deprecated in API 29
             val imageUri = context.contentResolver.insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    values
-            )
-            image = imageUri?.let { GalleryImage(it, filename, processed = false) }
-                    ?: throw IOException("Failed to insert new MediaStore record.")
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                values
+            ) ?: throw IOException("Failed to insert new MediaStore record.")
         }
 
-        return image
     }
     fun saveImage(
             filename: String,
             uri: Uri
-    ): GalleryImage? {
+    ) {
 
-        var image: GalleryImage? = null
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, filename)
             put(MediaStore.Images.Media.MIME_TYPE, "image/*")
@@ -210,7 +201,6 @@ class FileWorker(val context: Context){
                         values,
                         null, null
                 )
-                image = GalleryImage(imageUri, filename, processed = false)
             }
         } else {
 
@@ -235,9 +225,8 @@ class FileWorker(val context: Context){
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     values
             )
-            image = imageUri?.let { GalleryImage(it, filename, processed = false) }
+
         }
-        return image
     }
 
     private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
