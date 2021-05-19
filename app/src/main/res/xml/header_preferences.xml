@@ -1,0 +1,22 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="System">
+        <Preference
+            app:icon="@drawable/messages"
+            app:key="permissions_header"
+            app:title="@string/permissions_header" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="App Information">
+        <Preference
+            app:title="Get Support"
+            app:key="support_preference"/>
+        <Preference
+            app:key="developer_header"
+            app:title="Developers"/>
+        <Preference
+            app:key="build_version"
+            app:title="Build Version"
+            app:summary="@string/version_code"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>

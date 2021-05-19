@@ -1,0 +1,23 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Preference
+        app:key="vince"
+        app:title="Jay-Vince Eleazar"
+        app:summary="201720078@fit.edu.ph"
+        />
+    <Preference
+        app:key="maika"
+        app:title="Jorena Maika Calinog"
+        app:summary="201812784@fit.edu.ph"
+        />
+    <Preference
+        app:key="august"
+        app:title="August Bryan Florese"
+        app:summary="201710437@fit.edu.ph"
+        />
+    <Preference
+        app:key="kenneth"
+        app:title="Kenneth Dan Villanueva"
+        app:summary="201812840@fit.edu.ph"
+        />
+</PreferenceScreen>

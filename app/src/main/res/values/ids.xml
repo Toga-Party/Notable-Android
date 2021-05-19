@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="retake" type="id" />
+    <item name="crop" type="id" />
+    <item name="fab_delete" type="id" />
+    <item name="fab_inspect" type="id" />
+    <item name="fab_process" type="id" />
+</resources>

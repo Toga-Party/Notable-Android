@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="me.togaparty.notable_android.ui.fragments.PreviewImageFragment">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/preview_image"
+        android:scaleType="fitXY"
+        android:visibility="visible" />
+
+    <com.leinardi.android.speeddial.SpeedDialView
+        android:id="@+id/speedDial2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|end"
+        app:sdMainFabClosedBackgroundColor="#FFEB3B"
+        app:sdMainFabClosedSrc="@drawable/ic_list_black"
+        app:sdMainFabOpenedBackgroundColor="#F6F4DF"
+        app:sdMainFabOpenedSrc="@drawable/ic_fab_open_black" />
+
+    <ImageButton
+        android:id="@+id/save_button_1"
+        android:layout_width="64dp"
+        android:layout_height="65dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="4dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/button_background"
+        android:contentDescription="@string/save_button"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_save_button_foreground" />
+
+</RelativeLayout>
